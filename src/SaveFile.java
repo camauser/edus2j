@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Cameron Auser
+ * Copyright 2016 Paul Kulyk, Paul Olszynski, Cameron Auser
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@ import java.util.Stack;
 
 /**
  * 
- *  Purpose: This is a class with a single static method to save objects to 
- *  files.
+ * Purpose: This is a class with a single static method to save objects to
+ * files.
  *
  * @author Cameron Auser
  * @version 1.0
@@ -35,8 +35,11 @@ public class SaveFile
     /**
      * 
      * Purpose: Save an object to a file.
-     * @param toSave - The object to save
-     * @param fileName - The file to save the object to.
+     * 
+     * @param toSave
+     *            - The object to save
+     * @param fileName
+     *            - The file to save the object to.
      * @throws Exception
      */
     public static void save(Object toSave, String fileName) throws Exception
@@ -48,6 +51,6 @@ public class SaveFile
         oos.writeObject(toSave);
         // Save the file, and close the connection.
         oos.close();
-        
+
     }
 }

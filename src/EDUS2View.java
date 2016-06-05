@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Cameron Auser
+ * Copyright 2016 Paul Kulyk, Paul Olszynski, Cameron Auser
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ import javafx.stage.Stage;
 
 /**
  * 
- *  Purpose: The main class used to run the EDUS2J program.
+ * Purpose: The main class used to run the EDUS2J program.
  *
  * @author Cameron Auser
  * @version 1.0
@@ -69,6 +69,7 @@ public class EDUS2View extends Application
     /**
      * 
      * Purpose: The main method, used to launch our application.
+     * 
      * @param args
      */
     public static void main(String[] args)
@@ -80,28 +81,13 @@ public class EDUS2View extends Application
     /**
      * 
      * Purpose: Update the playback progress component on the GUI.
-     * @param progress - the new progress to be shown
+     * 
+     * @param progress
+     *            - the new progress to be shown
      */
     public static void updateProgress(double progress)
     {
         playbackProgress.setProgress(progress);
-    }
-
-    /**
-     * Purpose: The default stop method, run when the application closes.
-     */
-    public void stop()
-    {
-        // When the program stops, we'll try to save all the scans to a file
-        // called EDUS2Data.bin
-        try
-        {
-            SaveFile.save(scansAndVideos, "EDUS2Data.bin");
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -175,7 +161,7 @@ public class EDUS2View extends Application
 
         // Setting up a handler for when a key is pressed
         scene.setOnKeyPressed(new EventHandler<KeyEvent>()
-        {
+                {
             public void handle(KeyEvent event)
             {
                 // If enter was pressed, we'll go through the process of
@@ -248,12 +234,12 @@ public class EDUS2View extends Application
                 }
             }
 
-        });
+                });
 
         // When the about button is clicked, a little popup will show on-screen
         // with credits for the program
         btnAbout.setOnAction(new EventHandler<ActionEvent>()
-        {
+                {
             public void handle(ActionEvent event)
             {
                 BorderPane credits = new BorderPane();
@@ -281,24 +267,24 @@ public class EDUS2View extends Application
                 test.setTitle("EDUS2J Credits");
                 test.show();
             }
-        });
+                });
 
         // The fullscreen button will just toggle fullscreen status of the
         // program
         btnFullscreen.setOnAction(new EventHandler<ActionEvent>()
-        {
+                {
             public void handle(ActionEvent event)
             {
                 // Just set the program to be the opposite of what it's current
                 // fullscreen status is
                 stage.setFullScreen(!stage.isFullScreen());
             }
-        });
+                });
 
         // When the settings button is pressed, we'll create a SettingsWindow
         // object and show it on-screen
         btnSettings.setOnAction(new EventHandler<ActionEvent>()
-        {
+                {
             public void handle(ActionEvent event)
             {
                 SettingsWindow scanWindow = new SettingsWindow(scansAndVideos);
@@ -313,23 +299,25 @@ public class EDUS2View extends Application
                 temp.show();
 
             }
-        });
+                });
 
         // We'll close the program when the quit button is clicked
         btnQuit.setOnAction(new EventHandler<ActionEvent>()
-        {
+                {
             public void handle(ActionEvent event)
             {
                 stage.close();
             }
-        });
+                });
     }
 
     /**
      * 
      * Purpose: Convert a passed in String to a valid file name and location.
-     * @param original - the original path (presumably grabbed from a
-     * FileChooser object
+     * 
+     * @param original
+     *            - the original path (presumably grabbed from a FileChooser
+     *            object
      * @return - the correctly formatted path
      */
     public static String convertFileName(String original)
@@ -358,7 +346,9 @@ public class EDUS2View extends Application
     /**
      * 
      * Purpose: Get a video according to the passed in scan ID.
-     * @param id - the ID of the scan
+     * 
+     * @param id
+     *            - the ID of the scan
      * @return - the file location of the video
      */
     private String getScanVideoById(String id)
@@ -389,7 +379,9 @@ public class EDUS2View extends Application
     /**
      * 
      * Purpose: Determine if a scan exists from a passed in ID
-     * @param id - the ID to verify existance of
+     * 
+     * @param id
+     *            - the ID to verify existance of
      * @return - true/false depending on if it exists
      */
     private boolean scanExists(String id)

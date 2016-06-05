@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Cameron Auser
+ * Copyright 2016 Paul Kulyk, Paul Olszynski, Cameron Auser
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@ import javafx.util.Duration;
 
 /**
  * 
- *  Purpose: A thread used to update the progress of the video currently
- *  being played in the EDUS2J software.
+ * Purpose: A thread used to update the progress of the video currently being
+ * played in the EDUS2J software.
  *
  * @author Cameron Auser
  * @version 1.0
@@ -40,12 +40,17 @@ public class ProgressUpdater extends Thread
     /**
      * 
      * Constructor for the ProgressUpdater class.
-     * @param toWatch - The MediaPlayer that we're going to keep track of to 
-     * update the progress bar 
-     * @param toUpdate - The progress bar that we want to update
-     * @param master - A reference to our instance of EDUS2View
+     * 
+     * @param toWatch
+     *            - The MediaPlayer that we're going to keep track of to update
+     *            the progress bar
+     * @param toUpdate
+     *            - The progress bar that we want to update
+     * @param master
+     *            - A reference to our instance of EDUS2View
      */
-    public ProgressUpdater(MediaPlayer toWatch, ProgressBar toUpdate, EDUS2View master)
+    public ProgressUpdater(MediaPlayer toWatch, ProgressBar toUpdate,
+            EDUS2View master)
     {
         this.toWatch = toWatch;
         this.toUpdate = toUpdate;

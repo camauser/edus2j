@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Cameron Auser
+ * Copyright 2016 Paul Kulyk, Paul Olszynski, Cameron Auser
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,19 +21,21 @@ import java.util.Stack;
 
 /**
  * 
- *  Purpose: A utility class to load an object from a file. 
+ * Purpose: A utility class to load an object from a file.
  *
  * @author Cameron Auser
  * @version 1.0
  */
-public class LoadFile 
+public class LoadFile
 {
 
     /**
      * 
-     * Purpose: A static method to load an object from a file, and then
-     * return it.
-     * @param fileName - The file to read from.
+     * Purpose: A static method to load an object from a file, and then return
+     * it.
+     * 
+     * @param fileName
+     *            - The file to read from.
      * @return The object returned from the file.
      * @throws Exception
      */
@@ -42,11 +44,9 @@ public class LoadFile
         // Set up a FIS and OIS to grab the object from the file.
         FileInputStream fis = new FileInputStream(fileName);
         ObjectInputStream ois = new ObjectInputStream(fis);
-        // We'll grab the object in the file, and then convert it to a Stack
-        // I know this won't ever throw an error, since only Stacks will ever
-        // be saved to this file
+        // We'll grab the object in the file, and then return it
         Object toReturn = ois.readObject();
-        // Return the stack
+        
         return toReturn;
     }
 }

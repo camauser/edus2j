@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Cameron Auser
+ * Copyright 2016 Paul Kulyk, Paul Olszynski, Cameron Auser
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ import javafx.stage.Stage;
 
 /**
  * 
- *  Purpose: Display a settings window for EDUS2. 
+ * Purpose: Display a settings window for EDUS2.
  *
  * @author Cameron Auser
  * @version 1.0
@@ -57,7 +57,9 @@ public class SettingsWindow extends VBox
     /**
      * 
      * Constructor for the SettingsWindow class.
-     * @param scans - the Scans to pass into the ScansWindow constructor.
+     * 
+     * @param scans
+     *            - the Scans to pass into the ScansWindow constructor.
      */
     public SettingsWindow(ArrayList<Scan> scans)
     {
@@ -179,6 +181,15 @@ public class SettingsWindow extends VBox
                 Scan selected = scanList.getSelectedItem();
                 scans.remove(selected);
                 scanList.removeItem(selected);
+                // Lastly, we'll write out the changes to our save file
+                try
+                {
+                    SaveFile.save(scans, "EDUS2Data.bin");
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -200,6 +211,15 @@ public class SettingsWindow extends VBox
                     // If OK was clicked, we'll nuke all the scans
                     SettingsWindow.this.scans.clear();
                     scanList.removeAllScans();
+                    // Lastly, we'll write out the changes to our save file
+                    try
+                    {
+                        SaveFile.save(scans, "EDUS2Data.bin");
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -232,6 +252,7 @@ public class SettingsWindow extends VBox
      * 
      * Purpose: Set the stage variable of this class, and set up the stage's
      * icon as well.
+     * 
      * @param stage
      */
     public void setStage(Stage stage)
@@ -273,7 +294,9 @@ public class SettingsWindow extends VBox
     /**
      * 
      * Purpose: A helper method, to import scans in csv format from a text file.
-     * @param textFile - the file to read scans from.
+     * 
+     * @param textFile
+     *            - the file to read scans from.
      */
     private void importScansFromCSV(String textFile)
     {
@@ -301,7 +324,9 @@ public class SettingsWindow extends VBox
      * 
      * Purpose: A helper method to import a single scan from a line in csv
      * format.
-     * @param csvLine - The line to read.
+     * 
+     * @param csvLine
+     *            - The line to read.
      */
     private void importSingleScan(String csvLine)
     {
@@ -311,9 +336,10 @@ public class SettingsWindow extends VBox
         String path = csvLine.substring(csvLine.indexOf(',') + 1);
 
         // Create a scan from the values, and add it to our array
-        Scan toAdd = new Scan(id, path);
-        scans.add(toAdd);
-        scanList.addItem(toAdd);
+        // Scan toAdd = new Scan(id, path);
+        // scans.add(toAdd);
+        // scanList.addItem(toAdd);
+        addScan(id, path);
     }
 
     /**
@@ -333,7 +359,7 @@ public class SettingsWindow extends VBox
                 // Print out our header first
                 output.println(EDUS2View.IMPORT_MESSAGE);
                 Iterator<Scan> scanIterator = scans.iterator();
-                // Then print each scan object out as CSV as long as there are 
+                // Then print each scan object out as CSV as long as there are
                 // more scans to read through
                 while (scanIterator.hasNext())
                 {
@@ -341,6 +367,9 @@ public class SettingsWindow extends VBox
                     output.flush();
                 }
                 output.close();
+                Alert alert = new Alert(AlertType.CONFIRMATION,
+                        "Scans exported successfully!");
+                alert.showAndWait();
             }
             catch (Exception e)
             {
@@ -352,7 +381,9 @@ public class SettingsWindow extends VBox
     /**
      * 
      * Purpose: Determine if the passed in ID already exists in our array.
-     * @param id - the ID to check
+     * 
+     * @param id
+     *            - the ID to check
      * @return - true/false, depending if the ID is present.
      */
     private boolean IDAlreadyExists(String id)
@@ -373,8 +404,11 @@ public class SettingsWindow extends VBox
     /**
      * 
      * Purpose: Add a scan to the program.
-     * @param id - the ID of the new scan
-     * @param path - the path of the scan's video
+     * 
+     * @param id
+     *            - the ID of the new scan
+     * @param path
+     *            - the path of the scan's video
      */
     private void addScan(String id, String path)
     {
@@ -385,6 +419,16 @@ public class SettingsWindow extends VBox
             Scan toAdd = new Scan(id, path);
             scans.add(toAdd);
             scanList.addItem(toAdd);
+
+            // Lastly, we'll write out the changes to our save file
+            try
+            {
+                SaveFile.save(scans, "EDUS2Data.bin");
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
         else if (IDAlreadyExists(id))
         {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Cameron Auser
+ * Copyright 2016 Paul Kulyk, Paul Olszynski, Cameron Auser
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import javafx.scene.layout.Pane;
 
 /**
  * 
- *  Purpose: Display all of the scans in a nicely formatted table.
+ * Purpose: Display all of the scans in a nicely formatted table.
  *
  * @author Cameron Auser
  * @version 1.0
@@ -34,11 +34,13 @@ public class ScansWindow extends Pane
 {
     private ObservableList<Scan> scans;
     private TableView<Scan> records;
-    
+
     /**
      * 
      * Constructor for the ScansWindow class.
-     * @param scans - the ArrayList of scans to show in the table.
+     * 
+     * @param scans
+     *            - the ArrayList of scans to show in the table.
      */
     public ScansWindow(ArrayList<Scan> scans)
     {
@@ -48,51 +50,58 @@ public class ScansWindow extends Pane
         this.scans.addAll(scans);
         records = new TableView<Scan>();
         records.setEditable(true);
-        TableColumn<Scan, String> scanID = new TableColumn<Scan, String>("Scan ID");
-        TableColumn<Scan, String> path = new TableColumn<Scan, String>("File Path");
+        TableColumn<Scan, String> scanID = new TableColumn<Scan, String>(
+                "Scan ID");
+        TableColumn<Scan, String> path = new TableColumn<Scan, String>(
+                "File Path");
         scanID.setMinWidth(100);
         path.setMinWidth(500);
-        
+
         scanID.setCellValueFactory(new PropertyValueFactory<Scan, String>("id"));
         path.setCellValueFactory(new PropertyValueFactory<Scan, String>("path"));
-        
+
         records.setItems(this.scans);
-        
+
         records.getColumns().addAll(scanID, path);
-        
+
         this.getChildren().add(records);
     }
-    
+
     /**
      * 
      * Purpose: Return the currently selected scan.
+     * 
      * @return
      */
     public Scan getSelectedItem()
     {
-        return (Scan)records.getSelectionModel().getSelectedItem();
+        return (Scan) records.getSelectionModel().getSelectedItem();
     }
-    
+
     /**
      * 
      * Purpose: Remove a certain scan from our array of scans.
-     * @param toRemove - the Scan to remove.
+     * 
+     * @param toRemove
+     *            - the Scan to remove.
      */
     public void removeItem(Scan toRemove)
     {
         scans.remove(toRemove);
     }
-    
+
     /**
      * 
      * Purpose: Add a scan to our array.
-     * @param toAdd - the scan to add.
+     * 
+     * @param toAdd
+     *            - the scan to add.
      */
     public void addItem(Scan toAdd)
     {
         scans.add(toAdd);
     }
-    
+
     /**
      * 
      * Purpose: Remove all scans from our array.
