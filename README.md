@@ -23,10 +23,10 @@ The process for adding many videos at once is very similar to the steps outlined
 After you've added some scans, close the Settings window, and try scanning an RFID tag that you set up a scan for. The corresponding video should start playing in the main window.
 
 # FAQ
-As of now, there are no frequently asked questions. However, if you have a question regarding edus2j, please contact me and I'll do my best to answer your question.
+As of now, there are no frequently asked questions. However, if you have a question regarding edus2j, please contact me using [this form] (http://camauser.ca/contact.php) and I'll do my best to answer your question.
 
 # Known Bugs
-As of right now, there are no currently known bugs or issues with edus2j. However, if you run into what you suspect is a bug, please contact me the following information:
+As of right now, there are no currently known bugs or issues with edus2j. However, if you run into what you suspect is a bug, please open a new issue on this repository with the following information:
 
 - The bug itself (what isn't working correctly?)
 - Steps taken leading up to the bug
