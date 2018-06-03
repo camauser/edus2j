@@ -15,11 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-import java.util.Stack;
+import logging.LoggerSingleton;
+
+import java.io.*;
 
 /**
  * 
@@ -31,26 +29,18 @@ import java.util.Stack;
  */
 public class SaveFile
 {
-
-    /**
-     * 
-     * Purpose: Save an object to a file.
-     * 
-     * @param toSave
-     *            - The object to save
-     * @param fileName
-     *            - The file to save the object to.
-     * @throws Exception
-     */
-    public static void save(Object toSave, String fileName) throws Exception
+    public static void save(String toSave, String fileName)
     {
-        // Setting up a FOS and OOS to quickly save the file.
-        FileOutputStream fos = new FileOutputStream(fileName);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-        // Write out the object to our file
-        oos.writeObject(toSave);
-        // Save the file, and close the connection.
-        oos.close();
+        try
+        {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileName)));
+            bw.write(toSave);
+            bw.close();
+        }
+        catch(IOException e)
+        {
+            LoggerSingleton.logErrorIfEnabled("Unable to save to " + fileName + ". Error: " + e.getMessage());
+        }
 
     }
 }

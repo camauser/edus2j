@@ -29,8 +29,6 @@ import javafx.beans.property.SimpleStringProperty;
  */
 public class Scan implements Serializable
 {
-    // TODO : Make these variables private, use getters/setters instead
-    // of direct references in other classes
     private String id;
     private String path;
 
@@ -92,9 +90,9 @@ public class Scan implements Serializable
     }
 
     /**
-     * 
+     *
      * Purpose: A method to set the scan video's path.
-     * 
+     *
      * @param path
      *            - the new path
      */

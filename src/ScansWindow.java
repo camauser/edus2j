@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
@@ -42,12 +41,12 @@ public class ScansWindow extends Pane
      * @param scans
      *            - the ArrayList of scans to show in the table.
      */
-    public ScansWindow(ArrayList<Scan> scans)
+    public ScansWindow(EDUS2Logic scans)
     {
         // Set up a TableView to display all the records in, and then
         // show the table
         this.scans = FXCollections.observableArrayList();
-        this.scans.addAll(scans);
+        this.scans.addAll(scans.getAllScans());
         records = new TableView<Scan>();
         records.setEditable(true);
         TableColumn<Scan, String> scanID = new TableColumn<Scan, String>(

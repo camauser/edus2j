@@ -19,13 +19,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
-
-import javax.swing.JOptionPane;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -33,13 +30,12 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import logging.LoggerSingleton;
 
 /**
  * 
@@ -52,7 +48,7 @@ public class SettingsWindow extends VBox
 {
     public Stage stage;
     ScansWindow scanList;
-    ArrayList<Scan> scans;
+    EDUS2Logic scans;
 
     /**
      * 
@@ -61,7 +57,7 @@ public class SettingsWindow extends VBox
      * @param scans
      *            - the Scans to pass into the ScansWindow constructor.
      */
-    public SettingsWindow(ArrayList<Scan> scans)
+    public SettingsWindow(EDUS2Logic scans)
     {
         // Just set up a settings window, which is then shown on-screen
         super(10);
@@ -179,16 +175,18 @@ public class SettingsWindow extends VBox
             public void handle(ActionEvent event)
             {
                 Scan selected = scanList.getSelectedItem();
-                scans.remove(selected);
+                scans.removeScan(selected);
                 scanList.removeItem(selected);
                 // Lastly, we'll write out the changes to our save file
                 try
                 {
-                    SaveFile.save(scans, "EDUS2Data.bin");
+                    SaveFile.save(scans.toCSV(), "EDUS2Data.bin");
+                    LoggerSingleton.logInfoIfEnabled("Removed scan \"" + selected.getId() + "\" from the saved file");
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
+                    LoggerSingleton.logErrorIfEnabled("Error saving " + EDUS2View.EDUS2_SAVE_FILE_NAME + ": " + e.getMessage());
                 }
             }
         });
@@ -209,16 +207,18 @@ public class SettingsWindow extends VBox
                 if (alert.getResult().getText().equals("OK"))
                 {
                     // If OK was clicked, we'll nuke all the scans
-                    SettingsWindow.this.scans.clear();
+                    SettingsWindow.this.scans.removeAllScans();
                     scanList.removeAllScans();
                     // Lastly, we'll write out the changes to our save file
                     try
                     {
-                        SaveFile.save(scans, "EDUS2Data.bin");
+                        SaveFile.save(scans.toCSV(), "EDUS2Data.bin");
+                        LoggerSingleton.logInfoIfEnabled("All scans removed from saved file");
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
+                        LoggerSingleton.logErrorIfEnabled("Error saving " + EDUS2View.EDUS2_SAVE_FILE_NAME + ": " + e.getMessage());
                     }
                 }
             }
@@ -258,7 +258,7 @@ public class SettingsWindow extends VBox
     public void setStage(Stage stage)
     {
         this.stage = stage;
-        this.stage.getIcons().add(new Image("img/edus2-icon.png"));
+        this.stage.getIcons().add(EDUS2View.getThumbnailImage());
     }
 
     /**
@@ -287,6 +287,7 @@ public class SettingsWindow extends VBox
             catch (Exception e)
             {
                 e.printStackTrace();
+                LoggerSingleton.logErrorIfEnabled("Encountered error importing scans: " + e.getMessage());
             }
         }
     }
@@ -340,6 +341,7 @@ public class SettingsWindow extends VBox
         // scans.add(toAdd);
         // scanList.addItem(toAdd);
         addScan(id, path);
+        LoggerSingleton.logInfoIfEnabled("Imported scan \"" + id + "\"" + " with path \"" + path + "\"");
     }
 
     /**
@@ -358,14 +360,9 @@ public class SettingsWindow extends VBox
                 PrintWriter output = new PrintWriter(selected);
                 // Print out our header first
                 output.println(EDUS2View.IMPORT_MESSAGE);
-                Iterator<Scan> scanIterator = scans.iterator();
-                // Then print each scan object out as CSV as long as there are
-                // more scans to read through
-                while (scanIterator.hasNext())
-                {
-                    output.println(scanIterator.next().toCSV());
-                    output.flush();
-                }
+                output.print(scans.toCSV());
+                output.flush();
+                LoggerSingleton.logInfoIfEnabled("Exported all scans to file \"" + selected.getName() + "\"");
                 output.close();
                 Alert alert = new Alert(AlertType.CONFIRMATION,
                         "Scans exported successfully!");
@@ -374,31 +371,9 @@ public class SettingsWindow extends VBox
             catch (Exception e)
             {
                 e.printStackTrace();
+                LoggerSingleton.logErrorIfEnabled("Error exporting all scans: " + e.getMessage());
             }
         }
-    }
-
-    /**
-     * 
-     * Purpose: Determine if the passed in ID already exists in our array.
-     * 
-     * @param id
-     *            - the ID to check
-     * @return - true/false, depending if the ID is present.
-     */
-    private boolean IDAlreadyExists(String id)
-    {
-        boolean toReturn = false;
-        // Loop through all scans until either the ID is found, or we're at the
-        // end of the list
-        for (int i = 0; i < scans.size() && !toReturn; i++)
-        {
-            if (scans.get(i).getId().equals(id))
-            {
-                toReturn = true;
-            }
-        }
-        return toReturn;
     }
 
     /**
@@ -414,24 +389,27 @@ public class SettingsWindow extends VBox
     {
         // perform checks to ensure id is valid and unused
         // add scan to scan collection
-        if (!id.equals("") && !IDAlreadyExists(id))
+        if (!id.equals("") && !scans.containsScan(id))
         {
             Scan toAdd = new Scan(id, path);
-            scans.add(toAdd);
+            scans.addScan(toAdd);
             scanList.addItem(toAdd);
 
             // Lastly, we'll write out the changes to our save file
             try
             {
-                SaveFile.save(scans, "EDUS2Data.bin");
+                SaveFile.save(scans.toCSV(), EDUS2View.EDUS2_SAVE_FILE_NAME);
+                LoggerSingleton.logInfoIfEnabled("Added scan \"" + id + "\" with path \"" + path + "\" to scan file");
             }
             catch (Exception e)
             {
                 e.printStackTrace();
+                LoggerSingleton.logErrorIfEnabled("Error saving scan: " + e.getMessage());
             }
         }
-        else if (IDAlreadyExists(id))
+        else if (scans.containsScan(id))
         {
+            LoggerSingleton.logWarningIfEnabled("Can't add scan \"" + id + "\" as it already exists in the system.");
             Alert alert = new Alert(AlertType.ERROR,
                     "There's already a scan with that ID!");
             alert.showAndWait();

@@ -15,9 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
+import java.io.File;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -43,6 +41,7 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import logging.LoggerSingleton;
 
 /**
  * 
@@ -59,12 +58,19 @@ public class EDUS2View extends Application
     public boolean currentlyPlaying = false;
     private static ProgressBar playbackProgress;
     public int durationThreads = 0;
-    private ArrayList<Scan> scansAndVideos = new ArrayList<Scan>();
     private MediaPlayer player;
     private MediaView vidView;
     private BorderPane main;
     public static final String IMPORT_MESSAGE = "### EDUS2 Scan Import File - Do not edit! ###";
     public static final Font BUTTON_FONT = new Font("Calibri", 18);
+    public static final String EDUS2_SAVE_FILE_NAME = "EDUS2Data.bin";
+    private static final String INFO_FLAG = "--info";
+    private static final String WARNING_FLAG = "--warning";
+    private static final String ERROR_FLAG = "--error";
+    private static final String NO_INFO_FLAG = "--no-info";
+    private static final String NO_WARNING_FLAG = "--no-warning";
+    private static final String NO_ERROR_FLAG = "--no-error";
+    private EDUS2Logic scans;
 
     /**
      * 
@@ -75,19 +81,42 @@ public class EDUS2View extends Application
     public static void main(String[] args)
     {
         // Run the start method, and open up the GUI
+        LoggerSingleton.initializeLogger();
+        LoggerSingleton.enableErrorLogging();
+        processArguments(args);
         Application.launch(args);
     }
 
-    /**
-     * 
-     * Purpose: Update the playback progress component on the GUI.
-     * 
-     * @param progress
-     *            - the new progress to be shown
-     */
-    public static void updateProgress(double progress)
+    private static void processArguments(String[] args) {
+        for(String arg : args)
+        {
+            switch(arg){
+                case INFO_FLAG:
+                    LoggerSingleton.enableInfoLogging();
+                    break;
+                case WARNING_FLAG:
+                    LoggerSingleton.enableWarningLogging();
+                    break;
+                case ERROR_FLAG:
+                    LoggerSingleton.enableErrorLogging();
+                    break;
+                case NO_INFO_FLAG:
+                    LoggerSingleton.disableInfoLogging();
+                    break;
+                case NO_WARNING_FLAG:
+                    LoggerSingleton.disableWarningLogging();
+                    break;
+                case NO_ERROR_FLAG:
+                    LoggerSingleton.disableErrorLogging();
+                    break;
+            }
+        }
+    }
+
+    public static Image getThumbnailImage()
     {
-        playbackProgress.setProgress(progress);
+        File imageFile = new File("img/edus2-icon.png");
+        return new Image("file:///" + imageFile.getAbsolutePath());
     }
 
     /**
@@ -100,10 +129,14 @@ public class EDUS2View extends Application
         // will happen.
         try
         {
-            scansAndVideos = (ArrayList<Scan>) (LoadFile.load("EDUS2Data.bin"));
+            LoggerSingleton.logInfoIfEnabled("Attempting to load scans from " + EDUS2_SAVE_FILE_NAME);
+            scans = new EDUS2Logic();
+            LegacyUtilities.loadFileAndConvertToCSVIfNeeded(EDUS2_SAVE_FILE_NAME, scans);
+            LoggerSingleton.logInfoIfEnabled("Loaded " + scans.scanCount() + " scans from " + EDUS2_SAVE_FILE_NAME);
         }
         catch (Exception e)
         {
+            LoggerSingleton.logErrorIfEnabled("Failed to load scans from " + EDUS2_SAVE_FILE_NAME + ". Reason: " + e.getMessage());
         }
 
         // Setting up the actual interface of the program
@@ -155,7 +188,7 @@ public class EDUS2View extends Application
         main.setCenter(placeholder);
         Scene scene = new Scene(main);
         stage.setScene(scene);
-        stage.getIcons().add(new Image("img/edus2-icon.png"));
+        stage.getIcons().add(getThumbnailImage());
         stage.setTitle("EDUS2J");
         stage.show();
 
@@ -169,8 +202,10 @@ public class EDUS2View extends Application
                 // we'll start up the corresponding video.
                 if (event.getCode() == KeyCode.ENTER)
                 {
-                    if (scanExists(currentScan))
+                    LoggerSingleton.logInfoIfEnabled("Scan \"" + currentScan + "\" was entered");
+                    if (scans.containsScan(currentScan))
                     {
+                        LoggerSingleton.logInfoIfEnabled("Scan \"" + currentScan + "\" exists in the system");
                         if (currentlyPlaying
                                 && !currentScan.equals(currentScanPlaying))
                         {
@@ -179,7 +214,9 @@ public class EDUS2View extends Application
                         }
                         if (!currentScan.equals(currentScanPlaying))
                         {
-                            video = new Media(getScanVideoById(currentScan));
+                            String scanPath = scans.getScan(currentScan).get().getPath();
+                            video = new Media(scanPath);
+                            LoggerSingleton.logInfoIfEnabled("Starting to play " + scanPath + " for scan \"" + currentScan + "\"");
                             currentScanPlaying = currentScan;
                             player = new MediaPlayer(video);
                             vidView = new MediaView(player);
@@ -262,7 +299,7 @@ public class EDUS2View extends Application
                 Scene scene = new Scene(credits);
 
                 Stage test = new Stage();
-                test.getIcons().add(new Image("img/edus2-icon.png"));
+                test.getIcons().add(getThumbnailImage());
                 test.setScene(scene);
                 test.setTitle("EDUS2J Credits");
                 test.show();
@@ -287,7 +324,7 @@ public class EDUS2View extends Application
                 {
             public void handle(ActionEvent event)
             {
-                SettingsWindow scanWindow = new SettingsWindow(scansAndVideos);
+                SettingsWindow scanWindow = new SettingsWindow(scans);
                 Stage temp = new Stage();
                 Scene tempScene = new Scene(scanWindow);
                 temp.setScene(tempScene);
@@ -340,66 +377,7 @@ public class EDUS2View extends Application
                 original = previous + "%20" + after;
             }
         }
+        LoggerSingleton.logInfoIfEnabled("Filename \"" + original + "\" converts to \"" + toReturn + original + "\"");
         return toReturn + original;
     }
-
-    /**
-     * 
-     * Purpose: Get a video according to the passed in scan ID.
-     * 
-     * @param id
-     *            - the ID of the scan
-     * @return - the file location of the video
-     */
-    private String getScanVideoById(String id)
-    {
-        boolean found = false;
-        Iterator<Scan> iterator = scansAndVideos.iterator();
-        String toReturn = null;
-        Scan foundScan = null;
-        // Just iterate through all our records looking for the scan
-        while (iterator.hasNext() && !found)
-        {
-            Scan temp = (Scan) iterator.next();
-            if (temp.getId().equals(id))
-            {
-                foundScan = temp;
-                found = true;
-            }
-        }
-        if (foundScan != null)
-        {
-            toReturn = foundScan.getPath();
-        }
-        // Finally, return the scan. If the ID wasn't found, an empty String
-        // will be returned
-        return toReturn;
-    }
-
-    /**
-     * 
-     * Purpose: Determine if a scan exists from a passed in ID
-     * 
-     * @param id
-     *            - the ID to verify existance of
-     * @return - true/false depending on if it exists
-     */
-    private boolean scanExists(String id)
-    {
-        boolean found = false;
-        Iterator<Scan> iterator = scansAndVideos.iterator();
-
-        // Like getScanVideoById, we just iterate through records
-        // until we either hit the end, or we find the matching scan
-        while (iterator.hasNext() && !found)
-        {
-            Scan temp = (Scan) iterator.next();
-            if (temp.getId().equals(id))
-            {
-                found = true;
-            }
-        }
-        return found;
-    }
-
 }

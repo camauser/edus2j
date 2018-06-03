@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
-import java.util.Stack;
+import logging.LoggerSingleton;
+
+import java.io.*;
 
 /**
  * 
@@ -36,17 +36,28 @@ public class LoadFile
      * 
      * @param fileName
      *            - The file to read from.
-     * @return The object returned from the file.
+     * @return The string contents of the file.
      * @throws Exception
      */
-    public static Object load(String fileName) throws Exception
+    public static String load(String fileName)
     {
-        // Set up a FIS and OIS to grab the object from the file.
-        FileInputStream fis = new FileInputStream(fileName);
-        ObjectInputStream ois = new ObjectInputStream(fis);
-        // We'll grab the object in the file, and then return it
-        Object toReturn = ois.readObject();
-        
-        return toReturn;
+        try
+        {
+            BufferedReader bw = new BufferedReader(new FileReader(new File(fileName)));
+            String currentLine = bw.readLine();
+            StringBuffer stringBuffer = new StringBuffer();
+            while(currentLine != null)
+            {
+                stringBuffer.append(currentLine);
+                stringBuffer.append('\n');
+                currentLine = bw.readLine();
+            }
+            return stringBuffer.toString();
+        }
+        catch(IOException e)
+        {
+            LoggerSingleton.logErrorIfEnabled("Unable to read from " + fileName + ". Error: " + e.getMessage());
+            return "";
+        }
     }
 }

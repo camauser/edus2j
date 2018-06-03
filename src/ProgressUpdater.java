@@ -17,9 +17,7 @@
 
 import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.util.Duration;
 
 /**
  * 
