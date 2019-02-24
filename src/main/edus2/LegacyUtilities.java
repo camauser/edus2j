@@ -1,6 +1,9 @@
-import logging.LoggerSingleton;
+package edus2;
 
-import java.io.*;
+import edus2.logging.LoggerSingleton;
+
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
 public class LegacyUtilities {
@@ -29,7 +32,7 @@ public class LegacyUtilities {
             ObjectInputStream ois = new ObjectInputStream(fis);
             ArrayList<Scan> scans = (ArrayList<Scan>)ois.readObject();
             EDUS2Logic logic = new EDUS2Logic();
-            logic.addMultipleScans(scans);
+            logic.addScans(scans);
             return logic.toCSV();
         }
         catch(Exception e)
