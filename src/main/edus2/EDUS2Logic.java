@@ -1,4 +1,4 @@
-/*
+package edus2;/*
  * Copyright 2018 Paul Kulyk, Paul Olszynski, Cameron Auser
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,9 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import logging.LoggerSingleton;
+import edus2.logging.LoggerSingleton;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Scanner;
 
 public class EDUS2Logic {
     private ArrayList<Scan> scans;
@@ -42,15 +45,7 @@ public class EDUS2Logic {
 
     public boolean containsScan(String id)
     {
-        for(Scan scan : scans)
-        {
-            if (scan.getId().equals(id))
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return scans.stream().anyMatch(s -> s.getId().equals(id));
     }
 
     public void addScan(Scan scan)
@@ -58,7 +53,7 @@ public class EDUS2Logic {
         scans.add(scan);
     }
 
-    public void addMultipleScans(Collection<Scan> scans)
+    public void addScans(Collection<Scan> scans)
     {
         this.scans.addAll(scans);
     }
