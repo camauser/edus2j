@@ -24,71 +24,53 @@ import java.util.Scanner;
 
 public class ScanFacade {
     private ArrayList<Scan> scans;
-    public ScanFacade()
-    {
+
+    public ScanFacade() {
         scans = new ArrayList<>();
     }
 
-    public Optional<Scan> getScan(String id)
-    {
-        for(Scan scan : scans)
-        {
-            if (scan.getId().equals(id))
-            {
-                LoggerSingleton.logInfoIfEnabled("The path for scan \"" + id + "\" appears to be " + scan.getPath());
-                return Optional.of(scan);
-            }
+    public Optional<Scan> getScan(String id) {
+        Optional<Scan> scan = scans.stream().filter(s -> s.getId().equals(id)).findFirst();
+        if (scan.isPresent()) {
+            LoggerSingleton.logInfoIfEnabled("The path for scan \"" + id + "\" appears to be " + scan.get().getPath());
+        } else {
+            LoggerSingleton.logInfoIfEnabled("Scan \"" + id + "\" doesn't exist in the system");
         }
-        LoggerSingleton.logInfoIfEnabled("Scan \"" + id + "\" doesn't exist in the system");
-        return Optional.empty();
+
+        return scan;
     }
 
-    public boolean containsScan(String id)
-    {
+    public boolean containsScan(String id) {
         return scans.stream().anyMatch(s -> s.getId().equals(id));
     }
 
-    public void addScan(Scan scan)
-    {
+    public void addScan(Scan scan) {
         scans.add(scan);
     }
 
-    public void addScans(Collection<Scan> scans)
-    {
+    public void addScans(Collection<Scan> scans) {
         this.scans.addAll(scans);
     }
 
-    public void removeScan(Scan scan)
-    {
+    public void removeScan(Scan scan) {
         scans.remove(scan);
     }
 
-    public void removeAllScans()
-    {
+    public void removeAllScans() {
         scans.clear();
     }
 
-    public ArrayList<Scan> getAllScans()
-    {
-        ArrayList<Scan> toReturn = new ArrayList<>();
-        for(Scan scan : scans)
-        {
-            toReturn.add(scan);
-        }
-
-        return toReturn;
+    public ArrayList<Scan> getAllScans() {
+        return scans;
     }
 
-    public int scanCount()
-    {
+    public int scanCount() {
         return scans.size();
     }
 
-    public String toCSV()
-    {
-        StringBuffer stringBuffer = new StringBuffer();
-        for(Scan scan : scans)
-        {
+    public String toCSV() {
+        StringBuilder stringBuffer = new StringBuilder();
+        for (Scan scan : scans) {
             stringBuffer.append(scan.getId());
             stringBuffer.append(',');
             stringBuffer.append(scan.getPath());
@@ -97,16 +79,13 @@ public class ScanFacade {
         return stringBuffer.toString();
     }
 
-    public void importCSV(String csv)
-    {
+    public void importCSV(String csv) {
         Scanner scanner = new Scanner(csv);
-        while(scanner.hasNextLine())
-        {
+        while (scanner.hasNextLine()) {
             String currentLine = scanner.nextLine();
             String id = currentLine.split(",")[0];
             String scan = currentLine.split(",")[1];
-            if (!containsScan(id))
-            {
+            if (!containsScan(id)) {
                 scans.add(new Scan(id, scan));
             }
         }
