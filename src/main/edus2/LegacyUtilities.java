@@ -31,7 +31,7 @@ public class LegacyUtilities {
             FileInputStream fis = new FileInputStream(fileName);
             ObjectInputStream ois = new ObjectInputStream(fis);
             ArrayList<Scan> scans = (ArrayList<Scan>)ois.readObject();
-            EDUS2Logic logic = new EDUS2Logic();
+            ScanFacade logic = new ScanFacade();
             logic.addScans(scans);
             return logic.toCSV();
         }
@@ -42,7 +42,7 @@ public class LegacyUtilities {
         }
     }
 
-    public static void loadFileAndConvertToCSVIfNeeded(String fileName, EDUS2Logic logic)
+    public static void loadFileAndConvertToCSVIfNeeded(String fileName, ScanFacade logic)
     {
         if (LegacyUtilities.isLegacyFile(fileName))
         {

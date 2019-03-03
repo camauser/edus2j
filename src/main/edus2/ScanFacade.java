@@ -22,9 +22,9 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Scanner;
 
-public class EDUS2Logic {
+public class ScanFacade {
     private ArrayList<Scan> scans;
-    public EDUS2Logic()
+    public ScanFacade()
     {
         scans = new ArrayList<>();
     }

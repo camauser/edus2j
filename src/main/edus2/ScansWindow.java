@@ -41,7 +41,7 @@ public class ScansWindow extends Pane
      * @param scans
      *            - the ArrayList of scans to show in the table.
      */
-    public ScansWindow(EDUS2Logic scans)
+    public ScansWindow(ScanFacade scans)
     {
         // Set up a TableView to display all the records in, and then
         // show the table
