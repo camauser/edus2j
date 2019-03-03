@@ -1,4 +1,4 @@
-package edus2;/*
+package edus2.adapter;/*
  * Copyright 2016 Paul Kulyk, Paul Olszynski, Cameron Auser
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@ package edus2;/*
  */
 
 import java.io.*;
-import edus2.logging.LoggerSingleton;
+import edus2.adapter.logging.LoggerSingleton;
 
 /**
  * 

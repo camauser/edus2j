@@ -1,4 +1,4 @@
-package edus2;/*
+package edus2.application;/*
  * Copyright 2016 Paul Kulyk, Paul Olszynski, Cameron Auser
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,9 @@ package edus2;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import edus2.adapter.ui.ProgressUpdater;
+import edus2.adapter.LegacyUtilities;
+import edus2.adapter.ui.SettingsWindow;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -42,7 +45,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.File;
-import edus2.logging.LoggerSingleton;
+import edus2.adapter.logging.LoggerSingleton;
 
 /**
  * 

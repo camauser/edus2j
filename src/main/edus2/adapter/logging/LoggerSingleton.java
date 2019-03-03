@@ -1,4 +1,4 @@
-package edus2.logging;
+package edus2.adapter.logging;
 
 import java.io.BufferedWriter;
 import java.io.File;

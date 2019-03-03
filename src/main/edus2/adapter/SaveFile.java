@@ -1,4 +1,4 @@
-package edus2;/*
+package edus2.adapter;/*
  * Copyright 2016 Paul Kulyk, Paul Olszynski, Cameron Auser
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import edus2.logging.LoggerSingleton;
+import edus2.adapter.logging.LoggerSingleton;
 
 /**
  * 

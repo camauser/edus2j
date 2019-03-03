@@ -1,5 +1,6 @@
 package edus2;
 
+import edus2.domain.Scan;
 import org.junit.Test;
 
 import static edus2.TestUtil.randomAlphanumericString;
