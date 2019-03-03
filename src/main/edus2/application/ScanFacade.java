@@ -1,4 +1,4 @@
-package edus2;/*
+package edus2.application;/*
  * Copyright 2018 Paul Kulyk, Paul Olszynski, Cameron Auser
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,7 +15,8 @@ package edus2;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import edus2.logging.LoggerSingleton;
+import edus2.domain.Scan;
+import edus2.adapter.logging.LoggerSingleton;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,6 +1,8 @@
-package edus2;
+package edus2.adapter;
 
-import edus2.logging.LoggerSingleton;
+import edus2.domain.Scan;
+import edus2.application.ScanFacade;
+import edus2.adapter.logging.LoggerSingleton;
 
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;

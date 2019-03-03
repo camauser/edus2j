@@ -1,5 +1,7 @@
 package edus2;
 
+import edus2.domain.Scan;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TestUtil {

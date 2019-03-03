@@ -1,4 +1,4 @@
-package edus2;
+package edus2.application;
 
 import java.util.ArrayList;
 import java.util.Arrays;

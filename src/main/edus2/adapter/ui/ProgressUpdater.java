@@ -1,4 +1,4 @@
-package edus2;/*
+package edus2.adapter.ui;/*
  * Copyright 2016 Paul Kulyk, Paul Olszynski, Cameron Auser
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@ package edus2;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import edus2.application.EDUS2View;
 import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.media.MediaPlayer;
