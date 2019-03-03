@@ -71,7 +71,7 @@ public class EDUS2View extends Application
     private static final String NO_INFO_FLAG = "--no-info";
     private static final String NO_WARNING_FLAG = "--no-warning";
     private static final String NO_ERROR_FLAG = "--no-error";
-    private EDUS2Logic scans;
+    private ScanFacade scans;
 
     /**
      * 
@@ -131,7 +131,7 @@ public class EDUS2View extends Application
         try
         {
             LoggerSingleton.logInfoIfEnabled("Attempting to load scans from " + EDUS2_SAVE_FILE_NAME);
-            scans = new EDUS2Logic();
+            scans = new ScanFacade();
             LegacyUtilities.loadFileAndConvertToCSVIfNeeded(EDUS2_SAVE_FILE_NAME, scans);
             LoggerSingleton.logInfoIfEnabled("Loaded " + scans.scanCount() + " scans from " + EDUS2_SAVE_FILE_NAME);
         }

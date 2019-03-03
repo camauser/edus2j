@@ -48,7 +48,7 @@ public class SettingsWindow extends VBox
 {
     public Stage stage;
     ScansWindow scanList;
-    EDUS2Logic scans;
+    ScanFacade scans;
 
     /**
      * 
@@ -57,7 +57,7 @@ public class SettingsWindow extends VBox
      * @param scans
      *            - the Scans to pass into the ScansWindow constructor.
      */
-    public SettingsWindow(EDUS2Logic scans)
+    public SettingsWindow(ScanFacade scans)
     {
         // Just set up a settings window, which is then shown on-screen
         super(10);
