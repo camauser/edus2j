@@ -52,9 +52,9 @@ import java.util.Scanner;
  */
 public class SettingsWindow extends VBox
 {
-    public Stage stage;
-    ScansWindow scanList;
-    ScanFacade scans;
+    private Stage stage;
+    private ScansWindow scanList;
+    private ScanFacade scans;
     private Gson gson = new GsonBuilder().create();
 
     /**
@@ -80,24 +80,69 @@ public class SettingsWindow extends VBox
         Button btnExport = new Button("Export to File");
 
         // When add is clicked, run through the process of adding a new scan
-        btnAdd.setOnAction(new EventHandler<ActionEvent>()
-        {
-            public void handle(ActionEvent event)
+        btnAdd.setOnAction(event -> {
+            FileChooser browser = new FileChooser();
+            File selected = browser.showOpenDialog(stage);
+            if (selected != null)
             {
-                FileChooser browser = new FileChooser();
-                File selected = browser.showOpenDialog(stage);
-                if (selected != null)
+                String fileName = selected.getPath();
+                String converted = EDUS2View.convertFileName(fileName);
+                boolean added = false;
+                while (!added)
                 {
-                    String fileName = selected.getPath();
-                    String converted = EDUS2View.convertFileName(fileName);
+                    TextInputDialog nameEntry = new TextInputDialog();
+                    nameEntry.setHeaderText("Enter Scan ID");
+                    nameEntry
+                            .setContentText("What would you like the scan ID to be?");
+                    Optional<String> result = nameEntry.showAndWait();
+                    try
+                    {
+                        if (result.get().equals(""))
+                        {
+                            Alert alert = new Alert(AlertType.ERROR,
+                                    "You must enter a scan ID!");
+                            alert.showAndWait();
+                        }
+                        else
+                        {
+                            addScan(result.get(), converted);
+                            added = true;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Alert alert = new Alert(AlertType.ERROR,
+                                "You must enter a scan ID!");
+                        alert.showAndWait();
+                    }
+                }
+            }
+        });
+
+        // When bulk add is clicked, the user can select multiple files to add.
+        // Then we run through each selected file and set ID's for all of them.
+        btnBulkAdd.setOnAction(event -> {
+            FileChooser browser = new FileChooser();
+            List<File> selected = browser.showOpenMultipleDialog(stage);
+            if (selected != null)
+            {
+                Iterator<File> listIt = selected.iterator();
+                while (listIt.hasNext())
+                {
+                    File current = listIt.next();
+                    String fileName = current.getPath();
                     boolean added = false;
                     while (!added)
                     {
+                        String converted = EDUS2View
+                                .convertFileName(fileName);
                         TextInputDialog nameEntry = new TextInputDialog();
                         nameEntry.setHeaderText("Enter Scan ID");
-                        nameEntry
-                                .setContentText("What would you like the scan ID to be?");
+                        nameEntry.setContentText("Filename: "
+                                + current.getName()
+                                + "\nWhat would you like the scan ID to be?");
                         Optional<String> result = nameEntry.showAndWait();
+                        // Now add the scan
                         try
                         {
                             if (result.get().equals(""))
@@ -123,72 +168,44 @@ public class SettingsWindow extends VBox
             }
         });
 
-        // When bulk add is clicked, the user can select multiple files to add.
-        // Then we run through each selected file and set ID's for all of them.
-        btnBulkAdd.setOnAction(new EventHandler<ActionEvent>()
-        {
-            public void handle(ActionEvent event)
+        // Delete the selected scan when the delete button is clicked.
+        btnDelete.setOnAction(event -> {
+            Scan selected = scanList.getSelectedItem();
+            scans.removeScan(selected);
+            scanList.removeItem(selected);
+            // Lastly, we'll write out the changes to our save file
+            try
             {
-                FileChooser browser = new FileChooser();
-                List<File> selected = browser.showOpenMultipleDialog(stage);
-                if (selected != null)
-                {
-                    Iterator<File> listIt = selected.iterator();
-                    while (listIt.hasNext())
-                    {
-                        File current = (File) listIt.next();
-                        String fileName = current.getPath();
-                        boolean added = false;
-                        while (!added)
-                        {
-                            String converted = EDUS2View
-                                    .convertFileName(fileName);
-                            TextInputDialog nameEntry = new TextInputDialog();
-                            nameEntry.setHeaderText("Enter Scan ID");
-                            nameEntry.setContentText("Filename: "
-                                    + current.getName()
-                                    + "\nWhat would you like the scan ID to be?");
-                            Optional<String> result = nameEntry.showAndWait();
-                            // Now add the scan
-                            try
-                            {
-                                if (result.get().equals(""))
-                                {
-                                    Alert alert = new Alert(AlertType.ERROR,
-                                            "You must enter a scan ID!");
-                                    alert.showAndWait();
-                                }
-                                else
-                                {
-                                    addScan(result.get(), converted);
-                                    added = true;
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Alert alert = new Alert(AlertType.ERROR,
-                                        "You must enter a scan ID!");
-                                alert.showAndWait();
-                            }
-                        }
-                    }
-                }
+                SaveFile.save(gson.toJson(scans.getAllScans()), EDUS2View.EDUS2_SAVE_FILE_NAME);
+                LoggerSingleton.logInfoIfEnabled("Removed scan \"" + selected.getId() + "\" from the saved file");
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                LoggerSingleton.logErrorIfEnabled("Error saving " + EDUS2View.EDUS2_SAVE_FILE_NAME + ": " + e.getMessage());
             }
         });
 
-        // Delete the selected scan when the delete button is clicked.
-        btnDelete.setOnAction(new EventHandler<ActionEvent>()
-        {
-            public void handle(ActionEvent event)
+        // Delete ALL the scans when the delete all button is clicked.
+        btnDeleteAll.setOnAction(event -> {
+            // Show the user a warning, to let them know they're going
+            // to permanently remove all scans from the program by doing
+            // this
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setContentText("Are you sure you want to remove ALL scans in memory?\nIt is suggested to export all scans before doing this.");
+            alert.setHeaderText("Proceed with removing all scans?");
+            alert.setTitle("Proceed with removing all scans?");
+            alert.showAndWait();
+            if (alert.getResult().getText().equals("OK"))
             {
-                Scan selected = scanList.getSelectedItem();
-                scans.removeScan(selected);
-                scanList.removeItem(selected);
+                // If OK was clicked, we'll nuke all the scans
+                SettingsWindow.this.scans.removeAllScans();
+                scanList.removeAllScans();
                 // Lastly, we'll write out the changes to our save file
                 try
                 {
                     SaveFile.save(gson.toJson(scans.getAllScans()), EDUS2View.EDUS2_SAVE_FILE_NAME);
-                    LoggerSingleton.logInfoIfEnabled("Removed scan \"" + selected.getId() + "\" from the saved file");
+                    LoggerSingleton.logInfoIfEnabled("All scans removed from saved file");
                 }
                 catch (Exception e)
                 {
@@ -198,56 +215,11 @@ public class SettingsWindow extends VBox
             }
         });
 
-        // Delete ALL the scans when the delete all button is clicked.
-        btnDeleteAll.setOnAction(new EventHandler<ActionEvent>()
-        {
-            public void handle(ActionEvent event)
-            {
-                // Show the user a warning, to let them know they're going
-                // to permanently remove all scans from the program by doing
-                // this
-                Alert alert = new Alert(AlertType.CONFIRMATION);
-                alert.setContentText("Are you sure you want to remove ALL scans in memory?\nIt is suggested to export all scans before doing this.");
-                alert.setHeaderText("Proceed with removing all scans?");
-                alert.setTitle("Proceed with removing all scans?");
-                alert.showAndWait();
-                if (alert.getResult().getText().equals("OK"))
-                {
-                    // If OK was clicked, we'll nuke all the scans
-                    SettingsWindow.this.scans.removeAllScans();
-                    scanList.removeAllScans();
-                    // Lastly, we'll write out the changes to our save file
-                    try
-                    {
-                        SaveFile.save(gson.toJson(scans.getAllScans()), EDUS2View.EDUS2_SAVE_FILE_NAME);
-                        LoggerSingleton.logInfoIfEnabled("All scans removed from saved file");
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                        LoggerSingleton.logErrorIfEnabled("Error saving " + EDUS2View.EDUS2_SAVE_FILE_NAME + ": " + e.getMessage());
-                    }
-                }
-            }
-        });
-
         // Import scans from a file
-        btnImport.setOnAction(new EventHandler<ActionEvent>()
-        {
-            public void handle(ActionEvent event)
-            {
-                importScans();
-            }
-        });
+        btnImport.setOnAction(event -> importScans());
 
         // Export all the current scans to a file
-        btnExport.setOnAction(new EventHandler<ActionEvent>()
-        {
-            public void handle(ActionEvent event)
-            {
-                exportScans();
-            }
-        });
+        btnExport.setOnAction(event -> exportScans());
 
         buttons.setAlignment(Pos.CENTER);
         buttons.getChildren().addAll(btnAdd, btnBulkAdd, btnDelete,
