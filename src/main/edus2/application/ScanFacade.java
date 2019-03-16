@@ -18,10 +18,7 @@ package edus2.application;/*
 import edus2.domain.Scan;
 import edus2.adapter.logging.LoggerSingleton;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
 public class ScanFacade {
     private ArrayList<Scan> scans;
@@ -61,7 +58,7 @@ public class ScanFacade {
         scans.clear();
     }
 
-    public ArrayList<Scan> getAllScans() {
+    public List<Scan> getAllScans() {
         return scans;
     }
 

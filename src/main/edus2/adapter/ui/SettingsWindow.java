@@ -15,6 +15,8 @@ package edus2.adapter.ui;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import edus2.application.EDUS2View;
 import edus2.adapter.SaveFile;
 import edus2.application.ScanFacade;
@@ -53,6 +55,7 @@ public class SettingsWindow extends VBox
     public Stage stage;
     ScansWindow scanList;
     ScanFacade scans;
+    private Gson gson = new GsonBuilder().create();
 
     /**
      * 
@@ -184,7 +187,7 @@ public class SettingsWindow extends VBox
                 // Lastly, we'll write out the changes to our save file
                 try
                 {
-                    SaveFile.save(scans.toCSV(), "EDUS2Data.bin");
+                    SaveFile.save(gson.toJson(scans.getAllScans()), EDUS2View.EDUS2_SAVE_FILE_NAME);
                     LoggerSingleton.logInfoIfEnabled("Removed scan \"" + selected.getId() + "\" from the saved file");
                 }
                 catch (Exception e)
@@ -216,7 +219,7 @@ public class SettingsWindow extends VBox
                     // Lastly, we'll write out the changes to our save file
                     try
                     {
-                        SaveFile.save(scans.toCSV(), "EDUS2Data.bin");
+                        SaveFile.save(gson.toJson(scans.getAllScans()), EDUS2View.EDUS2_SAVE_FILE_NAME);
                         LoggerSingleton.logInfoIfEnabled("All scans removed from saved file");
                     }
                     catch (Exception e)
@@ -402,7 +405,7 @@ public class SettingsWindow extends VBox
             // Lastly, we'll write out the changes to our save file
             try
             {
-                SaveFile.save(scans.toCSV(), EDUS2View.EDUS2_SAVE_FILE_NAME);
+                SaveFile.save(gson.toJson(scans.getAllScans()), EDUS2View.EDUS2_SAVE_FILE_NAME);
                 LoggerSingleton.logInfoIfEnabled("Added scan \"" + id + "\" with path \"" + path + "\" to scan file");
             }
             catch (Exception e)
