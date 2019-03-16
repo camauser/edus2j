@@ -5,7 +5,7 @@ import edus2.domain.Scan;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static edus2.TestUtil.randomAlphanumericString;
@@ -127,7 +127,7 @@ public class ScanFacadeTest {
         scanFacade.addScans(Lst(scan, scanTwo));
 
         // Act
-        ArrayList<Scan> actual = scanFacade.getAllScans();
+        List<Scan> actual = scanFacade.getAllScans();
 
         // Assert
         assertTrue(actual.contains(scan));
@@ -138,7 +138,7 @@ public class ScanFacadeTest {
     @Test
     public void getAllScans_shouldReturnEmptyList_whenNoScansPresent() {
         // Act
-        ArrayList<Scan> actual = scanFacade.getAllScans();
+        List<Scan> actual = scanFacade.getAllScans();
 
         // Assert
         assertTrue(actual.isEmpty());

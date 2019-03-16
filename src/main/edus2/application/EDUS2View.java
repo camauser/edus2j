@@ -18,6 +18,7 @@ package edus2.application;/*
 import edus2.adapter.ui.ProgressUpdater;
 import edus2.adapter.LegacyUtilities;
 import edus2.adapter.ui.SettingsWindow;
+import edus2.domain.Scan;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -45,6 +46,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.List;
+
 import edus2.adapter.logging.LoggerSingleton;
 
 /**
@@ -67,14 +70,14 @@ public class EDUS2View extends Application
     private BorderPane main;
     public static final String IMPORT_MESSAGE = "### EDUS2 Scan Import File - Do not edit! ###";
     public static final Font BUTTON_FONT = new Font("Calibri", 18);
-    public static final String EDUS2_SAVE_FILE_NAME = "EDUS2Data.bin";
+    public static final String EDUS2_SAVE_FILE_NAME = "EDUS2Data.json";
     private static final String INFO_FLAG = "--info";
     private static final String WARNING_FLAG = "--warning";
     private static final String ERROR_FLAG = "--error";
     private static final String NO_INFO_FLAG = "--no-info";
     private static final String NO_WARNING_FLAG = "--no-warning";
     private static final String NO_ERROR_FLAG = "--no-error";
-    private ScanFacade scans;
+    private ScanFacade scanFacade;
 
     /**
      * 
@@ -134,9 +137,10 @@ public class EDUS2View extends Application
         try
         {
             LoggerSingleton.logInfoIfEnabled("Attempting to load scans from " + EDUS2_SAVE_FILE_NAME);
-            scans = new ScanFacade();
-            LegacyUtilities.loadFileAndConvertToCSVIfNeeded(EDUS2_SAVE_FILE_NAME, scans);
-            LoggerSingleton.logInfoIfEnabled("Loaded " + scans.scanCount() + " scans from " + EDUS2_SAVE_FILE_NAME);
+            scanFacade = new ScanFacade();
+            List<Scan> scans = LegacyUtilities.loadFileAndConvertToJSONIfNeeded(EDUS2_SAVE_FILE_NAME);
+            scanFacade.addScans(scans);
+            LoggerSingleton.logInfoIfEnabled("Loaded " + scans.size() + " scans from " + EDUS2_SAVE_FILE_NAME);
         }
         catch (Exception e)
         {
@@ -207,7 +211,7 @@ public class EDUS2View extends Application
                 if (event.getCode() == KeyCode.ENTER)
                 {
                     LoggerSingleton.logInfoIfEnabled("Scan \"" + currentScan + "\" was entered");
-                    if (scans.containsScan(currentScan))
+                    if (scanFacade.containsScan(currentScan))
                     {
                         LoggerSingleton.logInfoIfEnabled("Scan \"" + currentScan + "\" exists in the system");
                         if (currentlyPlaying
@@ -218,7 +222,7 @@ public class EDUS2View extends Application
                         }
                         if (!currentScan.equals(currentScanPlaying))
                         {
-                            String scanPath = scans.getScan(currentScan).get().getPath();
+                            String scanPath = scanFacade.getScan(currentScan).get().getPath();
                             video = new Media(scanPath);
                             LoggerSingleton.logInfoIfEnabled("Starting to play " + scanPath + " for scan \"" + currentScan + "\"");
                             currentScanPlaying = currentScan;
@@ -324,7 +328,7 @@ public class EDUS2View extends Application
                 {
             public void handle(ActionEvent event)
             {
-                SettingsWindow scanWindow = new SettingsWindow(scans);
+                SettingsWindow scanWindow = new SettingsWindow(scanFacade);
                 Stage temp = new Stage();
                 Scene tempScene = new Scene(scanWindow);
                 temp.setScene(tempScene);
