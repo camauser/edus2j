@@ -15,20 +15,22 @@ package edus2.application;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import edus2.adapter.FileScanRepository;
 import edus2.domain.Scan;
 import edus2.adapter.logging.LoggerSingleton;
+import edus2.domain.ScanRepository;
 
 import java.util.*;
 
 public class ScanFacade {
-    private ArrayList<Scan> scans;
+    private ScanRepository scanRepository;
 
     public ScanFacade() {
-        scans = new ArrayList<>();
+        scanRepository = new FileScanRepository(FileScanRepository.FILE_NAME);
     }
 
     public Optional<Scan> getScan(String id) {
-        Optional<Scan> scan = scans.stream().filter(s -> s.getId().equals(id)).findFirst();
+        Optional<Scan> scan = getAllScans().stream().filter(s -> s.getId().equals(id)).findFirst();
         if (scan.isPresent()) {
             LoggerSingleton.logInfoIfEnabled("The path for scan \"" + id + "\" appears to be " + scan.get().getPath());
         } else {
@@ -39,36 +41,38 @@ public class ScanFacade {
     }
 
     public boolean containsScan(String id) {
-        return scans.stream().anyMatch(s -> s.getId().equals(id));
+        return getAllScans().stream().anyMatch(s -> s.getId().equals(id));
     }
 
     public void addScan(Scan scan) {
-        scans.add(scan);
+        scanRepository.save(scan);
     }
 
     public void addScans(Collection<Scan> scans) {
-        this.scans.addAll(scans);
+        for (Scan scan : scans) {
+            addScan(scan);
+        }
     }
 
     public void removeScan(Scan scan) {
-        scans.remove(scan);
+        scanRepository.remove(scan);
     }
 
     public void removeAllScans() {
-        scans.clear();
+        scanRepository.removeAll();
     }
 
     public List<Scan> getAllScans() {
-        return scans;
+        return scanRepository.retrieveAll();
     }
 
     public int scanCount() {
-        return scans.size();
+        return getAllScans().size();
     }
 
     public String toCSV() {
         StringBuilder stringBuffer = new StringBuilder();
-        for (Scan scan : scans) {
+        for (Scan scan : getAllScans()) {
             stringBuffer.append(scan.getId());
             stringBuffer.append(',');
             stringBuffer.append(scan.getPath());
@@ -84,7 +88,7 @@ public class ScanFacade {
             String id = currentLine.split(",")[0];
             String scan = currentLine.split(",")[1];
             if (!containsScan(id)) {
-                scans.add(new Scan(id, scan));
+                getAllScans().add(new Scan(id, scan));
             }
         }
     }

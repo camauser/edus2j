@@ -377,6 +377,7 @@ public class SettingsWindow extends VBox
             // Lastly, we'll write out the changes to our save file
             try
             {
+                /// TODO: Move file saving logic into the facade - this class should call facade
                 SaveFile.save(gson.toJson(scans.getAllScans()), EDUS2View.EDUS2_SAVE_FILE_NAME);
                 LoggerSingleton.logInfoIfEnabled("Added scan \"" + id + "\" with path \"" + path + "\" to scan file");
             }
