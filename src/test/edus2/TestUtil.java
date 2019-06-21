@@ -2,6 +2,7 @@ package edus2;
 
 import edus2.domain.Scan;
 
+import java.io.File;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TestUtil {
@@ -26,4 +27,12 @@ public class TestUtil {
     public static Scan randomScan() {
         return new Scan(randomAlphanumericString(), randomAlphanumericString());
     }
+
+    public static String randomTempFile() {
+        String fileName = randomAlphanumericString();
+        File file = new File(fileName);
+        file.deleteOnExit();
+        return fileName;
+    }
+
 }

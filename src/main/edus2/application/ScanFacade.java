@@ -25,8 +25,8 @@ import java.util.*;
 public class ScanFacade {
     private ScanRepository scanRepository;
 
-    public ScanFacade() {
-        scanRepository = new FileScanRepository(FileScanRepository.FILE_NAME);
+    public ScanFacade(ScanRepository scanRepository) {
+        this.scanRepository = scanRepository;
     }
 
     public Optional<Scan> getScan(String id) {
@@ -86,9 +86,10 @@ public class ScanFacade {
         while (scanner.hasNextLine()) {
             String currentLine = scanner.nextLine();
             String id = currentLine.split(",")[0];
-            String scan = currentLine.split(",")[1];
+            String path = currentLine.split(",")[1];
             if (!containsScan(id)) {
-                getAllScans().add(new Scan(id, scan));
+                Scan scan = new Scan(id, path);
+                scanRepository.save(scan);
             }
         }
     }
