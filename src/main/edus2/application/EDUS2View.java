@@ -15,6 +15,7 @@ package edus2.application;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import edus2.adapter.FileScanRepository;
 import edus2.adapter.ui.ProgressUpdater;
 import edus2.adapter.LegacyUtilities;
 import edus2.adapter.ui.SettingsWindow;
@@ -137,7 +138,8 @@ public class EDUS2View extends Application
         try
         {
             LoggerSingleton.logInfoIfEnabled("Attempting to load scans from " + EDUS2_SAVE_FILE_NAME);
-            scanFacade = new ScanFacade();
+            // TODO: Inject scanFacade
+            scanFacade = new ScanFacade(new FileScanRepository(FileScanRepository.FILE_NAME));
             List<Scan> scans = LegacyUtilities.loadFileAndConvertToJSONIfNeeded(EDUS2_SAVE_FILE_NAME);
             scanFacade.addScans(scans);
             LoggerSingleton.logInfoIfEnabled("Loaded " + scans.size() + " scans from " + EDUS2_SAVE_FILE_NAME);

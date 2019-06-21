@@ -1,5 +1,6 @@
 package edus2;
 
+import edus2.adapter.FileScanRepository;
 import edus2.application.ScanFacade;
 import edus2.domain.Scan;
 import org.junit.Before;
@@ -10,9 +11,11 @@ import java.util.Optional;
 
 import static edus2.TestUtil.randomAlphanumericString;
 import static edus2.TestUtil.randomScan;
+import static edus2.TestUtil.randomTempFile;
 import static edus2.application.Util.Lst;
 import static org.junit.Assert.*;
 
+@SuppressWarnings("ConstantConditions")
 public class ScanFacadeTest {
 
     private ScanFacade scanFacade;
@@ -20,7 +23,8 @@ public class ScanFacadeTest {
 
     @Before
     public void setup() {
-        scanFacade = new ScanFacade();
+        // TODO: Inject scanFacade
+        scanFacade = new ScanFacade(new FileScanRepository(randomTempFile()));
         scan = randomScan();
     }
 
