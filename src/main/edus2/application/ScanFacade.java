@@ -15,7 +15,6 @@ package edus2.application;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import edus2.adapter.FileScanRepository;
 import edus2.domain.Scan;
 import edus2.adapter.logging.LoggerSingleton;
 import edus2.domain.ScanRepository;
