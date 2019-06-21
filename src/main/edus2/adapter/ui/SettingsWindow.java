@@ -22,8 +22,6 @@ import edus2.adapter.SaveFile;
 import edus2.application.ScanFacade;
 import edus2.domain.Scan;
 import edus2.adapter.logging.LoggerSingleton;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -54,22 +52,22 @@ public class SettingsWindow extends VBox
 {
     private Stage stage;
     private ScansWindow scanList;
-    private ScanFacade scans;
+    private ScanFacade scanFacade;
     private Gson gson = new GsonBuilder().create();
 
     /**
      * 
      * Constructor for the SettingsWindow class.
      * 
-     * @param scans
+     * @param scanFacade
      *            - the Scans to pass into the ScansWindow constructor.
      */
-    public SettingsWindow(ScanFacade scans)
+    public SettingsWindow(ScanFacade scanFacade)
     {
         // Just set up a settings window, which is then shown on-screen
         super(10);
-        this.scans = scans;
-        scanList = new ScansWindow(scans);
+        this.scanFacade = scanFacade;
+        scanList = new ScansWindow(scanFacade);
         HBox buttons = new HBox();
 
         Button btnAdd = new Button("Add");
@@ -171,12 +169,12 @@ public class SettingsWindow extends VBox
         // Delete the selected scan when the delete button is clicked.
         btnDelete.setOnAction(event -> {
             Scan selected = scanList.getSelectedItem();
-            scans.removeScan(selected);
-            scanList.removeItem(selected);
+            scanFacade.removeScan(selected);
+            scanList.refreshTableItems();
             // Lastly, we'll write out the changes to our save file
             try
             {
-                SaveFile.save(gson.toJson(scans.getAllScans()), EDUS2View.EDUS2_SAVE_FILE_NAME);
+                SaveFile.save(gson.toJson(scanFacade.getAllScans()), EDUS2View.EDUS2_SAVE_FILE_NAME);
                 LoggerSingleton.logInfoIfEnabled("Removed scan \"" + selected.getId() + "\" from the saved file");
             }
             catch (Exception e)
@@ -199,12 +197,12 @@ public class SettingsWindow extends VBox
             if (alert.getResult().getText().equals("OK"))
             {
                 // If OK was clicked, we'll nuke all the scans
-                SettingsWindow.this.scans.removeAllScans();
-                scanList.removeAllScans();
+                SettingsWindow.this.scanFacade.removeAllScans();
+                scanList.refreshTableItems();
                 // Lastly, we'll write out the changes to our save file
                 try
                 {
-                    SaveFile.save(gson.toJson(scans.getAllScans()), EDUS2View.EDUS2_SAVE_FILE_NAME);
+                    SaveFile.save(gson.toJson(scanFacade.getAllScans()), EDUS2View.EDUS2_SAVE_FILE_NAME);
                     LoggerSingleton.logInfoIfEnabled("All scans removed from saved file");
                 }
                 catch (Exception e)
@@ -339,7 +337,7 @@ public class SettingsWindow extends VBox
                 PrintWriter output = new PrintWriter(selected);
                 // Print out our header first
                 output.println(EDUS2View.IMPORT_MESSAGE);
-                output.print(scans.toCSV());
+                output.print(scanFacade.toCSV());
                 output.flush();
                 LoggerSingleton.logInfoIfEnabled("Exported all scans to file \"" + selected.getName() + "\"");
                 output.close();
@@ -368,17 +366,18 @@ public class SettingsWindow extends VBox
     {
         // perform checks to ensure id is valid and unused
         // add scan to scan collection
-        if (!id.equals("") && !scans.containsScan(id))
+        // TODO: Move this validation logic into scanFacade - display an alert if exception thrown
+        if (!id.equals("") && !scanFacade.containsScan(id))
         {
             Scan toAdd = new Scan(id, path);
-            scans.addScan(toAdd);
-            scanList.addItem(toAdd);
+            scanFacade.addScan(toAdd);
+            scanList.refreshTableItems();
 
             // Lastly, we'll write out the changes to our save file
             try
             {
                 /// TODO: Move file saving logic into the facade - this class should call facade
-                SaveFile.save(gson.toJson(scans.getAllScans()), EDUS2View.EDUS2_SAVE_FILE_NAME);
+                SaveFile.save(gson.toJson(scanFacade.getAllScans()), EDUS2View.EDUS2_SAVE_FILE_NAME);
                 LoggerSingleton.logInfoIfEnabled("Added scan \"" + id + "\" with path \"" + path + "\" to scan file");
             }
             catch (Exception e)
@@ -387,7 +386,7 @@ public class SettingsWindow extends VBox
                 LoggerSingleton.logErrorIfEnabled("Error saving scan: " + e.getMessage());
             }
         }
-        else if (scans.containsScan(id))
+        else if (scanFacade.containsScan(id))
         {
             LoggerSingleton.logWarningIfEnabled("Can't add scan \"" + id + "\" as it already exists in the system.");
             Alert alert = new Alert(AlertType.ERROR,

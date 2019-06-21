@@ -1,6 +1,6 @@
 package edus2;
 
-import edus2.adapter.FileScanRepository;
+import edus2.adapter.repository.file.FileScanRepository;
 import edus2.application.ScanFacade;
 import edus2.domain.Scan;
 import org.junit.Before;
