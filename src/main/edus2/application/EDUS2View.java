@@ -17,9 +17,7 @@ package edus2.application;/*
 
 import edus2.adapter.repository.file.FileScanRepository;
 import edus2.adapter.ui.ProgressUpdater;
-import edus2.adapter.LegacyUtilities;
 import edus2.adapter.ui.SettingsWindow;
-import edus2.domain.Scan;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -47,7 +45,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.util.List;
 
 import edus2.adapter.logging.LoggerSingleton;
 
@@ -63,11 +60,11 @@ public class EDUS2View extends Application
     private String currentScan = "";
     private String currentScanPlaying = "";
     private Media video;
-    public boolean currentlyPlaying = false;
+    private boolean currentlyPlaying = false;
     private static ProgressBar playbackProgress;
     public int durationThreads = 0;
     private MediaPlayer player;
-    private MediaView vidView;
+    private MediaView videoView;
     private BorderPane main;
     public static final String IMPORT_MESSAGE = "### EDUS2 Scan Import File - Do not edit! ###";
     public static final Font BUTTON_FONT = new Font("Calibri", 18);
@@ -202,8 +199,7 @@ public class EDUS2View extends Application
         stage.show();
 
         // Setting up a handler for when a key is pressed
-        scene.setOnKeyPressed(new EventHandler<KeyEvent>()
-                {
+        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(KeyEvent event)
             {
                 // If enter was pressed, we'll go through the process of
@@ -212,11 +208,10 @@ public class EDUS2View extends Application
                 if (event.getCode() == KeyCode.ENTER)
                 {
                     LoggerSingleton.logInfoIfEnabled("Scan \"" + currentScan + "\" was entered");
-                    if (scanFacade.containsScan(currentScan))
+                    if (scanFacade.getScan(currentScan).isPresent())
                     {
                         LoggerSingleton.logInfoIfEnabled("Scan \"" + currentScan + "\" exists in the system");
-                        if (currentlyPlaying
-                                && !currentScan.equals(currentScanPlaying))
+                        if (currentlyPlaying && !currentScan.equals(currentScanPlaying))
                         {
                             currentlyPlaying = false;
                             player.stop();
@@ -228,27 +223,22 @@ public class EDUS2View extends Application
                             LoggerSingleton.logInfoIfEnabled("Starting to play " + scanPath + " for scan \"" + currentScan + "\"");
                             currentScanPlaying = currentScan;
                             player = new MediaPlayer(video);
-                            vidView = new MediaView(player);
-                            vidView.setMediaPlayer(player);
-                            vidView.setPreserveRatio(true);
+                            videoView = new MediaView(player);
+                            videoView.setPreserveRatio(true);
 
-                            player.setOnReady(new Runnable()
-                            {
-                                public void run()
+                            player.setOnReady(() -> {
+                                main.setCenter(videoView);
+                                videoView.setVisible(true);
+                                player.play();
+                                currentlyPlaying = true;
+
+                                if (durationThreads == 0)
                                 {
-                                    main.setCenter(vidView);
-                                    vidView.setVisible(true);
-                                    player.play();
-                                    currentlyPlaying = true;
-
-                                    if (durationThreads == 0)
-                                    {
-                                        Thread durationUpdater = new ProgressUpdater(
-                                                player, playbackProgress,
-                                                EDUS2View.this);
-                                        durationThreads++;
-                                        durationUpdater.start();
-                                    }
+                                    Thread durationUpdater = new ProgressUpdater(
+                                            player, playbackProgress,
+                                            EDUS2View.this);
+                                    durationThreads++;
+                                    durationUpdater.start();
                                 }
                             });
 
@@ -384,5 +374,9 @@ public class EDUS2View extends Application
         }
         LoggerSingleton.logInfoIfEnabled("Filename \"" + original + "\" converts to \"" + toReturn + original + "\"");
         return toReturn + original;
+    }
+
+    public boolean isCurrentlyPlaying() {
+        return currentlyPlaying;
     }
 }

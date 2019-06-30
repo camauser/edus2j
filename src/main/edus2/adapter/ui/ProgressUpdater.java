@@ -30,31 +30,31 @@ import javafx.scene.media.MediaPlayer;
  */
 public class ProgressUpdater extends Thread
 {
-    private MediaPlayer toWatch;
+    private MediaPlayer mediaPlayer;
     private double videoLength;
     private double currentTime;
-    private ProgressBar toUpdate;
-    private EDUS2View master;
+    private ProgressBar progressBar;
+    private EDUS2View edus2View;
 
     /**
      * 
      * Constructor for the ProgressUpdater class.
      * 
-     * @param toWatch
+     * @param mediaPlayer
      *            - The MediaPlayer that we're going to keep track of to update
      *            the progress bar
-     * @param toUpdate
+     * @param progressBar
      *            - The progress bar that we want to update
-     * @param master
+     * @param edus2View
      *            - A reference to our instance of EDUS2View
      */
-    public ProgressUpdater(MediaPlayer toWatch, ProgressBar toUpdate,
-            EDUS2View master)
+    public ProgressUpdater(MediaPlayer mediaPlayer, ProgressBar progressBar,
+            EDUS2View edus2View)
     {
-        this.toWatch = toWatch;
-        this.toUpdate = toUpdate;
-        videoLength = toWatch.getTotalDuration().toSeconds();
-        this.master = master;
+        this.mediaPlayer = mediaPlayer;
+        this.progressBar = progressBar;
+        videoLength = mediaPlayer.getTotalDuration().toSeconds();
+        this.edus2View = edus2View;
     }
 
     /**
@@ -65,25 +65,21 @@ public class ProgressUpdater extends Thread
         currentTime = 0;
         // Simply loop through this code as long as the video is playing,
         // and update the progress through the video
-        while (currentTime < videoLength && master.currentlyPlaying)
+        while (currentTime < videoLength && edus2View.isCurrentlyPlaying())
         {
-            currentTime = toWatch.getCurrentTime().toSeconds();
-            Platform.runLater(new Runnable()
-            {
-                public void run()
-                {
-                    toUpdate.setProgress(currentTime / videoLength);
-                }
+            currentTime = mediaPlayer.getCurrentTime().toSeconds();
+            Platform.runLater(() -> {
+                progressBar.setProgress(currentTime / videoLength);
             });
             try
             {
-                Thread.sleep((long) videoLength);
+                Thread.sleep(30);
             }
             catch (InterruptedException e)
             {
                 e.printStackTrace();
             }
         }
-        master.durationThreads--;
+        edus2View.durationThreads--;
     }
 }
