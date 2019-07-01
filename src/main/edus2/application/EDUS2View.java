@@ -1,6 +1,6 @@
 package edus2.application;/*
  * Copyright 2016 Paul Kulyk, Paul Olszynski, Cameron Auser
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -46,7 +46,7 @@ import javafx.stage.Stage;
 import java.io.File;
 
 /**
- * 
+ *
  * Purpose: The main class used to run the EDUS2J program.
  *
  * @author Cameron Auser
@@ -117,15 +117,13 @@ public class EDUS2View extends Application
     public void start(Stage stage)
     {
         // When the program first starts, we'll try to open up existing scans
-        // from the EDUS2Data.bin file. If that file doesn't exist, nothing
+        // from the EDUS2Data.json file. If that file doesn't exist, nothing
         // will happen.
         try
         {
             LoggerSingleton.logInfoIfEnabled("Attempting to load scans from " + EDUS2_SAVE_FILE_NAME);
             // TODO: Inject scanFacade
             scanFacade = new ScanFacade(new FileScanRepository(FileScanRepository.FILE_NAME));
-//            List<Scan> scans = LegacyUtilities.loadFileAndConvertToJSONIfNeeded(EDUS2_SAVE_FILE_NAME);
-//            LoggerSingleton.logInfoIfEnabled("Loaded " + scans.size() + " scans from " + EDUS2_SAVE_FILE_NAME);
         }
         catch (Exception e)
         {
@@ -185,36 +183,11 @@ public class EDUS2View extends Application
         stage.setTitle("EDUS2J");
         stage.show();
 
-        // Setting up a handler for when a key is pressed
         scene.setOnKeyPressed(event -> {
-            // If enter was pressed, we'll go through the process of
-            // checking to see if a valid scan was detected. If so,
-            // we'll start up the corresponding video.
-            if (event.getCode() == KeyCode.ENTER)
-            {
-                LoggerSingleton.logInfoIfEnabled("Scan \"" + currentScan + "\" was entered");
-                if (scanFacade.getScan(currentScan).isPresent())
-                {
-                    LoggerSingleton.logInfoIfEnabled("Scan \"" + currentScan + "\" exists in the system");
-                    if (!isScanPlaying(scanFacade.getScan(currentScan).get())) {
-                        stopPlayer();
-                        playScan(scanFacade.getScan(currentScan).get());
-                    }
-                    currentScan = "";
-                }
-                // If the scan doesn't exist, we'll clear the scanned
-                // in info, so that the user can attempt to scan again
-                else
-                {
-                    currentScan = "";
-                }
-            }
-            // If enter wasn't pressed, we'll just add that character
-            // onto our current scan string
-            else
-            {
-                String textEntered = event.getText();
-                currentScan += textEntered;
+            if (event.getCode() == KeyCode.ENTER) {
+                processScanRequest();
+            } else {
+                currentScan += event.getText();
             }
         });
 
@@ -275,6 +248,20 @@ public class EDUS2View extends Application
         btnQuit.setOnAction(event -> stage.close());
     }
 
+    private void processScanRequest() {
+        LoggerSingleton.logInfoIfEnabled("Scan \"" + currentScan + "\" was entered");
+        if (scanFacade.getScan(currentScan).isPresent()) {
+            LoggerSingleton.logInfoIfEnabled("Scan \"" + currentScan + "\" exists in the system");
+            if (!isScanPlaying(scanFacade.getScan(currentScan).get())) {
+                stopPlayer();
+                playScan(scanFacade.getScan(currentScan).get());
+            }
+            currentScan = "";
+        } else {
+            currentScan = "";
+        }
+    }
+
     private void stopPlayer() {
         if (player != null) {
             player.stop();
@@ -311,9 +298,9 @@ public class EDUS2View extends Application
     }
 
     /**
-     * 
+     *
      * Purpose: Convert a passed in String to a valid file name and location.
-     * 
+     *
      * @param original
      *            - the original path (presumably grabbed from a FileChooser
      *            object
