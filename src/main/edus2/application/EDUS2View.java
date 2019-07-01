@@ -15,13 +15,12 @@ package edus2.application;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import edus2.adapter.logging.LoggerSingleton;
 import edus2.adapter.repository.file.FileScanRepository;
 import edus2.adapter.ui.ScanProgressUpdater;
 import edus2.adapter.ui.SettingsWindow;
 import edus2.domain.Scan;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -29,7 +28,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -46,8 +44,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.File;
-
-import edus2.adapter.logging.LoggerSingleton;
 
 /**
  * 
@@ -74,12 +70,6 @@ public class EDUS2View extends Application
     private static final String NO_ERROR_FLAG = "--no-error";
     private ScanFacade scanFacade;
 
-    /**
-     * 
-     * Purpose: The main method, used to launch our application.
-     * 
-     * @param args
-     */
     public static void main(String[] args)
     {
         // Run the start method, and open up the GUI
@@ -196,115 +186,93 @@ public class EDUS2View extends Application
         stage.show();
 
         // Setting up a handler for when a key is pressed
-        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            public void handle(KeyEvent event)
+        scene.setOnKeyPressed(event -> {
+            // If enter was pressed, we'll go through the process of
+            // checking to see if a valid scan was detected. If so,
+            // we'll start up the corresponding video.
+            if (event.getCode() == KeyCode.ENTER)
             {
-                // If enter was pressed, we'll go through the process of
-                // checking to see if a valid scan was detected. If so,
-                // we'll start up the corresponding video.
-                if (event.getCode() == KeyCode.ENTER)
+                LoggerSingleton.logInfoIfEnabled("Scan \"" + currentScan + "\" was entered");
+                if (scanFacade.getScan(currentScan).isPresent())
                 {
-                    LoggerSingleton.logInfoIfEnabled("Scan \"" + currentScan + "\" was entered");
-                    if (scanFacade.getScan(currentScan).isPresent())
-                    {
-                        LoggerSingleton.logInfoIfEnabled("Scan \"" + currentScan + "\" exists in the system");
-                        if (!isScanPlaying(scanFacade.getScan(currentScan).get())) {
-                            stopPlayer();
-                            playScan(scanFacade.getScan(currentScan).get());
-                        }
-                        currentScan = "";
+                    LoggerSingleton.logInfoIfEnabled("Scan \"" + currentScan + "\" exists in the system");
+                    if (!isScanPlaying(scanFacade.getScan(currentScan).get())) {
+                        stopPlayer();
+                        playScan(scanFacade.getScan(currentScan).get());
                     }
-                    // If the scan doesn't exist, we'll clear the scanned
-                    // in info, so that the user can attempt to scan again
-                    else
-                    {
-                        currentScan = "";
-                    }
+                    currentScan = "";
                 }
-                // If enter wasn't pressed, we'll just add that character
-                // onto our current scan string
+                // If the scan doesn't exist, we'll clear the scanned
+                // in info, so that the user can attempt to scan again
                 else
                 {
-                    String textEntered = event.getText();
-                    currentScan += textEntered;
+                    currentScan = "";
                 }
             }
-
-                });
+            // If enter wasn't pressed, we'll just add that character
+            // onto our current scan string
+            else
+            {
+                String textEntered = event.getText();
+                currentScan += textEntered;
+            }
+        });
 
         // When the about button is clicked, a little popup will show on-screen
         // with credits for the program
-        btnAbout.setOnAction(new EventHandler<ActionEvent>()
-                {
-            public void handle(ActionEvent event)
-            {
-                BorderPane credits = new BorderPane();
-                Text header = new Text("EDUS2J Credits");
-                header.setFont(new Font(32.0));
-                credits.setTop(header);
-                header.setFont(Font.font("Calibri", FontWeight.BOLD,
-                        FontPosture.ITALIC, 36.0));
-                BorderPane.setAlignment(header, Pos.TOP_CENTER);
-                Text details = new Text(
-                        "Credits for this project go to: \n"
-                                + "Java Porting: Cameron Auser\n"
-                                + "Original Design: Paul Kulyk, Paul Olsynski\n"
-                                + "EDUS2 is an emergency department ultrasound simulator, "
-                                + "and EDUS2J is a port of this original software to Java.");
-                details.setFont(new Font("Calibri", 18.0));
-                credits.setCenter(details);
-                BorderPane.setAlignment(credits, Pos.CENTER);
+        btnAbout.setOnAction(event -> {
+            BorderPane credits = new BorderPane();
+            Text header = new Text("EDUS2J Credits");
+            header.setFont(new Font(32.0));
+            credits.setTop(header);
+            header.setFont(Font.font("Calibri", FontWeight.BOLD,
+                    FontPosture.ITALIC, 36.0));
+            BorderPane.setAlignment(header, Pos.TOP_CENTER);
+            Text details = new Text(
+                    "Credits for this project go to: \n"
+                            + "Java Porting: Cameron Auser\n"
+                            + "Original Design: Paul Kulyk, Paul Olsynski\n"
+                            + "EDUS2 is an emergency department ultrasound simulator, "
+                            + "and EDUS2J is a port of this original software to Java.");
+            details.setFont(new Font("Calibri", 18.0));
+            credits.setCenter(details);
+            BorderPane.setAlignment(credits, Pos.CENTER);
 
-                Scene scene = new Scene(credits);
+            Scene scene1 = new Scene(credits);
 
-                Stage test = new Stage();
-                test.getIcons().add(getThumbnailImage());
-                test.setScene(scene);
-                test.setTitle("EDUS2J Credits");
-                test.show();
-            }
-                });
+            Stage test = new Stage();
+            test.getIcons().add(getThumbnailImage());
+            test.setScene(scene1);
+            test.setTitle("EDUS2J Credits");
+            test.show();
+        });
 
         // The fullscreen button will just toggle fullscreen status of the
         // program
-        btnFullscreen.setOnAction(new EventHandler<ActionEvent>()
-                {
-            public void handle(ActionEvent event)
-            {
-                // Just set the program to be the opposite of what it's current
-                // fullscreen status is
-                stage.setFullScreen(!stage.isFullScreen());
-            }
-                });
+        btnFullscreen.setOnAction(event -> {
+            // Just set the program to be the opposite of what it's current
+            // fullscreen status is
+            stage.setFullScreen(!stage.isFullScreen());
+        });
 
         // When the settings button is pressed, we'll create a SettingsWindow
         // object and show it on-screen
-        btnSettings.setOnAction(new EventHandler<ActionEvent>()
-                {
-            public void handle(ActionEvent event)
-            {
-                SettingsWindow scanWindow = new SettingsWindow(scanFacade);
-                Stage temp = new Stage();
-                Scene tempScene = new Scene(scanWindow);
-                temp.setScene(tempScene);
+        btnSettings.setOnAction(event -> {
+            SettingsWindow scanWindow = new SettingsWindow(scanFacade);
+            Stage temp = new Stage();
+            Scene tempScene = new Scene(scanWindow);
+            temp.setScene(tempScene);
 
-                // Set the stage ref in our settings window so that we
-                // can show on-screen pop-ups for adding scans
-                scanWindow.setStage(temp);
+            // Set the stage ref in our settings window so that we
+            // can show on-screen pop-ups for adding scans
+            scanWindow.setStage(temp);
 
-                temp.show();
+            temp.show();
 
-            }
-                });
+        });
 
         // We'll close the program when the quit button is clicked
-        btnQuit.setOnAction(new EventHandler<ActionEvent>()
-                {
-            public void handle(ActionEvent event)
-            {
-                stage.close();
-            }
-                });
+        btnQuit.setOnAction(event -> stage.close());
     }
 
     private void stopPlayer() {
