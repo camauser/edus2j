@@ -16,8 +16,9 @@ package edus2.application;/*
  */
 
 import edus2.adapter.repository.file.FileScanRepository;
-import edus2.adapter.ui.ProgressUpdater;
+import edus2.adapter.ui.ScanProgressUpdater;
 import edus2.adapter.ui.SettingsWindow;
+import edus2.domain.Scan;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -59,15 +60,11 @@ public class EDUS2View extends Application
 {
     private String currentScan = "";
     private String currentScanPlaying = "";
-    private Media video;
-    private boolean currentlyPlaying = false;
     private static ProgressBar playbackProgress;
-    public int durationThreads = 0;
     private MediaPlayer player;
-    private MediaView videoView;
     private BorderPane main;
     public static final String IMPORT_MESSAGE = "### EDUS2 Scan Import File - Do not edit! ###";
-    public static final Font BUTTON_FONT = new Font("Calibri", 18);
+    private static final Font BUTTON_FONT = new Font("Calibri", 18);
     public static final String EDUS2_SAVE_FILE_NAME = "EDUS2Data.json";
     private static final String INFO_FLAG = "--info";
     private static final String WARNING_FLAG = "--warning";
@@ -211,42 +208,9 @@ public class EDUS2View extends Application
                     if (scanFacade.getScan(currentScan).isPresent())
                     {
                         LoggerSingleton.logInfoIfEnabled("Scan \"" + currentScan + "\" exists in the system");
-                        if (currentlyPlaying && !currentScan.equals(currentScanPlaying))
-                        {
-                            currentlyPlaying = false;
-                            player.stop();
-                        }
-                        if (!currentScan.equals(currentScanPlaying))
-                        {
-                            String scanPath = scanFacade.getScan(currentScan).get().getPath();
-                            video = new Media(scanPath);
-                            LoggerSingleton.logInfoIfEnabled("Starting to play " + scanPath + " for scan \"" + currentScan + "\"");
-                            currentScanPlaying = currentScan;
-                            player = new MediaPlayer(video);
-                            videoView = new MediaView(player);
-                            videoView.setPreserveRatio(true);
-
-                            player.setOnReady(() -> {
-                                main.setCenter(videoView);
-                                videoView.setVisible(true);
-                                player.play();
-                                currentlyPlaying = true;
-
-                                if (durationThreads == 0)
-                                {
-                                    Thread durationUpdater = new ProgressUpdater(
-                                            player, playbackProgress,
-                                            EDUS2View.this);
-                                    durationThreads++;
-                                    durationUpdater.start();
-                                }
-                            });
-
-                            player.setOnEndOfMedia(() -> {
-                                player.stop();
-                                currentlyPlaying = false;
-                                currentScanPlaying = "";
-                            });
+                        if (!isScanPlaying(scanFacade.getScan(currentScan).get())) {
+                            stopPlayer();
+                            playScan(scanFacade.getScan(currentScan).get());
                         }
                         currentScan = "";
                     }
@@ -343,6 +307,41 @@ public class EDUS2View extends Application
                 });
     }
 
+    private void stopPlayer() {
+        if (player != null) {
+            player.stop();
+        }
+    }
+
+    private boolean isScanPlaying(Scan scan) {
+        return player != null
+                && player.getStatus().equals(MediaPlayer.Status.PLAYING)
+                && scan.getId().equals(currentScanPlaying);
+    }
+
+    private void playScan(Scan scan) {
+        String scanPath = scan.getPath();
+        LoggerSingleton.logInfoIfEnabled("Starting to play " + scanPath + " for scan \"" + scan.getId() + "\"");
+        currentScanPlaying = scan.getId();
+        Media video = new Media(scanPath);
+        player = new MediaPlayer(video);
+        MediaView videoView = new MediaView(player);
+        videoView.setPreserveRatio(true);
+        main.setCenter(videoView);
+
+        player.setOnReady(() -> {
+            ScanProgressUpdater scanProgressUpdater = new ScanProgressUpdater(player, playbackProgress);
+            player.setOnEndOfMedia(() -> player.stop());
+            player.setOnStopped(() ->{
+                currentScanPlaying = "";
+                scanProgressUpdater.finish();
+            });
+
+            player.play();
+            scanProgressUpdater.start();
+        });
+    }
+
     /**
      * 
      * Purpose: Convert a passed in String to a valid file name and location.
@@ -374,9 +373,5 @@ public class EDUS2View extends Application
         }
         LoggerSingleton.logInfoIfEnabled("Filename \"" + original + "\" converts to \"" + toReturn + original + "\"");
         return toReturn + original;
-    }
-
-    public boolean isCurrentlyPlaying() {
-        return currentlyPlaying;
     }
 }
