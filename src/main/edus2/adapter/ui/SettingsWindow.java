@@ -82,32 +82,17 @@ public class SettingsWindow extends VBox
                 String fileName = selected.getPath();
                 String converted = EDUS2View.convertFileName(fileName);
                 boolean added = false;
-                while (!added)
-                {
+                while (!added) {
                     TextInputDialog nameEntry = new TextInputDialog();
                     nameEntry.setHeaderText("Enter Scan ID");
-                    nameEntry
-                            .setContentText("What would you like the scan ID to be?");
+                    nameEntry.setContentText("What would you like the scan ID to be?");
                     Optional<String> result = nameEntry.showAndWait();
-                    try
-                    {
-                        if (result.get().equals(""))
-                        {
-                            Alert alert = new Alert(AlertType.ERROR,
-                                    "You must enter a scan ID!");
-                            alert.showAndWait();
-                        }
-                        else
-                        {
-                            addScan(result.get(), converted);
-                            added = true;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Alert alert = new Alert(AlertType.ERROR,
-                                "You must enter a scan ID!");
+                    if (!result.isPresent() || result.get().trim().isEmpty()) {
+                        Alert alert = new Alert(AlertType.ERROR, "You must enter a scan ID!");
                         alert.showAndWait();
+                    } else {
+                        addScan(result.get(), converted);
+                        added = true;
                     }
                 }
             }
@@ -120,41 +105,27 @@ public class SettingsWindow extends VBox
             List<File> selected = browser.showOpenMultipleDialog(stage);
             if (selected != null)
             {
-                Iterator<File> listIt = selected.iterator();
-                while (listIt.hasNext())
-                {
-                    File current = listIt.next();
+                for (File current : selected) {
                     String fileName = current.getPath();
                     boolean added = false;
-                    while (!added)
-                    {
-                        String converted = EDUS2View
-                                .convertFileName(fileName);
+                    while (!added) {
+                        String convertedFileName = EDUS2View.convertFileName(fileName);
                         TextInputDialog nameEntry = new TextInputDialog();
                         nameEntry.setHeaderText("Enter Scan ID");
-                        nameEntry.setContentText("Filename: "
-                                + current.getName()
-                                + "\nWhat would you like the scan ID to be?");
+                        nameEntry.setContentText("Filename: " + current.getName() + "\nWhat would you like the scan ID to be?");
                         Optional<String> result = nameEntry.showAndWait();
-                        // Now add the scan
-                        try
-                        {
-                            if (result.get().equals(""))
-                            {
-                                Alert alert = new Alert(AlertType.ERROR,
-                                        "You must enter a scan ID!");
+
+                        if (result.isPresent() && !result.get().trim().isEmpty()) {
+                            if (!scanFacade.getScan(result.get()).isPresent()) {
+                                // TODO: Once scanFacade has logic to throw an exception when duplicates are saved, surround this with a try/catch instead of if/else
+                                addScan(result.get(), convertedFileName);
+                                added = true;
+                            } else {
+                                Alert alert = new Alert(AlertType.ERROR, String.format("Scan Id '%s' is already in use, choose a different ID.", result.get()));
                                 alert.showAndWait();
                             }
-                            else
-                            {
-                                addScan(result.get(), converted);
-                                added = true;
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Alert alert = new Alert(AlertType.ERROR,
-                                    "You must enter a scan ID!");
+                        } else {
+                            Alert alert = new Alert(AlertType.ERROR, "You must enter a scan ID!");
                             alert.showAndWait();
                         }
                     }
@@ -198,41 +169,29 @@ public class SettingsWindow extends VBox
         this.getChildren().addAll(scanList, buttons);
     }
 
-    /**
-     * 
-     * Purpose: Set the stage variable of this class, and set up the stage's
-     * icon as well.
-     * 
-     * @param stage
-     */
     public void setStage(Stage stage)
     {
         this.stage = stage;
         this.stage.getIcons().add(EDUS2View.getThumbnailImage());
     }
 
-    /**
-     * 
-     * Purpose: Run through the process of importing scans from a file.
-     */
     private void importScans()
     {
         FileChooser browser = new FileChooser();
-        File selected = browser.showOpenDialog(stage);
-        if (selected != null)
+        File scanFile = browser.showOpenDialog(stage);
+        if (scanFile != null)
         {
             try
             {
-                BufferedReader input = new BufferedReader(new FileReader(
-                        selected));
-                String entireFile = "";
-                String currentLine = "";
+                BufferedReader input = new BufferedReader(new FileReader(scanFile));
+                StringBuilder entireFile = new StringBuilder();
+                String currentLine;
                 while ((currentLine = input.readLine()) != null)
                 {
-                    entireFile += currentLine + "\n";
+                    entireFile.append(currentLine).append("\n");
                 }
                 input.close();
-                importScansFromCSV(entireFile);
+                importScansFromCSV(entireFile.toString());
             }
             catch (Exception e)
             {
@@ -287,9 +246,6 @@ public class SettingsWindow extends VBox
         String path = csvLine.substring(csvLine.indexOf(',') + 1);
 
         // Create a scan from the values, and add it to our array
-        // Scan toAdd = new Scan(id, path);
-        // scans.add(toAdd);
-        // scanList.addItem(toAdd);
         addScan(id, path);
         LoggerSingleton.logInfoIfEnabled("Imported scan \"" + id + "\"" + " with path \"" + path + "\"");
     }
