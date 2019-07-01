@@ -15,13 +15,10 @@ package edus2.adapter.ui;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import edus2.adapter.logging.LoggerSingleton;
 import edus2.application.EDUS2View;
-import edus2.adapter.SaveFile;
 import edus2.application.ScanFacade;
 import edus2.domain.Scan;
-import edus2.adapter.logging.LoggerSingleton;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -53,7 +50,6 @@ public class SettingsWindow extends VBox
     private Stage stage;
     private ScansWindow scanList;
     private ScanFacade scanFacade;
-    private Gson gson = new GsonBuilder().create();
 
     /**
      * 
@@ -171,24 +167,12 @@ public class SettingsWindow extends VBox
             Scan selected = scanList.getSelectedItem();
             scanFacade.removeScan(selected);
             scanList.refreshTableItems();
-            // Lastly, we'll write out the changes to our save file
-            try
-            {
-                SaveFile.save(gson.toJson(scanFacade.getAllScans()), EDUS2View.EDUS2_SAVE_FILE_NAME);
-                LoggerSingleton.logInfoIfEnabled("Removed scan \"" + selected.getId() + "\" from the saved file");
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                LoggerSingleton.logErrorIfEnabled("Error saving " + EDUS2View.EDUS2_SAVE_FILE_NAME + ": " + e.getMessage());
-            }
         });
 
         // Delete ALL the scans when the delete all button is clicked.
         btnDeleteAll.setOnAction(event -> {
             // Show the user a warning, to let them know they're going
-            // to permanently remove all scans from the program by doing
-            // this
+            // to permanently remove all scans from the program by doing this
             Alert alert = new Alert(AlertType.CONFIRMATION);
             alert.setContentText("Are you sure you want to remove ALL scans in memory?\nIt is suggested to export all scans before doing this.");
             alert.setHeaderText("Proceed with removing all scans?");
@@ -197,19 +181,8 @@ public class SettingsWindow extends VBox
             if (alert.getResult().getText().equals("OK"))
             {
                 // If OK was clicked, we'll nuke all the scans
-                SettingsWindow.this.scanFacade.removeAllScans();
+                scanFacade.removeAllScans();
                 scanList.refreshTableItems();
-                // Lastly, we'll write out the changes to our save file
-                try
-                {
-                    SaveFile.save(gson.toJson(scanFacade.getAllScans()), EDUS2View.EDUS2_SAVE_FILE_NAME);
-                    LoggerSingleton.logInfoIfEnabled("All scans removed from saved file");
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    LoggerSingleton.logErrorIfEnabled("Error saving " + EDUS2View.EDUS2_SAVE_FILE_NAME + ": " + e.getMessage());
-                }
             }
         });
 
@@ -341,8 +314,7 @@ public class SettingsWindow extends VBox
                 output.flush();
                 LoggerSingleton.logInfoIfEnabled("Exported all scans to file \"" + selected.getName() + "\"");
                 output.close();
-                Alert alert = new Alert(AlertType.CONFIRMATION,
-                        "Scans exported successfully!");
+                Alert alert = new Alert(AlertType.CONFIRMATION, "Scans exported successfully!");
                 alert.showAndWait();
             }
             catch (Exception e)
@@ -372,19 +344,6 @@ public class SettingsWindow extends VBox
             Scan toAdd = new Scan(id, path);
             scanFacade.addScan(toAdd);
             scanList.refreshTableItems();
-
-            // Lastly, we'll write out the changes to our save file
-            try
-            {
-                /// TODO: Move file saving logic into the facade - this class should call facade
-                SaveFile.save(gson.toJson(scanFacade.getAllScans()), EDUS2View.EDUS2_SAVE_FILE_NAME);
-                LoggerSingleton.logInfoIfEnabled("Added scan \"" + id + "\" with path \"" + path + "\" to scan file");
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                LoggerSingleton.logErrorIfEnabled("Error saving scan: " + e.getMessage());
-            }
         }
         else if (scanFacade.containsScan(id))
         {
