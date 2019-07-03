@@ -1,6 +1,6 @@
 package edus2.adapter.ui;/*
  * Copyright 2016 Paul Kulyk, Paul Olszynski, Cameron Auser
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -18,26 +18,16 @@ package edus2.adapter.ui;/*
 import edus2.application.ScanFacade;
 import edus2.domain.Scan;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 
-/**
- * 
- * Purpose: Display all of the scans in a nicely formatted table.
- *
- * @author Cameron Auser
- * @version 1.0
- */
-public class ScansWindow extends Pane
-{
+public class ScansWindow extends Pane {
     private TableView<Scan> records;
     private ScanFacade scanFacade;
 
-    public ScansWindow(ScanFacade scanFacade)
-    {
+    public ScansWindow(ScanFacade scanFacade) {
         this.scanFacade = scanFacade;
         // Set up a TableView to display all the records in, and then
         // show the table
@@ -52,6 +42,7 @@ public class ScansWindow extends Pane
         path.setCellValueFactory(new PropertyValueFactory<>("path"));
 
         refreshTableItems();
+        //noinspection unchecked
         records.getColumns().addAll(scanID, path);
 
         this.getChildren().add(records);
@@ -61,14 +52,7 @@ public class ScansWindow extends Pane
         records.setItems(FXCollections.observableArrayList(scanFacade.getAllScans()));
     }
 
-    /**
-     * 
-     * Purpose: Return the currently selected scan.
-     * 
-     * @return
-     */
-    public Scan getSelectedItem()
-    {
+    public Scan getSelectedItem() {
         return records.getSelectionModel().getSelectedItem();
     }
 
