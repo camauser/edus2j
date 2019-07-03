@@ -3,6 +3,9 @@ package edus2;
 import edus2.domain.Scan;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TestUtil {
@@ -12,6 +15,11 @@ public class TestUtil {
     private static final String UPPERCASE_ALPHABET = LOWERCASE_ALPHABET.toUpperCase();
     private static final String DIGITS = "0123456789";
     private static final String ALPHANUMERIC_CHARACTERS = LOWERCASE_ALPHABET + UPPERCASE_ALPHABET + DIGITS;
+
+    @SafeVarargs
+    public static <T> List<T> Lst(T... items) {
+        return new ArrayList<>(Arrays.asList(items));
+    }
 
     public static String randomAlphanumericString() {
         int stringLength = RANDOM.nextInt(1, 101);

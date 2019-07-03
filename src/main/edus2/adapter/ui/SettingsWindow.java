@@ -1,6 +1,6 @@
 package edus2.adapter.ui;/*
  * Copyright 2016 Paul Kulyk, Paul Olszynski, Cameron Auser
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -35,30 +35,24 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Optional;
-import java.util.Scanner;
 
 /**
- * 
  * Purpose: Display a settings window for EDUS2.
  *
  * @author Cameron Auser
  * @version 1.0
  */
-public class SettingsWindow extends VBox
-{
+public class SettingsWindow extends VBox {
     private Stage stage;
     private ScansWindow scanList;
     private ScanFacade scanFacade;
 
     /**
-     * 
      * Constructor for the SettingsWindow class.
-     * 
-     * @param scanFacade
-     *            - the Scans to pass into the ScansWindow constructor.
+     *
+     * @param scanFacade - the Scans to pass into the ScansWindow constructor.
      */
-    public SettingsWindow(ScanFacade scanFacade)
-    {
+    public SettingsWindow(ScanFacade scanFacade) {
         // Just set up a settings window, which is then shown on-screen
         super(10);
         this.scanFacade = scanFacade;
@@ -76,8 +70,7 @@ public class SettingsWindow extends VBox
         btnAdd.setOnAction(event -> {
             FileChooser browser = new FileChooser();
             File selected = browser.showOpenDialog(stage);
-            if (selected != null)
-            {
+            if (selected != null) {
                 String fileName = selected.getPath();
                 String converted = EDUS2View.convertFileName(fileName);
                 boolean added = false;
@@ -102,8 +95,7 @@ public class SettingsWindow extends VBox
         btnBulkAdd.setOnAction(event -> {
             FileChooser browser = new FileChooser();
             List<File> selected = browser.showOpenMultipleDialog(stage);
-            if (selected != null)
-            {
+            if (selected != null) {
                 for (File current : selected) {
                     String fileName = current.getPath();
                     boolean added = false;
@@ -148,8 +140,7 @@ public class SettingsWindow extends VBox
             alert.setHeaderText("Proceed with removing all scans?");
             alert.setTitle("Proceed with removing all scans?");
             alert.showAndWait();
-            if (alert.getResult().getText().equals("OK"))
-            {
+            if (alert.getResult().getText().equals("OK")) {
                 // If OK was clicked, we'll nuke all the scans
                 scanFacade.removeAllScans();
                 scanList.refreshTableItems();
@@ -168,32 +159,25 @@ public class SettingsWindow extends VBox
         this.getChildren().addAll(scanList, buttons);
     }
 
-    public void setStage(Stage stage)
-    {
+    public void setStage(Stage stage) {
         this.stage = stage;
         this.stage.getIcons().add(EDUS2View.getThumbnailImage());
     }
 
-    private void importScans()
-    {
+    private void importScans() {
         FileChooser browser = new FileChooser();
         File scanFile = browser.showOpenDialog(stage);
-        if (scanFile != null)
-        {
-            try
-            {
+        if (scanFile != null) {
+            try {
                 BufferedReader input = new BufferedReader(new FileReader(scanFile));
                 StringBuilder entireFile = new StringBuilder();
                 String currentLine;
-                while ((currentLine = input.readLine()) != null)
-                {
+                while ((currentLine = input.readLine()) != null) {
                     entireFile.append(currentLine).append("\n");
                 }
                 input.close();
-                importScansFromCSV(entireFile.toString());
-            }
-            catch (Exception e)
-            {
+                scanFacade.importCSV(entireFile.toString());
+            } catch (Exception e) {
                 e.printStackTrace();
                 LoggerSingleton.logErrorIfEnabled("Encountered error importing scans: " + e.getMessage());
             }
@@ -201,67 +185,14 @@ public class SettingsWindow extends VBox
     }
 
     /**
-     * 
-     * Purpose: A helper method, to import scans in csv format from a text file.
-     * 
-     * @param textFile
-     *            - the file to read scans from.
-     */
-    private void importScansFromCSV(String textFile)
-    {
-        Scanner reader = new Scanner(textFile);
-        // If the file has content, and has our import header, then we'll
-        // start reading through the file
-        if (reader.hasNextLine()
-                && reader.nextLine().equals(EDUS2View.IMPORT_MESSAGE))
-        {
-            // As long as there are more lines in the file, we'll keep importing
-            // scans
-            while (reader.hasNextLine())
-            {
-                String currLine = reader.nextLine();
-                if (currLine.indexOf(',') > 0)
-                {
-                    importSingleScan(currLine);
-                }
-            }
-        }
-        reader.close();
-    }
-
-    /**
-     * 
-     * Purpose: A helper method to import a single scan from a line in csv
-     * format.
-     * 
-     * @param csvLine
-     *            - The line to read.
-     */
-    private void importSingleScan(String csvLine)
-    {
-        // Snip up the line to get our values
-        String id = csvLine.substring(0, csvLine.indexOf(','));
-
-        String path = csvLine.substring(csvLine.indexOf(',') + 1);
-
-        // Create a scan from the values, and add it to our array
-        addScan(id, path);
-        LoggerSingleton.logInfoIfEnabled("Imported scan \"" + id + "\"" + " with path \"" + path + "\"");
-    }
-
-    /**
-     * 
      * Purpose: Export all scans to a file of the user's choice.
      */
-    private void exportScans()
-    {
+    private void exportScans() {
         // Show a file browser, so the user can select a file to save to.
         FileChooser browser = new FileChooser();
         File selected = browser.showSaveDialog(stage);
-        if (selected != null)
-        {
-            try
-            {
+        if (selected != null) {
+            try {
                 PrintWriter output = new PrintWriter(selected);
                 // Print out our header first
                 output.println(EDUS2View.IMPORT_MESSAGE);
@@ -271,9 +202,7 @@ public class SettingsWindow extends VBox
                 output.close();
                 Alert alert = new Alert(AlertType.CONFIRMATION, "Scans exported successfully!");
                 alert.showAndWait();
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
                 LoggerSingleton.logErrorIfEnabled("Error exporting all scans: " + e.getMessage());
             }
@@ -281,27 +210,20 @@ public class SettingsWindow extends VBox
     }
 
     /**
-     * 
      * Purpose: Add a scan to the program.
-     * 
-     * @param id
-     *            - the ID of the new scan
-     * @param path
-     *            - the path of the scan's video
+     *
+     * @param id   - the ID of the new scan
+     * @param path - the path of the scan's video
      */
-    private void addScan(String id, String path)
-    {
+    private void addScan(String id, String path) {
         // perform checks to ensure id is valid and unused
         // add scan to scan collection
         // TODO: Move this validation logic into scanFacade - display an alert if exception thrown
-        if (!id.equals("") && !scanFacade.containsScan(id))
-        {
+        if (!id.equals("") && !scanFacade.containsScan(id)) {
             Scan toAdd = new Scan(id, path);
             scanFacade.addScan(toAdd);
             scanList.refreshTableItems();
-        }
-        else if (scanFacade.containsScan(id))
-        {
+        } else if (scanFacade.containsScan(id)) {
             LoggerSingleton.logWarningIfEnabled("Can't add scan \"" + id + "\" as it already exists in the system.");
             Alert alert = new Alert(AlertType.ERROR,
                     "There's already a scan with that ID!");

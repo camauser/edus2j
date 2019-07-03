@@ -9,10 +9,7 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Optional;
 
-import static edus2.TestUtil.randomAlphanumericString;
-import static edus2.TestUtil.randomScan;
-import static edus2.TestUtil.randomTempFile;
-import static edus2.application.Util.Lst;
+import static edus2.TestUtil.*;
 import static org.junit.Assert.*;
 
 @SuppressWarnings("ConstantConditions")
