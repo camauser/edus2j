@@ -15,11 +15,14 @@ package edus2.application;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import edus2.domain.Scan;
 import edus2.adapter.logging.LoggerSingleton;
+import edus2.domain.Scan;
 import edus2.domain.ScanRepository;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Scanner;
 
 public class ScanFacade {
     private ScanRepository scanRepository;
@@ -48,9 +51,7 @@ public class ScanFacade {
     }
 
     public void addScans(Collection<Scan> scans) {
-        for (Scan scan : scans) {
-            addScan(scan);
-        }
+        scans.forEach(this::addScan);
     }
 
     public void removeScan(Scan scan) {
