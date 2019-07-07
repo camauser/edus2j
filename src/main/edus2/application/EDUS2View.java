@@ -291,36 +291,7 @@ public class EDUS2View extends Application
         });
     }
 
-    /**
-     *
-     * Purpose: Convert a passed in String to a valid file name and location.
-     *
-     * @param original
-     *            - the original path (presumably grabbed from a FileChooser
-     *            object
-     * @return - the correctly formatted path
-     */
-    public static String convertFileName(String original)
-    {
-        String toReturn = "file:///";
-        // Simply go through the string, turning backslashes into slashes,
-        // and fixing any spaces
-        for (int i = 0; i < original.length(); i++)
-        {
-            if (original.charAt(i) == '\\')
-            {
-                String previous = original.substring(0, i);
-                String after = original.substring(i + 1);
-                original = previous + "/" + after;
-            }
-            else if (original.charAt(i) == ' ')
-            {
-                String previous = original.substring(0, i);
-                String after = original.substring(i + 1);
-                original = previous + "%20" + after;
-            }
-        }
-        LoggerSingleton.logInfoIfEnabled("Filename \"" + original + "\" converts to \"" + toReturn + original + "\"");
-        return toReturn + original;
+    public static String convertFileName(String original) {
+        return "file:///" + original.replaceAll("\\\\", "/").replaceAll(" ", "%20");
     }
 }

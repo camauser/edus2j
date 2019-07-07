@@ -16,6 +16,8 @@ package edus2.application;/*
  */
 
 import edus2.adapter.logging.LoggerSingleton;
+import edus2.application.exception.EmptyScanIdException;
+import edus2.application.exception.ScanAlreadyExistsException;
 import edus2.domain.Scan;
 import edus2.domain.ScanRepository;
 
@@ -47,6 +49,14 @@ public class ScanFacade {
     }
 
     public void addScan(Scan scan) {
+        if (scan.getId().trim().isEmpty()) {
+            throw new EmptyScanIdException();
+        }
+
+        if (containsScan(scan.getId())) {
+            throw new ScanAlreadyExistsException(scan.getId());
+        }
+
         scanRepository.save(scan);
     }
 
