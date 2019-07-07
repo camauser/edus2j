@@ -21,10 +21,12 @@ import edus2.application.ScanFacade;
 import edus2.application.exception.EmptyScanIdException;
 import edus2.application.exception.ScanAlreadyExistsException;
 import edus2.domain.Scan;
+import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -37,6 +39,7 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Purpose: Display a settings window for EDUS2.
@@ -73,21 +76,8 @@ public class SettingsWindow extends VBox {
             FileChooser browser = new FileChooser();
             File selected = browser.showOpenDialog(stage);
             if (selected != null) {
-                String fileName = selected.getPath();
-                String converted = EDUS2View.convertFileName(fileName);
-                boolean added = false;
-                while (!added) {
-                    TextInputDialog nameEntry = new TextInputDialog();
-                    nameEntry.setHeaderText("Enter Scan ID");
-                    nameEntry.setContentText("What would you like the scan ID to be?");
-                    Optional<String> result = nameEntry.showAndWait();
-                    if (!result.isPresent() || result.get().trim().isEmpty()) {
-                        Alert alert = new Alert(AlertType.ERROR, "You must enter a scan ID!");
-                        alert.showAndWait();
-                    } else {
-                        added = addScan(result.get(), converted);
-                    }
-                }
+                promptForScanIdAndSaveScan(selected);
+
             }
         });
 
@@ -98,28 +88,7 @@ public class SettingsWindow extends VBox {
             List<File> selected = browser.showOpenMultipleDialog(stage);
             if (selected != null) {
                 for (File current : selected) {
-                    String fileName = current.getPath();
-                    boolean added = false;
-                    while (!added) {
-                        String convertedFileName = EDUS2View.convertFileName(fileName);
-                        TextInputDialog nameEntry = new TextInputDialog();
-                        nameEntry.setHeaderText("Enter Scan ID");
-                        nameEntry.setContentText("Filename: " + current.getName() + "\nWhat would you like the scan ID to be?");
-                        Optional<String> result = nameEntry.showAndWait();
-
-                        if (result.isPresent() && !result.get().trim().isEmpty()) {
-                            if (!scanFacade.getScan(result.get()).isPresent()) {
-                                // TODO: Once scanFacade has logic to throw an exception when duplicates are saved, surround this with a try/catch instead of if/else
-                                added = addScan(result.get(), convertedFileName);
-                            } else {
-                                Alert alert = new Alert(AlertType.ERROR, String.format("Scan ID '%s' is already in use, choose a different ID.", result.get()));
-                                alert.showAndWait();
-                            }
-                        } else {
-                            Alert alert = new Alert(AlertType.ERROR, "You must enter a scan ID!");
-                            alert.showAndWait();
-                        }
-                    }
+                    promptForScanIdAndSaveScan(current);
                 }
             }
         });
@@ -157,6 +126,40 @@ public class SettingsWindow extends VBox {
         buttons.getChildren().addAll(btnAdd, btnBulkAdd, btnDelete,
                 btnDeleteAll, btnImport, btnExport);
         this.getChildren().addAll(scanList, buttons);
+    }
+
+    private void promptForScanIdAndSaveScan(File file) {
+        boolean added = false;
+        while (!added) {
+            String convertedFilePath = EDUS2View.convertFilePath(file.getPath());
+            ScanPromptResponse response = promptForScanId("Filename: " + file.getName() + "\nWhat would you like the scan ID to be?");
+            if (response.isCancelled()) {
+                break;
+            }
+
+            if (response.getResponse().isPresent()) {
+                String scanId = response.getResponse().get();
+                added = addScan(scanId, convertedFilePath);
+            } else {
+                Alert alert = new Alert(AlertType.ERROR, "You must enter a scan ID!");
+                alert.showAndWait();
+            }
+        }
+    }
+
+    private ScanPromptResponse promptForScanId(String prompt) {
+        AtomicBoolean added = new AtomicBoolean(true);
+        TextInputDialog nameEntry = new TextInputDialog();
+        nameEntry.setHeaderText("Enter Scan ID");
+        nameEntry.setContentText(prompt);
+        nameEntry.getDialogPane().lookupButton(ButtonType.CANCEL).addEventFilter(ActionEvent.ACTION, e -> added.set(false));
+        Optional<String> result = nameEntry.showAndWait();
+
+        if (!added.get()) {
+            return ScanPromptResponse.ofCancelled();
+        }
+
+        return ScanPromptResponse.ofResponse(result.orElse(null));
     }
 
     public void setStage(Stage stage) {
@@ -221,6 +224,5 @@ public class SettingsWindow extends VBox {
             alert.showAndWait();
             return false;
         }
-
     }
 }

@@ -291,7 +291,7 @@ public class EDUS2View extends Application
         });
     }
 
-    public static String convertFileName(String original) {
-        return "file:///" + original.replaceAll("\\\\", "/").replaceAll(" ", "%20");
+    public static String convertFilePath(String originalPath) {
+        return "file:///" + originalPath.replaceAll("\\\\", "/").replaceAll(" ", "%20");
     }
 }
