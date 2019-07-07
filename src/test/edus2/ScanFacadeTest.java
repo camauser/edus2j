@@ -2,6 +2,8 @@ package edus2;
 
 import edus2.adapter.repository.file.FileScanRepository;
 import edus2.application.ScanFacade;
+import edus2.application.exception.EmptyScanIdException;
+import edus2.application.exception.ScanAlreadyExistsException;
 import edus2.domain.Scan;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,6 +69,25 @@ public class ScanFacadeTest {
 
         // Assert
         assertTrue(scanFacade.containsScan(scan.getId()));
+    }
+
+    @Test (expected = ScanAlreadyExistsException.class)
+    public void addScan_shouldThrowScanAlreadyExistsException_whenScanAlreadyExists() {
+        // Arrange
+        scanFacade.addScan(scan);
+
+        // Act
+        scanFacade.addScan(scan);
+    }
+
+    @Test (expected = EmptyScanIdException.class)
+    public void addScan_shouldThrowEmptyScanIdException_whenEmptyScanIdGiven() {
+        // Arrange
+        Scan emptyScanIdScan = new Scan("", randomAlphanumericString());
+
+        // Act
+        scanFacade.addScan(emptyScanIdScan);
+
     }
 
     @Test

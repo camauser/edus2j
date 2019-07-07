@@ -18,6 +18,8 @@ package edus2.adapter.ui;/*
 import edus2.adapter.logging.LoggerSingleton;
 import edus2.application.EDUS2View;
 import edus2.application.ScanFacade;
+import edus2.application.exception.EmptyScanIdException;
+import edus2.application.exception.ScanAlreadyExistsException;
 import edus2.domain.Scan;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -83,8 +85,7 @@ public class SettingsWindow extends VBox {
                         Alert alert = new Alert(AlertType.ERROR, "You must enter a scan ID!");
                         alert.showAndWait();
                     } else {
-                        addScan(result.get(), converted);
-                        added = true;
+                        added = addScan(result.get(), converted);
                     }
                 }
             }
@@ -109,10 +110,9 @@ public class SettingsWindow extends VBox {
                         if (result.isPresent() && !result.get().trim().isEmpty()) {
                             if (!scanFacade.getScan(result.get()).isPresent()) {
                                 // TODO: Once scanFacade has logic to throw an exception when duplicates are saved, surround this with a try/catch instead of if/else
-                                addScan(result.get(), convertedFileName);
-                                added = true;
+                                added = addScan(result.get(), convertedFileName);
                             } else {
-                                Alert alert = new Alert(AlertType.ERROR, String.format("Scan Id '%s' is already in use, choose a different ID.", result.get()));
+                                Alert alert = new Alert(AlertType.ERROR, String.format("Scan ID '%s' is already in use, choose a different ID.", result.get()));
                                 alert.showAndWait();
                             }
                         } else {
@@ -209,25 +209,18 @@ public class SettingsWindow extends VBox {
         }
     }
 
-    /**
-     * Purpose: Add a scan to the program.
-     *
-     * @param id   - the ID of the new scan
-     * @param path - the path of the scan's video
-     */
-    private void addScan(String id, String path) {
-        // perform checks to ensure id is valid and unused
-        // add scan to scan collection
-        // TODO: Move this validation logic into scanFacade - display an alert if exception thrown
-        if (!id.equals("") && !scanFacade.containsScan(id)) {
-            Scan toAdd = new Scan(id, path);
+    private boolean addScan(String id, String path) {
+        // TODO: Take a look at this logic and how this method is used: user is forced into saving a scan once they select one - no way to undo the add attempt
+        Scan toAdd = new Scan(id, path);
+        try {
             scanFacade.addScan(toAdd);
             scanList.refreshTableItems();
-        } else if (scanFacade.containsScan(id)) {
-            LoggerSingleton.logWarningIfEnabled("Can't add scan \"" + id + "\" as it already exists in the system.");
-            Alert alert = new Alert(AlertType.ERROR,
-                    "There's already a scan with that ID!");
+            return true;
+        } catch (EmptyScanIdException | ScanAlreadyExistsException e) {
+            Alert alert = new Alert(AlertType.ERROR, e.getMessage());
             alert.showAndWait();
+            return false;
         }
+
     }
 }
