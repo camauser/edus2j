@@ -15,8 +15,10 @@ package edus2.application;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import edus2.adapter.guice.EDUS2JModule;
 import edus2.adapter.logging.LoggerSingleton;
-import edus2.adapter.repository.file.FileScanRepository;
 import edus2.adapter.ui.ScanProgressUpdater;
 import edus2.adapter.ui.SettingsWindow;
 import edus2.domain.Scan;
@@ -45,14 +47,13 @@ import javafx.stage.Stage;
 import java.io.File;
 
 /**
- *
  * Purpose: The main class used to run the EDUS2J program.
  *
  * @author Cameron Auser
  * @version 1.0
  */
-public class EDUS2View extends Application
-{
+public class EDUS2View extends Application {
+    // TODO: Change import/export file format to be JSON - get rid of CSV import business
     private String currentScan = "";
     private String currentScanPlaying = "";
     private static ProgressBar playbackProgress;
@@ -68,10 +69,11 @@ public class EDUS2View extends Application
     private static final String NO_WARNING_FLAG = "--no-warning";
     private static final String NO_ERROR_FLAG = "--no-error";
     private ScanFacade scanFacade;
+    private static Injector injector;
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         // Run the start method, and open up the GUI
+        injector = Guice.createInjector(new EDUS2JModule());
         LoggerSingleton.initializeLogger();
         LoggerSingleton.enableErrorLogging();
         processArguments(args);
@@ -79,9 +81,8 @@ public class EDUS2View extends Application
     }
 
     private static void processArguments(String[] args) {
-        for(String arg : args)
-        {
-            switch(arg){
+        for (String arg : args) {
+            switch (arg) {
                 case INFO_FLAG:
                     LoggerSingleton.enableInfoLogging();
                     break;
@@ -104,8 +105,7 @@ public class EDUS2View extends Application
         }
     }
 
-    public static Image getThumbnailImage()
-    {
+    public static Image getThumbnailImage() {
         File imageFile = new File("img/edus2-icon.png");
         return new Image("file:///" + imageFile.getAbsolutePath());
     }
@@ -113,21 +113,8 @@ public class EDUS2View extends Application
     /**
      * Purpose: The default start method to start the JavaFX GUI.
      */
-    public void start(Stage stage)
-    {
-        // When the program first starts, we'll try to open up existing scans
-        // from the EDUS2Data.json file. If that file doesn't exist, nothing
-        // will happen.
-        try
-        {
-            LoggerSingleton.logInfoIfEnabled("Attempting to load scans from " + EDUS2_SAVE_FILE_NAME);
-            // TODO: Inject scanFacade
-            scanFacade = new ScanFacade(new FileScanRepository(FileScanRepository.FILE_NAME));
-        }
-        catch (Exception e)
-        {
-            LoggerSingleton.logErrorIfEnabled("Failed to load scans from " + EDUS2_SAVE_FILE_NAME + ". Reason: " + e.getMessage());
-        }
+    public void start(Stage stage) {
+        scanFacade = injector.getInstance(ScanFacade.class);
 
         main = new BorderPane();
         main.setTop(generateTop());
@@ -281,7 +268,7 @@ public class EDUS2View extends Application
         player.setOnReady(() -> {
             ScanProgressUpdater scanProgressUpdater = new ScanProgressUpdater(player, playbackProgress);
             player.setOnEndOfMedia(() -> player.stop());
-            player.setOnStopped(() ->{
+            player.setOnStopped(() -> {
                 currentScanPlaying = "";
                 scanProgressUpdater.finish();
             });

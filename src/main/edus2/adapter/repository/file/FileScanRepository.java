@@ -7,6 +7,7 @@ import edus2.adapter.logging.LoggerSingleton;
 import edus2.domain.Scan;
 import edus2.domain.ScanRepository;
 
+import javax.inject.Inject;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -14,10 +15,10 @@ import java.util.List;
 import java.util.Optional;
 
 public class FileScanRepository implements ScanRepository {
-    public static final String FILE_NAME = "EDUS2Data.json";
     private final Gson gson;
     private String fileName;
 
+    @Inject
     public FileScanRepository(String fileName) {
         this.fileName = fileName;
         this.gson = new GsonBuilder().create();
