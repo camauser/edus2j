@@ -21,6 +21,7 @@ import edus2.application.exception.ScanAlreadyExistsException;
 import edus2.domain.Scan;
 import edus2.domain.ScanRepository;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,7 @@ import java.util.Scanner;
 public class ScanFacade {
     private ScanRepository scanRepository;
 
+    @Inject
     public ScanFacade(ScanRepository scanRepository) {
         this.scanRepository = scanRepository;
     }

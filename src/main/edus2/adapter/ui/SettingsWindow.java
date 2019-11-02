@@ -77,7 +77,6 @@ public class SettingsWindow extends VBox {
             File selected = browser.showOpenDialog(stage);
             if (selected != null) {
                 promptForScanIdAndSaveScan(selected);
-
             }
         });
 
@@ -105,7 +104,7 @@ public class SettingsWindow extends VBox {
             // Show the user a warning, to let them know they're going
             // to permanently remove all scans from the program by doing this
             Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setContentText("Are you sure you want to remove ALL scans in memory?\nIt is suggested to export all scans before doing this.");
+            alert.setContentText("It is suggested to export all scans before doing this.\nAre you sure you want to remove ALL scans?\n");
             alert.setHeaderText("Proceed with removing all scans?");
             alert.setTitle("Proceed with removing all scans?");
             alert.showAndWait();
@@ -213,7 +212,6 @@ public class SettingsWindow extends VBox {
     }
 
     private boolean addScan(String id, String path) {
-        // TODO: Take a look at this logic and how this method is used: user is forced into saving a scan once they select one - no way to undo the add attempt
         Scan toAdd = new Scan(id, path);
         try {
             scanFacade.addScan(toAdd);

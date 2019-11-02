@@ -4,7 +4,7 @@ import edus2.domain.Scan;
 import org.junit.Test;
 
 import static edus2.TestUtil.randomAlphanumericString;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class ScanTest {
 

@@ -6,7 +6,8 @@ import org.junit.Test;
 import java.util.List;
 
 import static edus2.TestUtil.randomScan;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public abstract class ScanRepositoryTest {
 
@@ -60,6 +61,20 @@ public abstract class ScanRepositoryTest {
 
         List<Scan> actual = scanRepository.retrieveAll();
         assertTrue(actual.isEmpty());
+    }
+
+    @Test
+    public void remove_shouldNotRemoveDuplicateScan_whenSameVideoUnderMultipleIds() {
+        Scan scan = randomScan();
+        Scan duplicateScan = new Scan(scan.getId() + "-duplicate", scan.getPath());
+        scanRepository.save(scan);
+        scanRepository.save(duplicateScan);
+
+        scanRepository.remove(duplicateScan);
+
+        List<Scan> actual = scanRepository.retrieveAll();
+        assertEquals(1, actual.size());
+        assertTrue(actual.contains(scan));
     }
 
     @Test

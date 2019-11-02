@@ -22,7 +22,6 @@ public class ScanFacadeTest {
 
     @Before
     public void setup() {
-        // TODO: Inject scanFacade
         scanFacade = new ScanFacade(new FileScanRepository(randomTempFile()));
         scan = randomScan();
     }
