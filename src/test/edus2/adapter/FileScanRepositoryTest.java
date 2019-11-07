@@ -9,11 +9,10 @@ import java.io.File;
 import static edus2.TestUtil.randomAlphanumericString;
 
 public class FileScanRepositoryTest extends ScanRepositoryTest {
-    private String fileName;
 
     @Override
     protected ScanRepository getScanRepository() {
-        fileName = randomAlphanumericString();
+        String fileName = randomAlphanumericString();
         File file = new File(fileName);
         file.deleteOnExit();
         return new FileScanRepository(fileName);
