@@ -53,6 +53,8 @@ import java.io.File;
  * @version 1.0
  */
 public class EDUS2View extends Application {
+    public static final int MINIMUM_VIDEO_WIDTH_IN_PIXELS = 1280;
+    public static final int MINIMUM_VIDEO_HEIGHT_IN_PIXELS = 720;
     // TODO: Change import/export file format to be JSON - get rid of CSV import business
     private String currentScan = "";
     private String currentScanPlaying = "";
@@ -262,10 +264,13 @@ public class EDUS2View extends Application {
         Media video = new Media(scanPath);
         player = new MediaPlayer(video);
         MediaView videoView = new MediaView(player);
-        videoView.setPreserveRatio(true);
         main.setCenter(videoView);
 
         player.setOnReady(() -> {
+            videoView.setPreserveRatio(false);
+            // TODO: Move the min width/height into config file
+            videoView.setFitWidth(Math.max(MINIMUM_VIDEO_WIDTH_IN_PIXELS, video.getWidth()));
+            videoView.setFitHeight(Math.max(MINIMUM_VIDEO_HEIGHT_IN_PIXELS, video.getHeight()));
             ScanProgressUpdater scanProgressUpdater = new ScanProgressUpdater(player, playbackProgress);
             player.setOnEndOfMedia(() -> player.stop());
             player.setOnStopped(() -> {
