@@ -22,7 +22,7 @@ public class TestUtil {
     }
 
     public static String randomAlphanumericString() {
-        int stringLength = RANDOM.nextInt(1, 101);
+        int stringLength = randomInt(1, 101);
         StringBuilder result = new StringBuilder();
         for(int i = 1; i <= stringLength; i++) {
             int characterIndex = RANDOM.nextInt(0, ALPHANUMERIC_CHARACTERS.length());
@@ -30,6 +30,14 @@ public class TestUtil {
         }
 
         return result.toString();
+    }
+
+    public static int randomInt() {
+        return randomInt(0, Integer.MAX_VALUE);
+    }
+
+    public static int randomInt(int lowerInclusive, int upperInclusive) {
+        return RANDOM.nextInt(lowerInclusive, upperInclusive + 1);
     }
 
     public static Scan randomScan() {
