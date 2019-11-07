@@ -4,14 +4,30 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import edus2.domain.EDUS2Configuration;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 public class FileEDUS2Configuration extends FileRepository implements EDUS2Configuration {
 
+    public static final String CONFIG_FILE_NAME = "edus2j.conf";
     private Gson gson;
 
-    public FileEDUS2Configuration(String fileLocation) {
-        super(fileLocation);
+    public FileEDUS2Configuration(String saveFileDirectory) {
+        super(saveFileDirectory + "\\" + CONFIG_FILE_NAME);
+        Path path = Paths.get(saveFileDirectory);
+        try {
+            Files.createDirectories(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        this.gson = new GsonBuilder().create();
+    }
+
+    public FileEDUS2Configuration(String fileDirectory, String fileName) {
+        super(fileDirectory + "\\" + fileName);
         this.gson = new GsonBuilder().create();
     }
 
