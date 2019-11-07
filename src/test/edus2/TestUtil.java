@@ -33,7 +33,7 @@ public class TestUtil {
     }
 
     public static int randomInt() {
-        return randomInt(0, Integer.MAX_VALUE);
+        return randomInt(0, Integer.MAX_VALUE - 1);
     }
 
     public static int randomInt(int lowerInclusive, int upperInclusive) {
