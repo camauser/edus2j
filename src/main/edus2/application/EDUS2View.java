@@ -168,7 +168,7 @@ public class EDUS2View extends Application {
 
         btnSettings.setOnAction(event -> {
             if (isAuthenticated()) {
-                SettingsWindow scanWindow = new SettingsWindow(scanFacade);
+                SettingsWindow scanWindow = new SettingsWindow(scanFacade, authenticationFacade);
                 Stage scanWindowStage = new Stage();
                 Scene scanWindowScene = new Scene(scanWindow);
                 scanWindowStage.setScene(scanWindowScene);

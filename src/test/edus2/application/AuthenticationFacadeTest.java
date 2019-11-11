@@ -77,4 +77,16 @@ public class AuthenticationFacadeTest {
         // Assert
         assertTrue(actual);
     }
+
+    @Test
+    public void setPassword_shouldSetPassword() {
+        // Arrange
+        authenticationFacade.setPassword("password");
+
+        // Act
+        boolean actual = authenticationFacade.isValidLogin("password");
+
+        // Assert
+        assertTrue(actual);
+    }
 }

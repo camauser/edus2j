@@ -29,4 +29,7 @@ public class AuthenticationFacade {
         return hashedAttempt.equalsIgnoreCase(hashedPassword);
     }
 
+    public void setPassword(String newPassword) {
+        configuration.setHashedPassword(DigestUtils.sha256Hex(newPassword));
+    }
 }
