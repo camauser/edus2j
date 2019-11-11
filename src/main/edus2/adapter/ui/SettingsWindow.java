@@ -16,12 +16,14 @@ package edus2.adapter.ui;/*
  */
 
 import edus2.adapter.logging.LoggerSingleton;
+import edus2.application.AuthenticationFacade;
 import edus2.application.EDUS2View;
 import edus2.application.ScanFacade;
 import edus2.application.exception.EmptyScanIdException;
 import edus2.application.exception.ScanAlreadyExistsException;
 import edus2.domain.Scan;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -51,16 +53,18 @@ public class SettingsWindow extends VBox {
     private Stage stage;
     private ScansWindow scanList;
     private ScanFacade scanFacade;
+    private AuthenticationFacade authenticationFacade;
 
     /**
      * Constructor for the SettingsWindow class.
      *
      * @param scanFacade - the Scans to pass into the ScansWindow constructor.
      */
-    public SettingsWindow(ScanFacade scanFacade) {
+    public SettingsWindow(ScanFacade scanFacade, AuthenticationFacade authenticationFacade) {
         // Just set up a settings window, which is then shown on-screen
         super(10);
         this.scanFacade = scanFacade;
+        this.authenticationFacade = authenticationFacade;
         scanList = new ScansWindow(scanFacade);
         HBox buttons = new HBox();
 
@@ -70,6 +74,7 @@ public class SettingsWindow extends VBox {
         Button btnDeleteAll = new Button("Delete All");
         Button btnImport = new Button("Import from File");
         Button btnExport = new Button("Export to File");
+        Button btnSetPassword = new Button("Set Password");
 
         // When add is clicked, run through the process of adding a new scan
         btnAdd.setOnAction(event -> {
@@ -121,10 +126,33 @@ public class SettingsWindow extends VBox {
         // Export all the current scans to a file
         btnExport.setOnAction(event -> exportScans());
 
+        btnSetPassword.setOnAction(handlePasswordSet());
+
         buttons.setAlignment(Pos.CENTER);
         buttons.getChildren().addAll(btnAdd, btnBulkAdd, btnDelete,
-                btnDeleteAll, btnImport, btnExport);
+                btnDeleteAll, btnImport, btnExport, btnSetPassword);
         this.getChildren().addAll(scanList, buttons);
+    }
+
+    private EventHandler<ActionEvent> handlePasswordSet() {
+        return event -> {
+            PasswordInputDialog passwordInputDialog = new PasswordInputDialog("Set Password", "Enter new password used to secure scan settings");
+            Optional<String> password = passwordInputDialog.showAndWait();
+            if (password.isPresent()) {
+                PasswordInputDialog passwordConfirmationDialog = new PasswordInputDialog("Confirm Password", "Please confirm the password you entered");
+                Optional<String> passwordConfirmation = passwordConfirmationDialog.showAndWait();
+                if (passwordConfirmation.isPresent() && password.get().equals(passwordConfirmation.get())) {
+                    authenticationFacade.setPassword(password.get());
+                    Alert alert = new Alert(AlertType.INFORMATION, "Password successfully set.");
+                    alert.setHeaderText("Success");
+                    alert.showAndWait();
+                } else if (passwordConfirmation.isPresent()) {
+                    Alert alert = new Alert(AlertType.ERROR, "Password and password confirmation didn't match!");
+                    alert.setHeaderText("Failure");
+                    alert.showAndWait();
+                }
+            }
+        };
     }
 
     private void promptForScanIdAndSaveScan(File file) {
