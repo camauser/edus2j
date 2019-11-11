@@ -57,9 +57,8 @@ import java.util.Optional;
  * @version 1.0
  */
 public class EDUS2View extends Application {
-    public static final int DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS = 1280;
-    public static final int DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS = 720;
-    // TODO: Change import/export file format to be JSON - get rid of CSV import business
+    private static final int DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS = 1280;
+    private static final int DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS = 720;
     private String currentScan = "";
     private String currentScanPlaying = "";
     private static ProgressBar playbackProgress;
