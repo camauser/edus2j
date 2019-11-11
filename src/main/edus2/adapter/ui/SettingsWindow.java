@@ -15,7 +15,6 @@ package edus2.adapter.ui;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import edus2.adapter.logging.LoggerSingleton;
 import edus2.application.AuthenticationFacade;
 import edus2.application.EDUS2View;
 import edus2.application.ScanFacade;
@@ -208,8 +207,7 @@ public class SettingsWindow extends VBox {
                 input.close();
                 scanFacade.importCSV(entireFile.toString());
             } catch (Exception e) {
-                e.printStackTrace();
-                LoggerSingleton.logErrorIfEnabled("Encountered error importing scans: " + e.getMessage());
+                throw new RuntimeException("Encountered error importing scans: " + e.getMessage(), e);
             }
         }
     }
@@ -228,13 +226,11 @@ public class SettingsWindow extends VBox {
                 output.println(EDUS2View.IMPORT_MESSAGE);
                 output.print(scanFacade.toCSV());
                 output.flush();
-                LoggerSingleton.logInfoIfEnabled("Exported all scans to file \"" + selected.getName() + "\"");
                 output.close();
                 Alert alert = new Alert(AlertType.CONFIRMATION, "Scans exported successfully!");
                 alert.showAndWait();
             } catch (Exception e) {
-                e.printStackTrace();
-                LoggerSingleton.logErrorIfEnabled("Error exporting all scans: " + e.getMessage());
+                throw new RuntimeException("Error exporting all scans: " + e.getMessage(), e);
             }
         }
     }

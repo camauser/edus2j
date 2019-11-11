@@ -1,7 +1,5 @@
 package edus2.adapter.repository.file;
 
-import edus2.adapter.logging.LoggerSingleton;
-
 import java.io.*;
 import java.util.Optional;
 
@@ -40,7 +38,7 @@ public abstract class FileRepository {
                 writer.write(content);
             }
         } catch (IOException e) {
-            LoggerSingleton.logErrorIfEnabled("Unable to save to " + fileName + ". Error: " + e.getMessage());
+            throw new RuntimeException("Unable to save to " + fileName + ". Error: " + e.getMessage(), e);
         }
     }
 }
