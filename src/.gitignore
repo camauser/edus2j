@@ -1,3 +1,5 @@
 .idea
 EDUS2Data.json
 edus2j.log
+/target/classes/META-INF/edus2j.kotlin_module
+/target/test-classes/META-INF/edus2j.kotlin_module

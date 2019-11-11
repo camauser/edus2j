@@ -19,14 +19,17 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import edus2.adapter.guice.EDUS2JModule;
 import edus2.adapter.logging.LoggerSingleton;
+import edus2.adapter.ui.PasswordInputDialog;
 import edus2.adapter.ui.ScanProgressUpdater;
 import edus2.adapter.ui.SettingsWindow;
+import edus2.domain.EDUS2Configuration;
 import edus2.domain.Scan;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
@@ -45,6 +48,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.Optional;
 
 /**
  * Purpose: The main class used to run the EDUS2J program.
@@ -53,8 +57,8 @@ import java.io.File;
  * @version 1.0
  */
 public class EDUS2View extends Application {
-    public static final int MINIMUM_VIDEO_WIDTH_IN_PIXELS = 1280;
-    public static final int MINIMUM_VIDEO_HEIGHT_IN_PIXELS = 720;
+    public static final int DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS = 1280;
+    public static final int DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS = 720;
     // TODO: Change import/export file format to be JSON - get rid of CSV import business
     private String currentScan = "";
     private String currentScanPlaying = "";
@@ -72,6 +76,8 @@ public class EDUS2View extends Application {
     private static final String NO_ERROR_FLAG = "--no-error";
     private ScanFacade scanFacade;
     private static Injector injector;
+    private EDUS2Configuration configuration;
+    private AuthenticationFacade authenticationFacade;
 
     public static void main(String[] args) {
         // Run the start method, and open up the GUI
@@ -117,6 +123,8 @@ public class EDUS2View extends Application {
      */
     public void start(Stage stage) {
         scanFacade = injector.getInstance(ScanFacade.class);
+        configuration = injector.getInstance(EDUS2Configuration.class);
+        authenticationFacade = injector.getInstance(AuthenticationFacade.class);
 
         main = new BorderPane();
         main.setTop(generateTop());
@@ -159,22 +167,47 @@ public class EDUS2View extends Application {
         btnFullscreen.setOnAction(event -> stage.setFullScreen(!stage.isFullScreen()));
 
         btnSettings.setOnAction(event -> {
-            SettingsWindow scanWindow = new SettingsWindow(scanFacade);
-            Stage scanWindowStage = new Stage();
-            Scene scanWindowScene = new Scene(scanWindow);
-            scanWindowStage.setScene(scanWindowScene);
+            if (isAuthenticated()) {
+                SettingsWindow scanWindow = new SettingsWindow(scanFacade);
+                Stage scanWindowStage = new Stage();
+                Scene scanWindowScene = new Scene(scanWindow);
+                scanWindowStage.setScene(scanWindowScene);
 
-            // Set the stage ref in our settings window so that we
-            // can show on-screen pop-ups for adding scans
-            scanWindow.setStage(scanWindowStage);
+                // Set the stage ref in our settings window so that we
+                // can show on-screen pop-ups for adding scans
+                scanWindow.setStage(scanWindowStage);
 
-            scanWindowStage.show();
+                scanWindowStage.show();
+            } else {
+                Alert invalidPasswordAlert = new Alert(Alert.AlertType.ERROR);
+                invalidPasswordAlert.setTitle("Invalid password");
+                invalidPasswordAlert.setContentText("Invalid password entered.");
+                invalidPasswordAlert.showAndWait();
+            }
 
         });
 
         btnQuit.setOnAction(event -> stage.close());
 
         return buttons;
+    }
+
+    private boolean isAuthenticated() {
+        if (!authenticationFacade.isAuthenticationEnabled()) {
+            return true;
+        }
+
+        Optional<String> passwordAttemptOptional = promptForPassword();
+
+        if (!passwordAttemptOptional.isPresent()) {
+            return false;
+        }
+        return authenticationFacade.isValidLogin(passwordAttemptOptional.get());
+    }
+
+    private Optional<String> promptForPassword() {
+        PasswordInputDialog passwordEntryBox = new PasswordInputDialog("Enter Password", "Please enter password to continue");
+        return passwordEntryBox.showAndWait();
     }
 
     private VBox generateTop() {
@@ -268,9 +301,10 @@ public class EDUS2View extends Application {
 
         player.setOnReady(() -> {
             videoView.setPreserveRatio(false);
-            // TODO: Move the min width/height into config file
-            videoView.setFitWidth(Math.max(MINIMUM_VIDEO_WIDTH_IN_PIXELS, video.getWidth()));
-            videoView.setFitHeight(Math.max(MINIMUM_VIDEO_HEIGHT_IN_PIXELS, video.getHeight()));
+            int minVideoWidth = configuration.getMinimumVideoWidth().orElse(DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS);
+            int minVideoHeight = configuration.getMinimumVideoHeight().orElse(DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS);
+            videoView.setFitWidth(Math.max(minVideoWidth, video.getWidth()));
+            videoView.setFitHeight(Math.max(minVideoHeight, video.getHeight()));
             ScanProgressUpdater scanProgressUpdater = new ScanProgressUpdater(player, playbackProgress);
             player.setOnEndOfMedia(() -> player.stop());
             player.setOnStopped(() -> {
