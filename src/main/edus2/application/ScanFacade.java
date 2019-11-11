@@ -15,7 +15,6 @@ package edus2.application;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import edus2.adapter.logging.LoggerSingleton;
 import edus2.application.exception.EmptyScanIdException;
 import edus2.application.exception.ScanAlreadyExistsException;
 import edus2.domain.Scan;
@@ -36,14 +35,7 @@ public class ScanFacade {
     }
 
     public Optional<Scan> getScan(String id) {
-        Optional<Scan> scan = getAllScans().stream().filter(s -> s.getId().equals(id)).findFirst();
-        if (scan.isPresent()) {
-            LoggerSingleton.logInfoIfEnabled("The path for scan \"" + id + "\" appears to be " + scan.get().getPath());
-        } else {
-            LoggerSingleton.logInfoIfEnabled("Scan \"" + id + "\" doesn't exist in the system");
-        }
-
-        return scan;
+        return getAllScans().stream().filter(s -> s.getId().equals(id)).findFirst();
     }
 
     public boolean containsScan(String id) {

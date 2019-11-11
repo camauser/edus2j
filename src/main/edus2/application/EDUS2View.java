@@ -18,7 +18,6 @@ package edus2.application;/*
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import edus2.adapter.guice.EDUS2JModule;
-import edus2.adapter.logging.LoggerSingleton;
 import edus2.adapter.ui.PasswordInputDialog;
 import edus2.adapter.ui.ScanProgressUpdater;
 import edus2.adapter.ui.SettingsWindow;
@@ -67,12 +66,6 @@ public class EDUS2View extends Application {
     public static final String IMPORT_MESSAGE = "### EDUS2 Scan Import File - Do not edit! ###";
     private static final Font BUTTON_FONT = new Font("Calibri", 18);
     public static final String EDUS2_SAVE_FILE_NAME = "EDUS2Data.json";
-    private static final String INFO_FLAG = "--info";
-    private static final String WARNING_FLAG = "--warning";
-    private static final String ERROR_FLAG = "--error";
-    private static final String NO_INFO_FLAG = "--no-info";
-    private static final String NO_WARNING_FLAG = "--no-warning";
-    private static final String NO_ERROR_FLAG = "--no-error";
     private ScanFacade scanFacade;
     private static Injector injector;
     private EDUS2Configuration configuration;
@@ -81,35 +74,7 @@ public class EDUS2View extends Application {
     public static void main(String[] args) {
         // Run the start method, and open up the GUI
         injector = Guice.createInjector(new EDUS2JModule());
-        LoggerSingleton.initializeLogger();
-        LoggerSingleton.enableErrorLogging();
-        processArguments(args);
         Application.launch(args);
-    }
-
-    private static void processArguments(String[] args) {
-        for (String arg : args) {
-            switch (arg) {
-                case INFO_FLAG:
-                    LoggerSingleton.enableInfoLogging();
-                    break;
-                case WARNING_FLAG:
-                    LoggerSingleton.enableWarningLogging();
-                    break;
-                case ERROR_FLAG:
-                    LoggerSingleton.enableErrorLogging();
-                    break;
-                case NO_INFO_FLAG:
-                    LoggerSingleton.disableInfoLogging();
-                    break;
-                case NO_WARNING_FLAG:
-                    LoggerSingleton.disableWarningLogging();
-                    break;
-                case NO_ERROR_FLAG:
-                    LoggerSingleton.disableErrorLogging();
-                    break;
-            }
-        }
     }
 
     public static Image getThumbnailImage() {
@@ -264,9 +229,7 @@ public class EDUS2View extends Application {
     }
 
     private void processScanRequest() {
-        LoggerSingleton.logInfoIfEnabled("Scan \"" + currentScan + "\" was entered");
         if (scanFacade.getScan(currentScan).isPresent()) {
-            LoggerSingleton.logInfoIfEnabled("Scan \"" + currentScan + "\" exists in the system");
             if (!isScanPlaying(scanFacade.getScan(currentScan).get())) {
                 stopPlayer();
                 playScan(scanFacade.getScan(currentScan).get());
@@ -291,7 +254,6 @@ public class EDUS2View extends Application {
 
     private void playScan(Scan scan) {
         String scanPath = scan.getPath();
-        LoggerSingleton.logInfoIfEnabled("Starting to play " + scanPath + " for scan \"" + scan.getId() + "\"");
         currentScanPlaying = scan.getId();
         Media video = new Media(scanPath);
         player = new MediaPlayer(video);
