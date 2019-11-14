@@ -65,7 +65,6 @@ public class EDUS2View extends Application {
     private BorderPane main;
     public static final String IMPORT_MESSAGE = "### EDUS2 Scan Import File - Do not edit! ###";
     private static final Font BUTTON_FONT = new Font("Calibri", 18);
-    public static final String EDUS2_SAVE_FILE_NAME = "EDUS2Data.json";
     private ScanFacade scanFacade;
     private static Injector injector;
     private EDUS2Configuration configuration;
@@ -132,7 +131,7 @@ public class EDUS2View extends Application {
 
         btnSettings.setOnAction(event -> {
             if (isAuthenticated()) {
-                SettingsWindow scanWindow = new SettingsWindow(scanFacade, authenticationFacade);
+                SettingsWindow scanWindow = new SettingsWindow(scanFacade, authenticationFacade, configuration);
                 Stage scanWindowStage = new Stage();
                 Scene scanWindowScene = new Scene(scanWindow);
                 scanWindowStage.setScene(scanWindowScene);

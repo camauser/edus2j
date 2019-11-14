@@ -4,12 +4,8 @@ import java.io.*;
 import java.util.Optional;
 
 public abstract class FileRepository {
-    private final String fileName;
 
-    public FileRepository(String fileName) {
-        this.fileName = fileName;
-    }
-    protected Optional<String> readFileContents() {
+    protected Optional<String> readFileContents(String fileName) {
         File file = new File(fileName);
         StringBuilder json = new StringBuilder();
         try {
@@ -30,7 +26,7 @@ public abstract class FileRepository {
         return Optional.of(json.toString());
     }
 
-    protected void saveToFile(String content) {
+    protected void saveToFile(String content, String fileName) {
         File file = new File(fileName);
         try {
             file.createNewFile();

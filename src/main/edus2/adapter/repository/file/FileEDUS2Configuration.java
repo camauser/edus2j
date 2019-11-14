@@ -10,14 +10,15 @@ import java.util.Optional;
 public class FileEDUS2Configuration extends FileRepository implements EDUS2Configuration {
 
     private Gson gson;
+    String filePath;
 
     public FileEDUS2Configuration(String saveFilePath) {
-        super(Paths.get(saveFilePath).toString());
+        this.filePath = Paths.get(saveFilePath).toString();
         this.gson = new GsonBuilder().create();
     }
 
     FileEDUS2Configuration(String fileDirectory, String fileName) {
-        super(fileDirectory + "\\" + fileName);
+        this.filePath = fileDirectory + "\\" + fileName;
         this.gson = new GsonBuilder().create();
     }
 
@@ -46,7 +47,7 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         Optional<EDUS2ConfigurationDto> dtoOptional = getDto();
         EDUS2ConfigurationDto dto = dtoOptional.orElseGet(EDUS2ConfigurationDto::new);
         dto.minimumVideoHeight = minimumVideoHeight;
-        saveToFile(gson.toJson(dto));
+        saveToFile(gson.toJson(dto), filePath);
     }
 
     @Override
@@ -54,7 +55,7 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         Optional<EDUS2ConfigurationDto> dtoOptional = getDto();
         EDUS2ConfigurationDto dto = dtoOptional.orElseGet(EDUS2ConfigurationDto::new);
         dto.minimumVideoWidth = minimumVideoWidth;
-        saveToFile(gson.toJson(dto));
+        saveToFile(gson.toJson(dto), filePath);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         Optional<EDUS2ConfigurationDto> dtoOptional = getDto();
         EDUS2ConfigurationDto dto = dtoOptional.orElseGet(EDUS2ConfigurationDto::new);
         dto.hashedPassword = hashedPassword;
-        saveToFile(gson.toJson(dto));
+        saveToFile(gson.toJson(dto), filePath);
     }
 
     @Override
@@ -70,11 +71,11 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         Optional<EDUS2ConfigurationDto> dtoOptional = getDto();
         EDUS2ConfigurationDto dto = dtoOptional.orElseGet(EDUS2ConfigurationDto::new);
         dto.scanFileLocation = scanFileLocation;
-        saveToFile(gson.toJson(dto));
+        saveToFile(gson.toJson(dto), filePath);
     }
 
     private Optional<EDUS2ConfigurationDto> getDto() {
-        Optional<String> fileContents = readFileContents();
+        Optional<String> fileContents = readFileContents(filePath);
         return fileContents.map(s -> gson.fromJson(s, EDUS2ConfigurationDto.class));
     }
 

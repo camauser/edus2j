@@ -89,4 +89,17 @@ public class AuthenticationFacadeTest {
         // Assert
         assertTrue(actual);
     }
+
+    @Test
+    public void clearPassword_shouldRemovePassword() {
+        // Arrange
+        authenticationFacade.setPassword("password");
+
+        // Act
+        authenticationFacade.clearPassword();
+
+        // Assert
+        boolean actual = authenticationFacade.isAuthenticationEnabled();
+        assertFalse(actual);
+    }
 }
