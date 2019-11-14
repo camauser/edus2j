@@ -1,6 +1,7 @@
 package edus2;
 
 import edus2.adapter.repository.file.FileScanRepository;
+import edus2.adapter.repository.memory.InMemoryEDUS2Configuration;
 import edus2.application.ScanFacade;
 import edus2.application.exception.EmptyScanIdException;
 import edus2.application.exception.ScanAlreadyExistsException;
@@ -22,7 +23,9 @@ public class ScanFacadeTest {
 
     @Before
     public void setup() {
-        scanFacade = new ScanFacade(new FileScanRepository(randomTempFile()));
+        InMemoryEDUS2Configuration configuration = new InMemoryEDUS2Configuration();
+        configuration.setScanFileLocation(randomTempFile());
+        scanFacade = new ScanFacade(new FileScanRepository(configuration));
         scan = randomScan();
     }
 

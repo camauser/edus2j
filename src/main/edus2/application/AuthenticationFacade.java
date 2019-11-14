@@ -32,4 +32,8 @@ public class AuthenticationFacade {
     public void setPassword(String newPassword) {
         configuration.setHashedPassword(DigestUtils.sha256Hex(newPassword));
     }
+
+    public void clearPassword() {
+        configuration.setHashedPassword(null);
+    }
 }

@@ -1,6 +1,7 @@
 package edus2.adapter;
 
 import edus2.adapter.repository.file.FileScanRepository;
+import edus2.adapter.repository.memory.InMemoryEDUS2Configuration;
 import edus2.domain.ScanRepository;
 import edus2.domain.ScanRepositoryTest;
 
@@ -15,6 +16,8 @@ public class FileScanRepositoryTest extends ScanRepositoryTest {
         String fileName = randomAlphanumericString();
         File file = new File(fileName);
         file.deleteOnExit();
-        return new FileScanRepository(fileName);
+        InMemoryEDUS2Configuration configuration = new InMemoryEDUS2Configuration();
+        configuration.setScanFileLocation(file.getAbsolutePath());
+        return new FileScanRepository(configuration);
     }
 }
