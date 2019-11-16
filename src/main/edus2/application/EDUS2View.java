@@ -58,6 +58,7 @@ import java.util.Optional;
 public class EDUS2View extends Application {
     private static final int DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS = 1280;
     private static final int DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS = 720;
+    private static final double MAX_VIDEO_TO_SCREEN_SIZE_RATIO = 0.8;
     private String currentScan = "";
     private String currentScanPlaying = "";
     private static ProgressBar playbackProgress;
@@ -263,8 +264,10 @@ public class EDUS2View extends Application {
             videoView.setPreserveRatio(false);
             int minVideoWidth = configuration.getMinimumVideoWidth().orElse(DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS);
             int minVideoHeight = configuration.getMinimumVideoHeight().orElse(DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS);
-            videoView.setFitWidth(Math.max(minVideoWidth, video.getWidth()));
-            videoView.setFitHeight(Math.max(minVideoHeight, video.getHeight()));
+            double windowWidth = main.getWidth();
+            double windowHeight = main.getHeight();
+            videoView.setFitWidth(calculateVideoDimension(minVideoWidth, video.getWidth(), windowWidth));
+            videoView.setFitHeight(calculateVideoDimension(minVideoHeight, video.getHeight(), windowHeight));
             ScanProgressUpdater scanProgressUpdater = new ScanProgressUpdater(player, playbackProgress);
             player.setOnEndOfMedia(() -> player.stop());
             player.setOnStopped(() -> {
@@ -275,6 +278,14 @@ public class EDUS2View extends Application {
             player.play();
             scanProgressUpdater.start();
         });
+    }
+
+    private double calculateVideoDimension(int minimumSize, int videoSize, double screenSize) {
+        if (videoSize > MAX_VIDEO_TO_SCREEN_SIZE_RATIO * screenSize) {
+            return Math.max(minimumSize, MAX_VIDEO_TO_SCREEN_SIZE_RATIO * screenSize);
+        } else {
+            return Math.max(minimumSize, videoSize);
+        }
     }
 
     public static String convertFilePath(String originalPath) {
