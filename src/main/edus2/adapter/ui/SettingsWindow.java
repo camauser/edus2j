@@ -15,6 +15,7 @@ package edus2.adapter.ui;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import edus2.adapter.persistence.FileScanImportExportRepository;
 import edus2.application.AuthenticationFacade;
 import edus2.application.EDUS2View;
 import edus2.application.ScanFacade;
@@ -35,10 +36,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -53,6 +51,7 @@ public class SettingsWindow extends VBox {
     private Stage stage;
     private ScansWindow scanList;
     private ScanFacade scanFacade;
+    private FileScanImportExportRepository importExportRepository;
 
     /**
      * Constructor for the SettingsWindow class.
@@ -63,6 +62,7 @@ public class SettingsWindow extends VBox {
         // Just set up a settings window, which is then shown on-screen
         super(10);
         this.scanFacade = scanFacade;
+        this.importExportRepository = new FileScanImportExportRepository(scanFacade);
         scanList = new ScansWindow(scanFacade);
         HBox scanSettingButtonsBox = new HBox();
         HBox configurationButtonBox = new HBox();
@@ -189,16 +189,11 @@ public class SettingsWindow extends VBox {
         File scanFile = browser.showOpenDialog(stage);
         if (scanFile != null) {
             try {
-                BufferedReader input = new BufferedReader(new FileReader(scanFile));
-                StringBuilder entireFile = new StringBuilder();
-                String currentLine;
-                while ((currentLine = input.readLine()) != null) {
-                    entireFile.append(currentLine).append("\n");
-                }
-                input.close();
-                scanFacade.importCSV(entireFile.toString());
+                importExportRepository.importScansFromFile(scanFile);
+                scanList.refreshTableItems();
             } catch (Exception e) {
-                throw new RuntimeException("Encountered error importing scans: " + e.getMessage(), e);
+                Alert alert = new Alert(AlertType.ERROR, String.format("Encountered error while importing scans: %s", e.getMessage()));
+                alert.showAndWait();
             }
         }
     }
@@ -212,16 +207,12 @@ public class SettingsWindow extends VBox {
         File selected = browser.showSaveDialog(stage);
         if (selected != null) {
             try {
-                PrintWriter output = new PrintWriter(selected);
-                // Print out our header first
-                output.println(EDUS2View.IMPORT_MESSAGE);
-                output.print(scanFacade.toCSV());
-                output.flush();
-                output.close();
-                Alert alert = new Alert(AlertType.CONFIRMATION, "Scans exported successfully!");
+                importExportRepository.exportScansToFile(selected);
+                Alert alert = new Alert(AlertType.INFORMATION, "Scans exported successfully!");
                 alert.showAndWait();
             } catch (Exception e) {
-                throw new RuntimeException("Error exporting all scans: " + e.getMessage(), e);
+                Alert alert = new Alert(AlertType.ERROR, String.format("Encountered error while exporting scans: %s", e.getMessage()));
+                alert.showAndWait();
             }
         }
     }
