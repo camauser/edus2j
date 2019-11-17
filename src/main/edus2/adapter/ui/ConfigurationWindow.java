@@ -66,10 +66,12 @@ public class ConfigurationWindow extends VBox {
     private void setScanFileLocation() {
         FileChooser fileChooser = new FileChooser();
         File scanFile = fileChooser.showOpenDialog(this.stage);
-        configuration.setScanFileLocation(scanFile.getAbsolutePath());
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Scan file location updated.");
-        alert.setHeaderText("Scan File Location Successfully Updated");
-        alert.showAndWait();
+        if (scanFile != null) {
+            configuration.setScanFileLocation(scanFile.getAbsolutePath());
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Scan file location updated.");
+            alert.setHeaderText("Scan File Location Successfully Updated");
+            alert.showAndWait();
+        }
     }
 
     private void setPassword() {
