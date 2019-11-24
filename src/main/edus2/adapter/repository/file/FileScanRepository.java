@@ -13,27 +13,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class FileScanRepository  extends FileRepository implements ScanRepository {
+public class FileScanRepository extends FileCentralRepository implements ScanRepository {
+    private static final String SCAN_SECTION_NAME = "scans";
+    private static final Type SCAN_SECTION_TYPE = new TypeToken<List<Scan>>(){}.getType();
     private static final String DEFAULT_SCAN_FILE = "EDUS2Data.json";
     private final Gson gson;
-    private EDUS2Configuration configuration;
 
     @Inject
     public FileScanRepository(EDUS2Configuration configuration) {
-        this.configuration = configuration;
+        super(configuration.getScanFileLocation().orElse(DEFAULT_SCAN_FILE));
         this.gson = new GsonBuilder().create();
+    }
+
+    @Override
+    protected String getSectionName() {
+        return SCAN_SECTION_NAME;
     }
 
     @Override
     public List<Scan> retrieveAll() {
         List<Scan> scans = new ArrayList<>();
-        Optional<String> jsonOptional = readFileContents(getScanFile());
+        Optional<String> jsonOptional = retrieveSection();
         if (!jsonOptional.isPresent()) {
             return scans;
         }
 
-        Type type = new TypeToken<List<Scan>>(){}.getType();
-        List<Scan> retrievedScans = gson.fromJson(jsonOptional.get(), type);
+        List<Scan> retrievedScans = gson.fromJson(jsonOptional.get(), SCAN_SECTION_TYPE);
         scans.addAll(retrievedScans);
         return scans;
     }
@@ -43,7 +48,7 @@ public class FileScanRepository  extends FileRepository implements ScanRepositor
         List<Scan> allScans = retrieveAll();
         allScans.add(scan);
         String jsonScanString = gson.toJson(allScans);
-        saveToFile(jsonScanString, getScanFile());
+        saveSection(jsonScanString);
     }
 
     @Override
@@ -51,17 +56,13 @@ public class FileScanRepository  extends FileRepository implements ScanRepositor
         List<Scan> allScans = retrieveAll();
         allScans.remove(scan);
         String jsonScanString = gson.toJson(allScans);
-        saveToFile(jsonScanString, getScanFile());
+        saveSection(jsonScanString);
     }
 
     @Override
     public void removeAll() {
         List<Scan> noScans = new ArrayList<>();
         String jsonScanString = gson.toJson(noScans);
-        saveToFile(jsonScanString, getScanFile());
-    }
-
-    private String getScanFile() {
-        return configuration.getScanFileLocation().orElse(DEFAULT_SCAN_FILE);
+        saveSection(jsonScanString);
     }
 }

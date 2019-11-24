@@ -11,14 +11,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class FileMannequinRepository extends FileRepository implements MannequinRepository {
+public class FileMannequinRepository extends FileCentralRepository implements MannequinRepository {
 
-    private String filePath;
+    private static final String MANNEQUIN_SECTION_NAME = "mannequins";
+    private static final Type MANNEQUIN_SECTION_TYPE = new TypeToken<List<Mannequin>>(){}.getType();
     private final Gson gson;
 
     public FileMannequinRepository(String filePath) {
-        this.filePath = filePath;
+        super(filePath);
         this.gson = new GsonBuilder().create();
+    }
+
+    @Override
+    protected String getSectionName() {
+        return MANNEQUIN_SECTION_NAME;
     }
 
     @Override
@@ -28,10 +34,9 @@ public class FileMannequinRepository extends FileRepository implements Mannequin
 
     @Override
     public List<Mannequin> retrieveAll() {
-        Type type = new TypeToken<List<Mannequin>>(){}.getType();
-        Optional<String> fileContents = readFileContents(filePath);
+        Optional<String> json = retrieveSection();
         //noinspection unchecked
-        return fileContents.map(fc -> (List<Mannequin>)gson.fromJson(fc, type)).orElse(new ArrayList<>());
+        return json.map(fc -> (List<Mannequin>)gson.fromJson(fc, MANNEQUIN_SECTION_TYPE)).orElse(new ArrayList<>());
     }
 
     @Override
@@ -39,13 +44,13 @@ public class FileMannequinRepository extends FileRepository implements Mannequin
         List<Mannequin> mannequins = retrieveAll();
         mannequins.removeIf(m -> m.getName().equals(mannequin.getName()));
         mannequins.add(mannequin);
-        saveToFile(gson.toJson(mannequins), filePath);
+        saveSection(gson.toJson(mannequins));
     }
 
     @Override
     public void remove(String name) {
         List<Mannequin> mannequins = retrieveAll();
         mannequins.removeIf(m -> m.getName().equals(name));
-        saveToFile(gson.toJson(mannequins), filePath);
+        saveSection(gson.toJson(mannequins));
     }
 }
