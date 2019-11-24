@@ -85,21 +85,21 @@ public abstract class EDUS2ConfigurationTest {
     }
 
     @Test
-    public void getScanFileLocation_shouldReturnEmpty_whenNoLocationSpecified() {
+    public void getSaveFileLocation_shouldReturnEmpty_whenNoLocationSpecified() {
         // Act
-        Optional<String> actual = configuration.getScanFileLocation();
+        Optional<String> actual = configuration.getSaveFileLocation();
 
         // Assert
         assertFalse(actual.isPresent());
     }
 
     @Test
-    public void getScanFileLocation_shouldReturnScanLocation_whenLocationSet() {
+    public void getSaveFileLocation_shouldReturnScanLocation_whenLocationSet() {
         // Arrange
-        configuration.setScanFileLocation("file/scan/location.json");
+        configuration.setSaveFileLocation("file/scan/location.json");
 
         // Act
-        Optional<String> actual = configuration.getScanFileLocation();
+        Optional<String> actual = configuration.getSaveFileLocation();
 
         // Assert
         assertEquals(Optional.of("file/scan/location.json"), actual);

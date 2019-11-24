@@ -51,25 +51,25 @@ public class ConfigurationWindow extends VBox {
         Button btnSaveChanges = new Button("Save Changes");
         Button btnSetPassword = new Button("Set Password");
         Button btnClearPassword = new Button("Clear Password");
-        Button btnScanFileLocation = new Button("Set Scan File Location");
+        Button btnSaveFileLocation = new Button("Set Save File Location");
         btnSetPassword.setOnAction(a -> setPassword());
         btnClearPassword.setOnAction(a -> clearPassword());
-        btnScanFileLocation.setOnAction(a -> setScanFileLocation());
+        btnSaveFileLocation.setOnAction(a -> setSaveFileLocation());
         btnSaveChanges.setOnAction(a -> saveChanges());
         HBox saveBox = new HBox(btnSaveChanges);
         saveBox.setAlignment(Pos.CENTER);
-        HBox auxiliaryControls = new HBox(10, btnSetPassword, btnClearPassword, btnScanFileLocation);
+        HBox auxiliaryControls = new HBox(10, btnSetPassword, btnClearPassword, btnSaveFileLocation);
         auxiliaryControls.setAlignment(Pos.CENTER);
         this.getChildren().addAll(saveBox, auxiliaryControls);
     }
 
-    private void setScanFileLocation() {
+    private void setSaveFileLocation() {
         FileChooser fileChooser = new FileChooser();
-        File scanFile = fileChooser.showOpenDialog(this.stage);
-        if (scanFile != null) {
-            configuration.setScanFileLocation(scanFile.getAbsolutePath());
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Scan file location updated.");
-            alert.setHeaderText("Scan File Location Successfully Updated");
+        File saveFile = fileChooser.showOpenDialog(this.stage);
+        if (saveFile != null) {
+            configuration.setSaveFileLocation(saveFile.getAbsolutePath());
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Save file location updated.");
+            alert.setHeaderText("Save File Location Successfully Updated");
             alert.showAndWait();
         }
     }

@@ -10,7 +10,7 @@ import java.util.Optional;
 public class FileEDUS2Configuration extends FileRepository implements EDUS2Configuration {
 
     private Gson gson;
-    String filePath;
+    private String filePath;
 
     public FileEDUS2Configuration(String saveFilePath) {
         this.filePath = Paths.get(saveFilePath).toString();
@@ -38,8 +38,8 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
     }
 
     @Override
-    public Optional<String> getScanFileLocation() {
-        return getDto().map(dto -> dto.scanFileLocation);
+    public Optional<String> getSaveFileLocation() {
+        return getDto().map(dto -> dto.saveFileLocation);
     }
 
     @Override
@@ -67,10 +67,10 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
     }
 
     @Override
-    public void setScanFileLocation(String scanFileLocation) {
+    public void setSaveFileLocation(String saveFileLocation) {
         Optional<EDUS2ConfigurationDto> dtoOptional = getDto();
         EDUS2ConfigurationDto dto = dtoOptional.orElseGet(EDUS2ConfigurationDto::new);
-        dto.scanFileLocation = scanFileLocation;
+        dto.saveFileLocation = saveFileLocation;
         saveToFile(gson.toJson(dto), filePath);
     }
 
@@ -83,6 +83,6 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         protected Integer minimumVideoHeight;
         protected Integer minimumVideoWidth;
         protected String hashedPassword;
-        protected String scanFileLocation;
+        protected String saveFileLocation;
     }
 }

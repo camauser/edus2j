@@ -24,7 +24,7 @@ public class ScanFacadeTest {
     @Before
     public void setup() {
         InMemoryEDUS2Configuration configuration = new InMemoryEDUS2Configuration();
-        configuration.setScanFileLocation(randomTempFile());
+        configuration.setSaveFileLocation(randomTempFile());
         scanFacade = new ScanFacade(new FileScanRepository(configuration));
         scan = randomScan();
     }

@@ -16,12 +16,11 @@ import java.util.Optional;
 public class FileScanRepository extends FileCentralRepository implements ScanRepository {
     private static final String SCAN_SECTION_NAME = "scans";
     private static final Type SCAN_SECTION_TYPE = new TypeToken<List<Scan>>(){}.getType();
-    private static final String DEFAULT_SCAN_FILE = "EDUS2Data.json";
     private final Gson gson;
 
     @Inject
     public FileScanRepository(EDUS2Configuration configuration) {
-        super(configuration.getScanFileLocation().orElse(DEFAULT_SCAN_FILE));
+        super(configuration);
         this.gson = new GsonBuilder().create();
     }
 
