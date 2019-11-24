@@ -14,6 +14,14 @@ public class Mannequin {
         this.tagMap = tagMap;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public Map<MannequinScanEnum, String> getTagMap() {
+        return tagMap;
+    }
+
     private void validateAllScanPointsPresent(Map<MannequinScanEnum, String> tagMap) {
         for (MannequinScanEnum scanPoint : MannequinScanEnum.values()) {
             if (!tagMap.containsKey(scanPoint)) {
