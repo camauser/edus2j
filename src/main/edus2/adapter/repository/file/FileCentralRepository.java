@@ -7,23 +7,24 @@ import com.google.gson.JsonObject;
 
 import java.util.Optional;
 
-public class FileCentralRepository extends FileRepository {
+public abstract class FileCentralRepository extends FileRepository {
     private String fileName;
     private Gson gson;
 
+    // TODO: figure out how to allow for save file location changes
     public FileCentralRepository(String fileName) {
         this.fileName = fileName;
         this.gson = new GsonBuilder().create();
     }
 
-    protected Optional<String> retrieveSection(String name) {
+    protected Optional<String> retrieveSection() {
         Optional<String> fileContentsOptional = readFileContents(fileName);
         if (!fileContentsOptional.isPresent()) {
             return Optional.empty();
         }
 
         JsonObject json = gson.fromJson(fileContentsOptional.get(), JsonObject.class);
-        JsonElement section = json.get(name);
+        JsonElement section = json.get(getSectionName());
         if (section == null) {
             return Optional.empty();
         }
@@ -31,7 +32,7 @@ public class FileCentralRepository extends FileRepository {
         return Optional.of(section.getAsString());
     }
 
-    protected void saveSection(String name, String json) {
+    protected void saveSection(String json) {
         Optional<String> fileContentsOptional = readFileContents(fileName);
         JsonObject fileJson;
         if (fileContentsOptional.isPresent()) {
@@ -39,7 +40,9 @@ public class FileCentralRepository extends FileRepository {
         } else {
             fileJson = new JsonObject();
         }
-        fileJson.addProperty(name, json);
+        fileJson.addProperty(getSectionName(), json);
         saveToFile(gson.toJson(fileJson), fileName);
     }
+
+    protected abstract String getSectionName();
 }

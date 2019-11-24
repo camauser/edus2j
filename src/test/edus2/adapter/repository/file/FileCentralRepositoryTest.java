@@ -20,30 +20,26 @@ import static org.junit.Assert.assertFalse;
 public class FileCentralRepositoryTest {
 
     private FileCentralRepository repository;
+    private String sectionName;
+
     @Before
     public void setup() {
         String fileName = randomAlphanumericString();
         File file = new File(fileName);
         file.deleteOnExit();
-        this.repository = new FileCentralRepository(file.getAbsolutePath());
-    }
-
-    @Test
-    public void retrieveSection_shouldReturnEmpty_whenFileIsEmpty() {
-        // Act
-        Optional<String> actual = repository.retrieveSection(randomAlphanumericString());
-
-        // Assert
-        assertFalse(actual.isPresent());
+        this.sectionName = "hello";
+        this.repository = new FileCentralRepository(file.getAbsolutePath()) {
+            @Override
+            protected String getSectionName() {
+                return sectionName;
+            }
+        };
     }
 
     @Test
     public void retrieveSection_shouldReturnEmpty_whenFileDoesNotContainSection() {
-        // Arrange
-        repository.saveSection("hello", "world");
-
         // Act
-        Optional<String> actual = repository.retrieveSection(randomAlphanumericString());
+        Optional<String> actual = repository.retrieveSection();
 
         // Assert
         assertFalse(actual.isPresent());
@@ -53,10 +49,10 @@ public class FileCentralRepositoryTest {
     public void saveSection_shouldSaveSection_whenSectionDoesNotExist() {
         // Act
         String expected = "world";
-        repository.saveSection("hello", expected);
+        repository.saveSection(expected);
 
         // Assert
-        Optional<String> actual = repository.retrieveSection("hello");
+        Optional<String> actual = repository.retrieveSection();
         assertEquals(Optional.of(expected), actual);
     }
 
@@ -64,13 +60,13 @@ public class FileCentralRepositoryTest {
     public void saveSection_shouldOverwriteSection_whenSectionExists() {
         // Arrange
         String expected = "updated";
-        repository.saveSection("hello", "world");
+        repository.saveSection("world");
 
         // Act
-        repository.saveSection("hello", expected);
+        repository.saveSection(expected);
 
         // Assert
-        Optional<String> actual = repository.retrieveSection("hello");
+        Optional<String> actual = repository.retrieveSection();
         assertEquals(Optional.of(expected), actual);
     }
 
@@ -84,10 +80,10 @@ public class FileCentralRepositoryTest {
         scans.add(new Scan("id2", "path2"));
 
         // Act
-        repository.saveSection("scans", gson.toJson(scans));
+        repository.saveSection(gson.toJson(scans));
 
         // Assert
-        Optional<List<Scan>> actual = repository.retrieveSection("scans").map(j -> gson.fromJson(j, type));
+        Optional<List<Scan>> actual = repository.retrieveSection().map(j -> gson.fromJson(j, type));
         assertEquals(Optional.of(scans), actual);
     }
 }
