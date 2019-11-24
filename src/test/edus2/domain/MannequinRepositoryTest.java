@@ -105,14 +105,13 @@ public abstract class MannequinRepositoryTest {
         // Arrange
         String name = "mannequin";
         Map<MannequinScanEnum, String> tagMap = generateTagMap();
-        /// TODO: Ensure duplicateMap works as expected
         Mannequin mannequin = new Mannequin(duplicateMap(tagMap), name);
         repository.save(mannequin);
         String expected = tagMap.get(MannequinScanEnum.RIGHT_LUNG) + "-updated";
         tagMap.put(MannequinScanEnum.RIGHT_LUNG, expected);
 
         // Act
-        repository.save(mannequin);
+        repository.save(new Mannequin(tagMap, name));
 
         // Assert
         Optional<Mannequin> actual = repository.retrieve(name);
