@@ -9,7 +9,7 @@ public interface EDUS2Configuration {
 
      Optional<String> getHashedPassword();
 
-     Optional<String> getScanFileLocation();
+     Optional<String> getSaveFileLocation();
 
      void setMinimumVideoHeight(int minimumVideoHeight);
 
@@ -17,5 +17,5 @@ public interface EDUS2Configuration {
 
      void setHashedPassword(String hashedPassword);
 
-     void setScanFileLocation(String scanFileLocation);
+     void setSaveFileLocation(String saveFileLocation);
 }

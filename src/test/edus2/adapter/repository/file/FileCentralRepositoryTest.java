@@ -3,6 +3,8 @@ package edus2.adapter.repository.file;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import edus2.adapter.repository.memory.InMemoryEDUS2Configuration;
+import edus2.domain.EDUS2Configuration;
 import edus2.domain.Scan;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,8 +29,10 @@ public class FileCentralRepositoryTest {
         String fileName = randomAlphanumericString();
         File file = new File(fileName);
         file.deleteOnExit();
+        EDUS2Configuration configuration = new InMemoryEDUS2Configuration();
+        configuration.setSaveFileLocation(file.getAbsolutePath());
         this.sectionName = "hello";
-        this.repository = new FileCentralRepository(file.getAbsolutePath()) {
+        this.repository = new FileCentralRepository(configuration) {
             @Override
             protected String getSectionName() {
                 return sectionName;

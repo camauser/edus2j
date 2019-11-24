@@ -1,5 +1,7 @@
 package edus2.adapter.repository.file;
 
+import edus2.adapter.repository.memory.InMemoryEDUS2Configuration;
+import edus2.domain.EDUS2Configuration;
 import edus2.domain.MannequinRepository;
 import edus2.domain.MannequinRepositoryTest;
 
@@ -14,6 +16,8 @@ public class FileMannequinRepositoryTest extends MannequinRepositoryTest {
         String fileName = randomAlphanumericString();
         File file = new File(fileName);
         file.deleteOnExit();
-        return new FileMannequinRepository(file.getAbsolutePath());
+        EDUS2Configuration configuration = new InMemoryEDUS2Configuration();
+        configuration.setSaveFileLocation(file.getAbsolutePath());
+        return new FileMannequinRepository(configuration);
     }
 }

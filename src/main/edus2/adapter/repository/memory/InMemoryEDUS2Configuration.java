@@ -8,7 +8,7 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     private Integer minimumVideoHeight;
     private Integer minimumVideoWidth;
     private String hashedPassword;
-    private String scanFileLocation;
+    private String saveFileLocation;
 
     @Override
     public Optional<Integer> getMinimumVideoHeight() {
@@ -26,8 +26,8 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     }
 
     @Override
-    public Optional<String> getScanFileLocation() {
-        return Optional.ofNullable(scanFileLocation);
+    public Optional<String> getSaveFileLocation() {
+        return Optional.ofNullable(saveFileLocation);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     }
 
     @Override
-    public void setScanFileLocation(String scanFileLocation) {
-        this.scanFileLocation = scanFileLocation;
+    public void setSaveFileLocation(String saveFileLocation) {
+        this.saveFileLocation = saveFileLocation;
     }
 }

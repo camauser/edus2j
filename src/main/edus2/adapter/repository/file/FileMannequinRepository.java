@@ -3,6 +3,7 @@ package edus2.adapter.repository.file;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import edus2.domain.EDUS2Configuration;
 import edus2.domain.Mannequin;
 import edus2.domain.MannequinRepository;
 
@@ -17,8 +18,8 @@ public class FileMannequinRepository extends FileCentralRepository implements Ma
     private static final Type MANNEQUIN_SECTION_TYPE = new TypeToken<List<Mannequin>>(){}.getType();
     private final Gson gson;
 
-    public FileMannequinRepository(String filePath) {
-        super(filePath);
+    public FileMannequinRepository(EDUS2Configuration configuration) {
+        super(configuration);
         this.gson = new GsonBuilder().create();
     }
 

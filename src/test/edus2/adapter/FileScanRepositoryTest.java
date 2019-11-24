@@ -17,7 +17,7 @@ public class FileScanRepositoryTest extends ScanRepositoryTest {
         File file = new File(fileName);
         file.deleteOnExit();
         InMemoryEDUS2Configuration configuration = new InMemoryEDUS2Configuration();
-        configuration.setScanFileLocation(file.getAbsolutePath());
+        configuration.setSaveFileLocation(file.getAbsolutePath());
         return new FileScanRepository(configuration);
     }
 }
