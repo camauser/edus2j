@@ -53,11 +53,6 @@ public class ScanSettingsWindow extends VBox {
     private ScanFacade scanFacade;
     private FileScanImportExportRepository importExportRepository;
 
-    /**
-     * Constructor for the SettingsWindow class.
-     *
-     * @param scanFacade - the Scans to pass into the ScansWindow constructor.
-     */
     public ScanSettingsWindow(ScanFacade scanFacade, AuthenticationFacade authenticationFacade, EDUS2Configuration configuration) {
         // Just set up a settings window, which is then shown on-screen
         super(10);

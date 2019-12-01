@@ -18,6 +18,7 @@ package edus2.application;/*
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import edus2.adapter.guice.EDUS2JModule;
+import edus2.adapter.ui.MannequinSettingsWindow;
 import edus2.adapter.ui.PasswordInputDialog;
 import edus2.adapter.ui.ScanProgressUpdater;
 import edus2.adapter.ui.ScanSettingsWindow;
@@ -69,6 +70,7 @@ public class EDUS2View extends Application {
     private static Injector injector;
     private EDUS2Configuration configuration;
     private AuthenticationFacade authenticationFacade;
+    private MannequinFacade mannequinFacade;
 
     public static void main(String[] args) {
         // Run the start method, and open up the GUI
@@ -88,6 +90,7 @@ public class EDUS2View extends Application {
         scanFacade = injector.getInstance(ScanFacade.class);
         configuration = injector.getInstance(EDUS2Configuration.class);
         authenticationFacade = injector.getInstance(AuthenticationFacade.class);
+        mannequinFacade = injector.getInstance(MannequinFacade.class);
 
         main = new BorderPane();
         main.setTop(generateTop());
@@ -117,12 +120,13 @@ public class EDUS2View extends Application {
         btnFullscreen.setFont(BUTTON_FONT);
         Button btnScanSettings = new Button("Scan Settings");
         btnScanSettings.setFont(BUTTON_FONT);
+        Button btnMannequinSettings = new Button("Mannequin Settings");
+        btnMannequinSettings.setFont(BUTTON_FONT);
         Button btnQuit = new Button("Quit");
         btnQuit.setFont(BUTTON_FONT);
 
         HBox buttons = new HBox();
-        buttons.getChildren().addAll(btnAbout, btnFullscreen, btnScanSettings,
-                btnQuit);
+        buttons.getChildren().addAll(btnAbout, btnFullscreen, btnScanSettings, btnMannequinSettings, btnQuit);
         buttons.setAlignment(Pos.BOTTOM_RIGHT);
 
         btnAbout.setOnAction(event -> showCredits());
@@ -148,6 +152,14 @@ public class EDUS2View extends Application {
                 invalidPasswordAlert.showAndWait();
             }
 
+        });
+
+        btnMannequinSettings.setOnAction(event -> {
+            MannequinSettingsWindow mannequinSettingsWindow = new MannequinSettingsWindow(mannequinFacade);
+            Stage mannequinSettingStage = new Stage();
+            Scene mannequinWindowScene = new Scene(mannequinSettingsWindow);
+            mannequinSettingStage.setScene(mannequinWindowScene);
+            mannequinSettingStage.show();
         });
 
         btnQuit.setOnAction(event -> stage.close());
