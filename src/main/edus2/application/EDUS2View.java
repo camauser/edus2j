@@ -20,7 +20,7 @@ import com.google.inject.Injector;
 import edus2.adapter.guice.EDUS2JModule;
 import edus2.adapter.ui.PasswordInputDialog;
 import edus2.adapter.ui.ScanProgressUpdater;
-import edus2.adapter.ui.SettingsWindow;
+import edus2.adapter.ui.ScanSettingsWindow;
 import edus2.domain.EDUS2Configuration;
 import edus2.domain.Scan;
 import javafx.application.Application;
@@ -64,7 +64,6 @@ public class EDUS2View extends Application {
     private static ProgressBar playbackProgress;
     private MediaPlayer player;
     private BorderPane main;
-    public static final String IMPORT_MESSAGE = "### EDUS2 Scan Import File - Do not edit! ###";
     private static final Font BUTTON_FONT = new Font("Calibri", 18);
     private ScanFacade scanFacade;
     private static Injector injector;
@@ -116,13 +115,13 @@ public class EDUS2View extends Application {
         btnAbout.setFont(BUTTON_FONT);
         Button btnFullscreen = new Button("Toggle Fullscreen");
         btnFullscreen.setFont(BUTTON_FONT);
-        Button btnSettings = new Button("Settings");
-        btnSettings.setFont(BUTTON_FONT);
+        Button btnScanSettings = new Button("Scan Settings");
+        btnScanSettings.setFont(BUTTON_FONT);
         Button btnQuit = new Button("Quit");
         btnQuit.setFont(BUTTON_FONT);
 
         HBox buttons = new HBox();
-        buttons.getChildren().addAll(btnAbout, btnFullscreen, btnSettings,
+        buttons.getChildren().addAll(btnAbout, btnFullscreen, btnScanSettings,
                 btnQuit);
         buttons.setAlignment(Pos.BOTTOM_RIGHT);
 
@@ -130,16 +129,16 @@ public class EDUS2View extends Application {
 
         btnFullscreen.setOnAction(event -> stage.setFullScreen(!stage.isFullScreen()));
 
-        btnSettings.setOnAction(event -> {
+        btnScanSettings.setOnAction(event -> {
             if (isAuthenticated()) {
-                SettingsWindow scanWindow = new SettingsWindow(scanFacade, authenticationFacade, configuration);
+                ScanSettingsWindow scanSettingsWindow = new ScanSettingsWindow(scanFacade, authenticationFacade, configuration);
                 Stage scanWindowStage = new Stage();
-                Scene scanWindowScene = new Scene(scanWindow);
+                Scene scanWindowScene = new Scene(scanSettingsWindow);
                 scanWindowStage.setScene(scanWindowScene);
 
                 // Set the stage ref in our settings window so that we
                 // can show on-screen pop-ups for adding scans
-                scanWindow.setStage(scanWindowStage);
+                scanSettingsWindow.setStage(scanWindowStage);
 
                 scanWindowStage.show();
             } else {
