@@ -23,4 +23,8 @@ public class MannequinFacade {
     public List<Mannequin> getAllMannequins() {
         return mannequinRepository.retrieveAll();
     }
+
+    public void remove(Mannequin mannequin) {
+        mannequinRepository.remove(mannequin.getName());
+    }
 }
