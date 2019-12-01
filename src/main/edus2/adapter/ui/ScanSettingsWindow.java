@@ -47,7 +47,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Cameron Auser
  * @version 1.0
  */
-public class SettingsWindow extends VBox {
+public class ScanSettingsWindow extends VBox {
     private Stage stage;
     private ScansWindow scanList;
     private ScanFacade scanFacade;
@@ -58,7 +58,7 @@ public class SettingsWindow extends VBox {
      *
      * @param scanFacade - the Scans to pass into the ScansWindow constructor.
      */
-    public SettingsWindow(ScanFacade scanFacade, AuthenticationFacade authenticationFacade, EDUS2Configuration configuration) {
+    public ScanSettingsWindow(ScanFacade scanFacade, AuthenticationFacade authenticationFacade, EDUS2Configuration configuration) {
         // Just set up a settings window, which is then shown on-screen
         super(10);
         this.scanFacade = scanFacade;
