@@ -1,5 +1,7 @@
 package edus2.domain;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -9,6 +11,7 @@ public class Mannequin {
     private final Map<MannequinScanEnum, String> tagMap;
 
     public Mannequin(Map<MannequinScanEnum, String> tagMap, String name) {
+        validateName(name);
         validateAllScanPointsPresent(tagMap);
         this.name = name;
         this.tagMap = tagMap;
@@ -22,6 +25,12 @@ public class Mannequin {
         return tagMap;
     }
 
+    private void validateName(String name) {
+        if (StringUtils.isEmpty(name)) {
+            throw new InvalidMannequinNameException("Empty mannequin name given.");
+        }
+    }
+
     private void validateAllScanPointsPresent(Map<MannequinScanEnum, String> tagMap) {
         for (MannequinScanEnum scanPoint : MannequinScanEnum.values()) {
             if (!tagMap.containsKey(scanPoint)) {
@@ -31,6 +40,9 @@ public class Mannequin {
 
         Set<String> scans = new HashSet<>();
         for (String scan : tagMap.values()) {
+            if (StringUtils.isEmpty(scan)) {
+                throw new MissingRequiredScanPointException("One or more locations are missing a scan tag.");
+            }
             if (scans.contains(scan)) {
                 throw new DuplicateScanTagException(String.format("Scan tag %s was listed more than once", scan));
             }
