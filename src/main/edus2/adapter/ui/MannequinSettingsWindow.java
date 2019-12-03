@@ -85,6 +85,7 @@ public class MannequinSettingsWindow extends VBox{
         scanSettingButtonsBox.setAlignment(Pos.CENTER);
         scanSettingButtonsBox.getChildren().addAll(btnAdd, btnUpdate, btnChangeName, btnDelete);
 
+        mannequinDisplay.setAlignment(Pos.CENTER);
         this.getChildren().addAll(mannequinDisplay, scanSettingButtonsBox);
 
     }
