@@ -22,15 +22,14 @@ import edus2.application.ScanFacade;
 import edus2.application.exception.EmptyScanIdException;
 import edus2.application.exception.ScanAlreadyExistsException;
 import edus2.domain.EDUS2Configuration;
+import edus2.domain.MannequinScanEnum;
 import edus2.domain.Scan;
-import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -39,7 +38,6 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Purpose: Display a settings window for EDUS2.
@@ -144,34 +142,21 @@ public class ScanSettingsWindow extends VBox {
         boolean added = false;
         while (!added) {
             String convertedFilePath = EDUS2View.convertFilePath(file.getPath());
-            ScanPromptResponse response = promptForScanId("Filename: " + file.getName() + "\nWhat would you like the scan ID to be?");
-            if (response.isCancelled()) {
+            Optional<MannequinScanEnum> scanLocationOptional = promptForScanLocation("Filename: " + file.getName() + "\nWhat location would you like to link the video to?");
+            if (!scanLocationOptional.isPresent()) {
                 break;
             }
 
-            if (response.getResponse().isPresent()) {
-                String scanId = response.getResponse().get();
-                added = addScan(scanId, convertedFilePath);
-            } else {
-                Alert alert = new Alert(AlertType.ERROR, "You must enter a scan ID!");
-                alert.showAndWait();
-            }
+            added = addScan(scanLocationOptional.get(), convertedFilePath);
         }
     }
 
-    private ScanPromptResponse promptForScanId(String prompt) {
-        AtomicBoolean added = new AtomicBoolean(true);
-        TextInputDialog nameEntry = new TextInputDialog();
-        nameEntry.setHeaderText("Enter Scan ID");
-        nameEntry.setContentText(prompt);
-        nameEntry.getDialogPane().lookupButton(ButtonType.CANCEL).addEventFilter(ActionEvent.ACTION, e -> added.set(false));
-        Optional<String> result = nameEntry.showAndWait();
-
-        if (!added.get()) {
-            return ScanPromptResponse.ofCancelled();
-        }
-
-        return ScanPromptResponse.ofResponse(result.orElse(null));
+    private Optional<MannequinScanEnum> promptForScanLocation(String prompt) {
+        ChoiceDialog<MannequinScanEnum> scanLocationDialog = new ChoiceDialog<>();
+        scanLocationDialog.setHeaderText("Choose Scan Location");
+        scanLocationDialog.setContentText(prompt);
+//        scanLocationDialog.getDialogPane().lookupButton(ButtonType.CANCEL).addEventFilter(ActionEvent.ACTION, e -> added.set(false));
+        return scanLocationDialog.showAndWait();
     }
 
     public void setStage(Stage stage) {
@@ -212,8 +197,8 @@ public class ScanSettingsWindow extends VBox {
         }
     }
 
-    private boolean addScan(String id, String path) {
-        Scan toAdd = new Scan(id, path);
+    private boolean addScan(MannequinScanEnum scanEnum, String path) {
+        Scan toAdd = new Scan(scanEnum, path);
         try {
             scanFacade.addScan(toAdd);
             scanList.refreshTableItems();
