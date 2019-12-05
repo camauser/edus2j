@@ -32,7 +32,7 @@ public class ScanFacadeTest {
     @Test
     public void getScan_shouldReturnEmpty_whenScanDoesNotExist() {
         // Assert
-        assertEquals(Optional.empty(), scanFacade.getScan(randomAlphanumericString()));
+        assertEquals(Optional.empty(), scanFacade.getScan(randomMannequinScanEnum()));
     }
 
     @Test
@@ -41,7 +41,7 @@ public class ScanFacadeTest {
         scanFacade.addScan(scan);
 
         // Act
-        Optional<Scan> actual = scanFacade.getScan(scan.getId());
+        Optional<Scan> actual = scanFacade.getScan(scan.getScanEnum());
 
         // Assert
         assertEquals(scan, actual.get());
@@ -51,7 +51,7 @@ public class ScanFacadeTest {
     public void containsScan_shouldReturnFalse_whenScanDoesNotExist() {
         // Act
         // Assert
-        assertFalse(scanFacade.containsScan(randomAlphanumericString()));
+        assertFalse(scanFacade.containsScan(randomMannequinScanEnum()));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class ScanFacadeTest {
 
         // Act
         // Assert
-        assertTrue(scanFacade.containsScan(scan.getId()));
+        assertTrue(scanFacade.containsScan(scan.getScanEnum()));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class ScanFacadeTest {
         scanFacade.addScan(scan);
 
         // Assert
-        assertTrue(scanFacade.containsScan(scan.getId()));
+        assertTrue(scanFacade.containsScan(scan.getScanEnum()));
     }
 
     @Test (expected = ScanAlreadyExistsException.class)
@@ -85,7 +85,7 @@ public class ScanFacadeTest {
     @Test (expected = EmptyScanIdException.class)
     public void addScan_shouldThrowEmptyScanIdException_whenEmptyScanIdGiven() {
         // Arrange
-        Scan emptyScanIdScan = new Scan("", randomAlphanumericString());
+        Scan emptyScanIdScan = new Scan(null, randomAlphanumericString());
 
         // Act
         scanFacade.addScan(emptyScanIdScan);
@@ -101,8 +101,8 @@ public class ScanFacadeTest {
         scanFacade.addScans(Lst(scan, scanTwo));
 
         // Assert
-        assertTrue(scanFacade.containsScan(scan.getId()));
-        assertTrue(scanFacade.containsScan(scanTwo.getId()));
+        assertTrue(scanFacade.containsScan(scan.getScanEnum()));
+        assertTrue(scanFacade.containsScan(scanTwo.getScanEnum()));
     }
 
     @Test
@@ -114,7 +114,7 @@ public class ScanFacadeTest {
         scanFacade.removeScan(scan);
 
         // Assert
-        assertFalse(scanFacade.containsScan(scan.getId()));
+        assertFalse(scanFacade.containsScan(scan.getScanEnum()));
     }
 
     @Test
@@ -127,8 +127,8 @@ public class ScanFacadeTest {
         scanFacade.removeScan(scan);
 
         // Assert
-        assertFalse(scanFacade.containsScan(scan.getId()));
-        assertTrue(scanFacade.containsScan(scanTwo.getId()));
+        assertFalse(scanFacade.containsScan(scan.getScanEnum()));
+        assertTrue(scanFacade.containsScan(scanTwo.getScanEnum()));
     }
 
     @Test
@@ -178,7 +178,7 @@ public class ScanFacadeTest {
         String actual = scanFacade.toCSV();
 
         // Assert
-        assertEquals(scan.getId() + "," + scan.getPath() + "\n" + scanTwo.getId() + "," + scanTwo.getPath() + "\n", actual);
+        assertEquals(scan.getScanEnum() + "," + scan.getPath() + "\n" + scanTwo.getScanEnum() + "," + scanTwo.getPath() + "\n", actual);
     }
 
     @Test
@@ -187,11 +187,11 @@ public class ScanFacadeTest {
         Scan scanTwo = randomScan();
 
         // Act
-        scanFacade.importCSV(scan.getId() + "," + scan.getPath() + "\n" + scanTwo.getId() + "," + scanTwo.getPath() + "\n");
+        scanFacade.importCSV(scan.getScanEnum() + "," + scan.getPath() + "\n" + scanTwo.getScanEnum() + "," + scanTwo.getPath() + "\n");
 
         // Assert
-        assertEquals(scan, scanFacade.getScan(scan.getId()).get());
-        assertEquals(scanTwo, scanFacade.getScan(scanTwo.getId()).get());
+        assertEquals(scan, scanFacade.getScan(scan.getScanEnum()).get());
+        assertEquals(scanTwo, scanFacade.getScan(scanTwo.getScanEnum()).get());
     }
 
 }

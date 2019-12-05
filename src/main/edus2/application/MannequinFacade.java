@@ -1,16 +1,11 @@
 package edus2.application;
 
-import edus2.domain.DuplicateScanTagException;
-import edus2.domain.InvalidMannequinNameException;
-import edus2.domain.Mannequin;
-import edus2.domain.MannequinRepository;
+import edus2.domain.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.inject.Inject;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MannequinFacade {
@@ -58,12 +53,23 @@ public class MannequinFacade {
         mannequinRepository.remove(mannequin.getName());
     }
 
-    private Set<MannequinScanTagIdentifier> getAllScanTags() {
-
-        return getAllMannequins()
+    public Optional<MannequinScanEnum> getScanTagLocation(String scan) {
+        return getAllScanTags()
                 .stream()
-                .flatMap(m -> m.getTagMap().values().stream().map(t -> new MannequinScanTagIdentifier(m.getName(), t)))
-                .collect(Collectors.toSet());
+                .filter(st -> st.getScanTag().equals(scan))
+                .map(MannequinScanTagIdentifier::getScanLocation)
+                .findFirst();
+    }
+
+    private Set<MannequinScanTagIdentifier> getAllScanTags() {
+        Set<MannequinScanTagIdentifier> scanTagIdentifiers = new HashSet<>();
+        for (Mannequin mannequin : getAllMannequins()) {
+            for (Map.Entry<MannequinScanEnum, String> scan : mannequin.getTagMap().entrySet()) {
+                scanTagIdentifiers.add(new MannequinScanTagIdentifier(mannequin.getName(), scan.getValue(), scan.getKey()));
+            }
+        }
+
+        return scanTagIdentifiers;
     }
 
     private void validateUniqueScanTags(Mannequin mannequin) {
@@ -87,10 +93,12 @@ public class MannequinFacade {
     private class MannequinScanTagIdentifier {
         private final String mannequinName;
         private final String scanTag;
+        private final MannequinScanEnum scanLocation;
 
-        public MannequinScanTagIdentifier(String mannequinName, String scanTag) {
+        public MannequinScanTagIdentifier(String mannequinName, String scanTag, MannequinScanEnum scanLocation) {
             this.mannequinName = mannequinName;
             this.scanTag = scanTag;
+            this.scanLocation = scanLocation;
         }
 
         public String getMannequinName() {
@@ -99,6 +107,10 @@ public class MannequinFacade {
 
         public String getScanTag() {
             return scanTag;
+        }
+
+        public MannequinScanEnum getScanLocation() {
+            return scanLocation;
         }
 
         @Override

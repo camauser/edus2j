@@ -17,6 +17,7 @@ package edus2.application;/*
 
 import edus2.application.exception.EmptyScanIdException;
 import edus2.application.exception.ScanAlreadyExistsException;
+import edus2.domain.MannequinScanEnum;
 import edus2.domain.Scan;
 import edus2.domain.ScanRepository;
 
@@ -34,24 +35,28 @@ public class ScanFacade {
         this.scanRepository = scanRepository;
     }
 
-    public Optional<Scan> getScan(String id) {
-        return getAllScans().stream().filter(s -> s.getId().equals(id)).findFirst();
+    public Optional<Scan> getScan(MannequinScanEnum scanEnum) {
+        return getAllScans().stream().filter(s -> s.getScanEnum().equals(scanEnum)).findFirst();
     }
 
-    public boolean containsScan(String id) {
-        return getAllScans().stream().anyMatch(s -> s.getId().equals(id));
+    public boolean containsScan(MannequinScanEnum scanEnum) {
+        return getAllScans().stream().anyMatch(s -> s.getScanEnum().equals(scanEnum));
     }
 
     public void addScan(Scan scan) {
-        if (scan.getId().trim().isEmpty()) {
+        if (scan.getScanEnum() == null) {
             throw new EmptyScanIdException();
         }
 
-        if (containsScan(scan.getId())) {
-            throw new ScanAlreadyExistsException(scan.getId());
+        if (containsScanEnum(scan.getScanEnum())) {
+            throw new ScanAlreadyExistsException(scan.getScanEnum());
         }
 
         scanRepository.save(scan);
+    }
+
+    private boolean containsScanEnum(MannequinScanEnum scanEnum) {
+        return getAllScans().stream().map(Scan::getScanEnum).anyMatch(e -> e.equals(scanEnum));
     }
 
     public void addScans(Collection<Scan> scans) {
@@ -77,7 +82,7 @@ public class ScanFacade {
     public String toCSV() {
         StringBuilder stringBuffer = new StringBuilder();
         for (Scan scan : getAllScans()) {
-            stringBuffer.append(scan.getId());
+            stringBuffer.append(scan.getScanEnum());
             stringBuffer.append(',');
             stringBuffer.append(scan.getPath());
             stringBuffer.append('\n');
@@ -89,10 +94,10 @@ public class ScanFacade {
         Scanner scanner = new Scanner(csv);
         while (scanner.hasNextLine()) {
             String currentLine = scanner.nextLine();
-            String id = currentLine.split(",")[0];
+            MannequinScanEnum scanEnum = MannequinScanEnum.valueOf(currentLine.split(",")[0]);
             String path = currentLine.split(",")[1];
-            if (!containsScan(id)) {
-                Scan scan = new Scan(id, path);
+            if (!containsScan(scanEnum)) {
+                Scan scan = new Scan(scanEnum, path);
                 scanRepository.save(scan);
             }
         }

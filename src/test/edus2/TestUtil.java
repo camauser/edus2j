@@ -1,5 +1,6 @@
 package edus2;
 
+import edus2.domain.MannequinScanEnum;
 import edus2.domain.Scan;
 
 import java.io.File;
@@ -41,7 +42,12 @@ public class TestUtil {
     }
 
     public static Scan randomScan() {
-        return new Scan(randomAlphanumericString(), randomAlphanumericString());
+        return new Scan(randomMannequinScanEnum(), randomAlphanumericString());
+    }
+
+    public static MannequinScanEnum randomMannequinScanEnum() {
+        MannequinScanEnum[] values = MannequinScanEnum.values();
+        return values[ThreadLocalRandom.current().nextInt(0, values.length)];
     }
 
     public static String randomTempFile() {

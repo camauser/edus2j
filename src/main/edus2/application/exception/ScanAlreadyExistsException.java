@@ -1,7 +1,9 @@
 package edus2.application.exception;
 
+import edus2.domain.MannequinScanEnum;
+
 public class ScanAlreadyExistsException extends RuntimeException {
-    public ScanAlreadyExistsException(String scanId) {
-        super(String.format("A scan with ID %s already exists", scanId));
+    public ScanAlreadyExistsException(MannequinScanEnum scanEnum) {
+        super(String.format("A scan already exists for %s", scanEnum.getName()));
     }
 }

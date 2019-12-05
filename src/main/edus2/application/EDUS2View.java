@@ -23,6 +23,7 @@ import edus2.adapter.ui.PasswordInputDialog;
 import edus2.adapter.ui.ScanProgressUpdater;
 import edus2.adapter.ui.ScanSettingsWindow;
 import edus2.domain.EDUS2Configuration;
+import edus2.domain.MannequinScanEnum;
 import edus2.domain.Scan;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -60,8 +61,8 @@ public class EDUS2View extends Application {
     private static final int DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS = 1280;
     private static final int DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS = 720;
     private static final double MAX_VIDEO_TO_SCREEN_SIZE_RATIO = 0.8;
-    private String currentScan = "";
-    private String currentScanPlaying = "";
+    private String currentScanLocation = "";
+    private MannequinScanEnum currentLocationPlaying = null;
     private static ProgressBar playbackProgress;
     private MediaPlayer player;
     private BorderPane main;
@@ -108,7 +109,7 @@ public class EDUS2View extends Application {
             if (event.getCode() == KeyCode.ENTER) {
                 processScanRequest();
             } else {
-                currentScan += event.getText();
+                currentScanLocation += event.getText();
             }
         });
     }
@@ -240,15 +241,18 @@ public class EDUS2View extends Application {
     }
 
     private void processScanRequest() {
-        if (scanFacade.getScan(currentScan).isPresent()) {
-            if (!isScanPlaying(scanFacade.getScan(currentScan).get())) {
-                stopPlayer();
-                playScan(scanFacade.getScan(currentScan).get());
-            }
-            currentScan = "";
-        } else {
-            currentScan = "";
+        Optional<MannequinScanEnum> scanTagLocationOptional = mannequinFacade.getScanTagLocation(currentScanLocation);
+        if (!scanTagLocationOptional.isPresent()) {
+            currentScanLocation = "";
+            return;
         }
+
+        Optional<Scan> scanOptional = scanFacade.getScan(scanTagLocationOptional.get());
+        if (scanOptional.isPresent() && !isScanPlaying(scanOptional.get())) {
+            stopPlayer();
+            playScan(scanOptional.get());
+        }
+        currentScanLocation = "";
     }
 
     private void stopPlayer() {
@@ -260,12 +264,12 @@ public class EDUS2View extends Application {
     private boolean isScanPlaying(Scan scan) {
         return player != null
                 && player.getStatus().equals(MediaPlayer.Status.PLAYING)
-                && scan.getId().equals(currentScanPlaying);
+                && scan.getScanEnum().equals(currentLocationPlaying);
     }
 
     private void playScan(Scan scan) {
         String scanPath = scan.getPath();
-        currentScanPlaying = scan.getId();
+        currentLocationPlaying = scan.getScanEnum();
         Media video = new Media(scanPath);
         player = new MediaPlayer(video);
         MediaView videoView = new MediaView(player);
@@ -282,7 +286,7 @@ public class EDUS2View extends Application {
             ScanProgressUpdater scanProgressUpdater = new ScanProgressUpdater(player, playbackProgress);
             player.setOnEndOfMedia(() -> player.stop());
             player.setOnStopped(() -> {
-                currentScanPlaying = "";
+                currentLocationPlaying = null;
                 scanProgressUpdater.finish();
             });
 

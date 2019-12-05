@@ -20,59 +20,23 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
 
-/**
- * 
- * Purpose: Keep track of everything involved with an EDUS2 scan in a single
- * class.
- *
- * @author Cameron Auser
- * @version 1.0
- */
+
 public class Scan implements Serializable
 {
-    private String id;
+    private MannequinScanEnum scanEnum;
     private String path;
 
-    /**
-     * 
-     * Constructor for the Scan class.
-     * 
-     * @param id
-     *            - The ID of the scan.
-     * @param path
-     *            - The path of the video.
-     */
-    public Scan(String id, String path)
+    public Scan(MannequinScanEnum scanEnum, String path)
     {
-        this.id = id;
+        this.scanEnum = scanEnum;
         this.path = path;
     }
 
-    /**
-     * Purpose: A toString method for the Scan class.
-     */
-    public String toString()
+    public MannequinScanEnum getScanEnum()
     {
-        return "Scan[id = " + id + ", path = " + path + "]";
+        return scanEnum;
     }
 
-    /**
-     * 
-     * Purpose: A method to get the ID of the scan.
-     * 
-     * @return - The ID of the scan.
-     */
-    public String getId()
-    {
-        return id;
-    }
-
-    /**
-     * 
-     * Purpose: A method to get the scan video path.
-     * 
-     * @return - the video's path.
-     */
     public String getPath()
     {
         return path;
@@ -87,7 +51,7 @@ public class Scan implements Serializable
         Scan scan = (Scan) o;
 
         return new EqualsBuilder()
-                .append(id, scan.id)
+                .append(scanEnum, scan.scanEnum)
                 .append(path, scan.path)
                 .isEquals();
     }
@@ -95,7 +59,7 @@ public class Scan implements Serializable
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(id)
+                .append(scanEnum)
                 .append(path)
                 .toHashCode();
     }
