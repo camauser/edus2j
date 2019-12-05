@@ -39,15 +39,15 @@ public class FileScanImportExportRepository {
     }
 
     private static class ScanDto {
-        private String scanEnum;
+        private MannequinScanEnum scanEnum;
         private String path;
         ScanDto(Scan scan) {
-            this.scanEnum = scan.getScanEnum().getName();
+            this.scanEnum = scan.getScanEnum();
             this.path = scan.getPath();
         }
 
         Scan toScan() {
-            return new Scan(MannequinScanEnum.valueOf(scanEnum), this.path);
+            return new Scan(scanEnum, this.path);
         }
     }
 }
