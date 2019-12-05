@@ -5,6 +5,7 @@ import edus2.adapter.repository.memory.InMemoryEDUS2Configuration;
 import edus2.application.ScanFacade;
 import edus2.application.exception.EmptyScanIdException;
 import edus2.application.exception.ScanAlreadyExistsException;
+import edus2.domain.MannequinScanEnum;
 import edus2.domain.Scan;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,13 +21,15 @@ public class ScanFacadeTest {
 
     private ScanFacade scanFacade;
     private Scan scan;
+    private Scan scanTwo;
 
     @Before
     public void setup() {
         InMemoryEDUS2Configuration configuration = new InMemoryEDUS2Configuration();
         configuration.setSaveFileLocation(randomTempFile());
         scanFacade = new ScanFacade(new FileScanRepository(configuration));
-        scan = randomScan();
+        scan = new Scan(MannequinScanEnum.RIGHT_LUNG, randomAlphanumericString());
+        scanTwo = new Scan(MannequinScanEnum.LEFT_LUNG, randomAlphanumericString());
     }
 
     @Test
@@ -94,9 +97,6 @@ public class ScanFacadeTest {
 
     @Test
     public void addScans_shouldAddAllScans() {
-        // Arrange
-        Scan scanTwo = randomScan();
-
         // Act
         scanFacade.addScans(Lst(scan, scanTwo));
 
@@ -120,7 +120,6 @@ public class ScanFacadeTest {
     @Test
     public void removeScan_shouldLeaveOtherScansUntouched() {
         // Arrange
-        Scan scanTwo = randomScan();
         scanFacade.addScans(Lst(scan, scanTwo));
 
         // Act
@@ -134,7 +133,6 @@ public class ScanFacadeTest {
     @Test
     public void removeAllScans_shouldRemoveAllScans() {
         // Arrange
-        Scan scanTwo = randomScan();
         scanFacade.addScans(Lst(scan, scanTwo));
 
         // Act
@@ -147,7 +145,6 @@ public class ScanFacadeTest {
     @Test
     public void getAllScans_shouldReturnAllScans_whenScansPresent() {
         // Arrange
-        Scan scanTwo = randomScan();
         scanFacade.addScans(Lst(scan, scanTwo));
 
         // Act
@@ -171,7 +168,6 @@ public class ScanFacadeTest {
     @Test
     public void ToCSV_shouldCorrectlySerializeScans() {
         // Arrange
-        Scan scanTwo = randomScan();
         scanFacade.addScans(Lst(scan, scanTwo));
 
         // Act
@@ -183,9 +179,6 @@ public class ScanFacadeTest {
 
     @Test
     public void importCSV_shouldImportAllScanFromCSV() {
-        // Arrange
-        Scan scanTwo = randomScan();
-
         // Act
         scanFacade.importCSV(scan.getScanEnum() + "," + scan.getPath() + "\n" + scanTwo.getScanEnum() + "," + scanTwo.getPath() + "\n");
 

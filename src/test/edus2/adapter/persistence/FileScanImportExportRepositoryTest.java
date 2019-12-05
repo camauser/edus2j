@@ -33,7 +33,7 @@ public class FileScanImportExportRepositoryTest {
     public void importScans_shouldImportScansInFile() throws IOException {
         // Arrange
         String fileName = randomTempFile();
-        Files.write(Paths.get(fileName), "[{\"id\": \"RIGHT_LUNG\", \"path\": \"/path/to/scan\"}, {\"id\": \"secondScan\", \"LEFT_LUNG\": \"/path/to/second/scan\"}]".getBytes());
+        Files.write(Paths.get(fileName), "[{\"scanEnum\": \"RIGHT_LUNG\", \"path\": \"/path/to/scan\"}, {\"scanEnum\": \"LEFT_LUNG\", \"path\": \"/path/to/second/scan\"}]".getBytes());
 
         // Act
         repository.importScansFromFile(new File(fileName));
@@ -56,7 +56,7 @@ public class FileScanImportExportRepositoryTest {
 
         // Assert
         String result = new String(Files.readAllBytes(Paths.get(fileName)));
-        assertEquals("[{\"id\":\"RIGHT_LUNG\",\"path\":\"/scan/path\"},{\"id\":\"LEFT_LUNG\",\"path\":\"/second/path\"}]", result);
+        assertEquals("[{\"scanEnum\":\"RIGHT_LUNG\",\"path\":\"/scan/path\"},{\"scanEnum\":\"LEFT_LUNG\",\"path\":\"/second/path\"}]", result);
     }
 
     @Test
