@@ -21,4 +21,14 @@ public enum MannequinScanEnum {
     public String getName() {
         return name;
     }
+
+    public static MannequinScanEnum findByName(String name) {
+        for (MannequinScanEnum scanEnum : MannequinScanEnum.values()) {
+            if (scanEnum.getName().equals(name)) {
+                return scanEnum;
+            }
+        }
+
+        throw new InvalidMannequinScanEnumException(String.format("No scan enum found for '%s'", name));
+    }
 }
