@@ -1,7 +1,5 @@
 package edus2.adapter.ui;
 
-import edus2.application.MannequinFacade;
-import edus2.domain.InvalidMannequinNameException;
 import edus2.domain.Mannequin;
 import edus2.domain.MannequinScanEnum;
 import javafx.geometry.Pos;
@@ -16,9 +14,8 @@ import javafx.scene.text.Text;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Optional;
 
-public class MannequinCreationWindow extends HBox {
+public abstract class MannequinEntryWindow extends HBox {
     private GridPane mannequinFieldEntry;
     private TextField mannequinName;
     private TextField cardiacSc;
@@ -31,15 +28,13 @@ public class MannequinCreationWindow extends HBox {
     private TextField leftLungScan;
     private TextField cardiacPslPss;
     private TextField cardiacA4c;
-    private MannequinFacade mannequinFacade;
     private int fieldsAdded = 0;
 
-    public MannequinCreationWindow(MannequinFacade mannequinFacade) {
+    public MannequinEntryWindow() {
         super(20.0);
         this.mannequinFieldEntry = new GridPane();
         mannequinFieldEntry.setHgap(10.0);
         mannequinFieldEntry.setVgap(5.0);
-        this.mannequinFacade = mannequinFacade;
         File imageFile = new File("img/mannequin-scanpoints.png");
         Image scanPointImage = new Image("file:///" + imageFile.getAbsolutePath());
 
@@ -49,14 +44,8 @@ public class MannequinCreationWindow extends HBox {
         this.getChildren().addAll(mannequinFieldEntry, imageView);
     }
 
-    public void bindMannequin(String name) {
+    public void bindMannequin(Mannequin mannequin) {
         clearFields();
-        Optional<Mannequin> mannequinOptional = mannequinFacade.getMannequin(name);
-        if (!mannequinOptional.isPresent()) {
-            throw new InvalidMannequinNameException(String.format("Mannequin '%s' does not exist", name));
-        }
-
-        Mannequin mannequin = mannequinOptional.get();
         mannequinName.setText(mannequin.getName());
         mannequinName.setEditable(false);
         rightLungScan.setText(mannequin.getTagMap().get(MannequinScanEnum.RIGHT_LUNG));
@@ -79,19 +68,31 @@ public class MannequinCreationWindow extends HBox {
         cardiacA4c = generateEntryBox("(4) Cardiac A4C");
         cardiacSc = generateEntryBox("(5) Cardiac SC");
         ivc = generateEntryBox("(6) IVC");
-        ruq = generateEntryBox("(7) RUQ");
-        luq = generateEntryBox("(8) LUQ");
+        ruq = generateEntryBox("(7) Right Upper Quadrant");
+        luq = generateEntryBox("(8) Left Upper Quadrant");
         abdominalAorta = generateEntryBox("(9) Abdominal Aorta");
         pelvis = generateEntryBox("(10) Pelvis");
         Button btnSaveMannequin = new Button("Save Mannequin");
         btnSaveMannequin.setOnAction(action -> {
-            saveMannequin();
+            try {
+                Mannequin mannequin = generateMannequin();
+                saveMannequin(mannequin);
+                clearFields();
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, String.format("Successfully saved mannequin '%s'", mannequin.getName()));
+                alert.showAndWait();
+            } catch (Exception e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, String.format("Error saving mannequin: %s", e.getMessage()));
+                alert.showAndWait();
+            }
+
         });
         mannequinFieldEntry.add(btnSaveMannequin, 0, fieldsAdded);
         fieldsAdded++;
     }
 
-    private void saveMannequin() {
+    protected abstract void saveMannequin(Mannequin mannequin);
+
+    private Mannequin generateMannequin() {
         HashMap<MannequinScanEnum, String> tagMap = new HashMap<>();
         tagMap.put(MannequinScanEnum.RIGHT_LUNG, rightLungScan.getText());
         tagMap.put(MannequinScanEnum.LEFT_LUNG, leftLungScan.getText());
@@ -103,16 +104,7 @@ public class MannequinCreationWindow extends HBox {
         tagMap.put(MannequinScanEnum.LUQ, luq.getText());
         tagMap.put(MannequinScanEnum.ABDOMINAL_AORTA, abdominalAorta.getText());
         tagMap.put(MannequinScanEnum.PELVIS, pelvis.getText());
-        try {
-            Mannequin mannequin = new Mannequin(tagMap, mannequinName.getText());
-            mannequinFacade.save(mannequin);
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, String.format("Successfully saved mannequin '%s'", mannequin.getName()));
-            alert.showAndWait();
-            clearFields();
-        } catch (RuntimeException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, String.format("Error saving mannequin: %s", e.getMessage()));
-            alert.showAndWait();
-        }
+        return new Mannequin(tagMap, mannequinName.getText());
     }
 
     private void clearFields() {

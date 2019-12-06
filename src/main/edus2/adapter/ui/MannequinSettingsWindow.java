@@ -1,6 +1,7 @@
 package edus2.adapter.ui;
 
 import edus2.application.MannequinFacade;
+import edus2.domain.InvalidMannequinNameException;
 import edus2.domain.Mannequin;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -17,7 +18,6 @@ public class MannequinSettingsWindow extends VBox{
     private MannequinsWindow mannequinDisplay;
 
     public MannequinSettingsWindow(MannequinFacade mannequinFacade) {
-        // Just set up a settings window, which is then shown on-screen
         super(10);
         mannequinDisplay = new MannequinsWindow(mannequinFacade);
         HBox scanSettingButtonsBox = new HBox();
@@ -27,11 +27,10 @@ public class MannequinSettingsWindow extends VBox{
         Button btnChangeName = new Button("Update Name");
         Button btnDelete = new Button("Delete");
 
-        // When add is clicked, run through the process of adding a new scan
         btnAdd.setOnAction(event -> {
-            MannequinCreationWindow mannequinSettingsWindow = new MannequinCreationWindow(mannequinFacade);
+            MannequinCreateWindow mannequinCreateWindow = new MannequinCreateWindow(mannequinFacade);
             Stage stage = new Stage();
-            Scene scene = new Scene(mannequinSettingsWindow);
+            Scene scene = new Scene(mannequinCreateWindow);
             stage.setScene(scene);
             stage.showAndWait();
             mannequinDisplay.refreshTableItems();
@@ -42,10 +41,10 @@ public class MannequinSettingsWindow extends VBox{
             if (selected == null) {
                 return;
             }
-            MannequinCreationWindow mannequinSettingsWindow = new MannequinCreationWindow(mannequinFacade);
-            mannequinSettingsWindow.bindMannequin(selected.getName());
+            MannequinUpdateWindow mannequinUpdateWindow = new MannequinUpdateWindow(mannequinFacade);
+            mannequinUpdateWindow.bindMannequin(mannequinFacade.getMannequin(selected.getName()).orElseThrow(() -> new InvalidMannequinNameException(String.format("Mannequin %s does not exist!", selected.getName()))));
             Stage stage = new Stage();
-            Scene scene = new Scene(mannequinSettingsWindow);
+            Scene scene = new Scene(mannequinUpdateWindow);
             stage.setScene(scene);
             stage.showAndWait();
             mannequinDisplay.refreshTableItems();
@@ -72,7 +71,6 @@ public class MannequinSettingsWindow extends VBox{
             }
         });
 
-        // Delete the selected scan when the delete button is clicked.
         btnDelete.setOnAction(event -> {
             Mannequin selected = mannequinDisplay.getSelectedItem();
             if (selected == null) {
