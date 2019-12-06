@@ -17,6 +17,7 @@ package edus2.adapter.ui;/*
 
 import edus2.application.ScanFacade;
 import edus2.domain.Scan;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -29,21 +30,19 @@ public class ScansWindow extends Pane {
 
     public ScansWindow(ScanFacade scanFacade) {
         this.scanFacade = scanFacade;
-        // Set up a TableView to display all the records in, and then
-        // show the table
         records = new TableView<>();
-        records.setEditable(true);
-        TableColumn<Scan, String> scanID = new TableColumn<>("Scan ID");
-        TableColumn<Scan, String> path = new TableColumn<>("File Path");
-        scanID.setMinWidth(100);
-        path.setMinWidth(500);
+        TableColumn<Scan, String> scanEnum = new TableColumn<>("Mannequin Location");
+        scanEnum.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getScanEnum().getName()));
+        scanEnum.setMinWidth(130);
 
-        scanID.setCellValueFactory(new PropertyValueFactory<>("id"));
+        TableColumn<Scan, String> path = new TableColumn<>("File Path");
         path.setCellValueFactory(new PropertyValueFactory<>("path"));
+        path.setMinWidth(450);
+
 
         refreshTableItems();
         //noinspection unchecked
-        records.getColumns().addAll(scanID, path);
+        records.getColumns().addAll(scanEnum, path);
 
         this.getChildren().add(records);
     }
