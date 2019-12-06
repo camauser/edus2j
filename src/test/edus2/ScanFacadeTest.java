@@ -10,8 +10,10 @@ import edus2.domain.Scan;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static edus2.TestUtil.*;
 import static org.junit.Assert.*;
@@ -163,6 +165,29 @@ public class ScanFacadeTest {
 
         // Assert
         assertTrue(actual.isEmpty());
+    }
+
+    @Test
+    public void getUnusedScanEnums_shouldReturnAllEnums_whenNoScansExist() {
+        // Act
+        Set<MannequinScanEnum> actual = scanFacade.getUnusedScanEnums();
+
+        // Assert
+        assertEquals(MannequinScanEnum.values().length, actual.size());
+        assertTrue(actual.containsAll(Arrays.asList(MannequinScanEnum.values())));
+    }
+
+    @Test
+    public void getUnusedScanEnums_shouldExcludeScanEnum_whenEnumUsed() {
+        // Arrange
+        scanFacade.addScan(new Scan(MannequinScanEnum.RIGHT_LUNG, randomAlphanumericString()));
+
+        // Act
+        Set<MannequinScanEnum> actual = scanFacade.getUnusedScanEnums();
+
+        // Assert
+        assertEquals(MannequinScanEnum.values().length - 1, actual.size());
+        assertFalse(actual.contains(MannequinScanEnum.RIGHT_LUNG));
     }
 
     @Test
