@@ -15,4 +15,9 @@ public class MannequinUpdateWindow extends MannequinEntryWindow {
     protected void saveMannequin(Mannequin mannequin) {
         mannequinFacade.update(mannequin);
     }
+
+    @Override
+    protected boolean shouldClearFieldsAfterSave() {
+        return false;
+    }
 }

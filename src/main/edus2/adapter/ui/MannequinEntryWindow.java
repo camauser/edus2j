@@ -77,7 +77,9 @@ public abstract class MannequinEntryWindow extends HBox {
             try {
                 Mannequin mannequin = generateMannequin();
                 saveMannequin(mannequin);
-                clearFields();
+                if (shouldClearFieldsAfterSave()) {
+                    clearFields();
+                }
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, String.format("Successfully saved mannequin '%s'", mannequin.getName()));
                 alert.showAndWait();
             } catch (Exception e) {
@@ -91,6 +93,8 @@ public abstract class MannequinEntryWindow extends HBox {
     }
 
     protected abstract void saveMannequin(Mannequin mannequin);
+
+    protected abstract boolean shouldClearFieldsAfterSave();
 
     private Mannequin generateMannequin() {
         HashMap<MannequinScanEnum, String> tagMap = new HashMap<>();
