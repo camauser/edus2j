@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -49,47 +50,47 @@ public class MannequinFacadeTest extends MannequinTestBase {
     }
 
     @Test (expected = DuplicateScanTagException.class)
-    public void save_shouldThrowException_whenTagScanExistsForAnotherMannequin() {
+    public void create_shouldThrowException_whenTagScanExistsForAnotherMannequin() {
         // Arrange
         Map<MannequinScanEnum, String> tagMap = generateTagMap();
         Map<MannequinScanEnum, String> secondTagMap = generateTagMap();
         secondTagMap.put(MannequinScanEnum.RIGHT_LUNG, tagMap.get(MannequinScanEnum.RIGHT_LUNG));
         Mannequin first = new Mannequin(tagMap, "first");
         Mannequin second = new Mannequin(secondTagMap, "second");
-        facade.save(first);
+        facade.create(first);
 
         // Act
-        facade.save(second);
+        facade.create(second);
     }
 
     @Test
-    public void save_shouldNotThrowException_whenTagScansAllUnique() {
+    public void create_shouldNotThrowException_whenTagScansAllUnique() {
         // Arrange
         Map<MannequinScanEnum, String> tagMap = generateTagMap();
         Mannequin first = new Mannequin(tagMap, "first");
 
         // Act
-        facade.save(first);
+        facade.create(first);
     }
 
     @Test
-    public void save_shouldNotThrowException_whenUpdatingMannequin() {
+    public void update_shouldNotThrowException_validUpdateGiven() {
         // Arrange
         Map<MannequinScanEnum, String> tagMap = generateTagMap();
         HashMap<MannequinScanEnum, String> updatedMap = new HashMap<>(tagMap);
         updatedMap.put(MannequinScanEnum.RIGHT_LUNG, tagMap.get(MannequinScanEnum.RIGHT_LUNG) + "-new");
         Mannequin mannequin = new Mannequin(tagMap, "mannequin");
-        facade.save(mannequin);
+        facade.create(mannequin);
 
         // Act
-        facade.save(new Mannequin(updatedMap, "mannequin"));
+        facade.update(new Mannequin(updatedMap, "mannequin"));
     }
 
     @Test
     public void rename_shouldRenameMannequin_whenMannequinExists() {
         // Arrange
         Mannequin mannequin = new Mannequin(generateTagMap(), "mannequin");
-        facade.save(mannequin);
+        facade.create(mannequin);
 
         // Act
         facade.rename("mannequin", "updated");
@@ -111,10 +112,34 @@ public class MannequinFacadeTest extends MannequinTestBase {
         // Arrange
         Mannequin mannequin = new Mannequin(generateTagMap(), "mannequin");
         Mannequin second = new Mannequin(generateTagMap(), "second");
-        facade.save(mannequin);
-        facade.save(second);
+        facade.update(mannequin);
+        facade.update(second);
 
         // Act
         facade.rename("mannequin", "second");
+    }
+
+    @Test
+    public void create_shouldCreateNewMannequin() {
+        // Arrange
+        Mannequin mannequin = new Mannequin(generateTagMap(), "mannequin");
+
+        // Act
+        facade.create(mannequin);
+
+        // Assert
+        Optional<Mannequin> actual = facade.getMannequin(mannequin.getName());
+        assertTrue(actual.isPresent());
+    }
+
+    @Test (expected = InvalidMannequinNameException.class)
+    public void create_shouldThrowException_whenNameExists() {
+        // Arrange
+        Mannequin mannequin = new Mannequin(generateTagMap(), "mannequin");
+        Mannequin secondMannequin = new Mannequin(generateTagMap(), "mannequin");
+        facade.create(mannequin);
+
+        // Act
+        facade.create(secondMannequin);
     }
 }

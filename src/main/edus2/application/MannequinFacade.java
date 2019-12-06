@@ -28,9 +28,32 @@ public class MannequinFacade {
         return mannequinRepository.retrieveAll();
     }
 
-    public void save(Mannequin mannequin) {
+    public void create(Mannequin mannequin) {
+        validateUniqueScanTags(mannequin);
+        validateUniqueName(mannequin);
+        mannequinRepository.save(mannequin);
+    }
+
+    private void validateUniqueName(Mannequin mannequin) {
+        if (nameExists(mannequin.getName())) {
+            throw new InvalidMannequinNameException(String.format("A mannequin named %s already exists!", mannequin.getName()));
+        }
+    }
+
+    public void update(Mannequin mannequin) {
+        validateMannequinExists(mannequin);
         validateUniqueScanTags(mannequin);
         mannequinRepository.save(mannequin);
+    }
+
+    private void validateMannequinExists(Mannequin mannequin) {
+        if (!nameExists(mannequin.getName())) {
+            throw new InvalidMannequinNameException(String.format("A mannequin named %s does not exist!", mannequin.getName()));
+        }
+    }
+
+    private boolean nameExists(String name) {
+        return getAllMannequins().stream().anyMatch(m -> m.getName().equals(name));
     }
 
     public void rename(String currentName, String newName) {
