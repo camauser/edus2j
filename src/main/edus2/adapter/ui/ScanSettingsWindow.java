@@ -178,11 +178,10 @@ public class ScanSettingsWindow extends VBox {
 
     private Optional<MannequinScanEnum> promptForScanLocation(String prompt) {
         Set<MannequinScanEnum> unusedScanEnums = scanFacade.getUnusedScanEnums();
-        ChoiceDialog<MannequinScanEnum> scanLocationDialog = new ChoiceDialog<>(unusedScanEnums.iterator().next(), unusedScanEnums);
+        ChoiceDialog<String> scanLocationDialog = new ChoiceDialog<>(unusedScanEnums.iterator().next().getName(), unusedScanEnums.stream().map(MannequinScanEnum::getName).collect(Collectors.toSet()));
         scanLocationDialog.setHeaderText("Choose Scan Location");
         scanLocationDialog.setContentText(prompt);
-//        scanLocationDialog.getDialogPane().lookupButton(ButtonType.CANCEL).addEventFilter(ActionEvent.ACTION, e -> added.set(false));
-        return scanLocationDialog.showAndWait();
+        return scanLocationDialog.showAndWait().map(MannequinScanEnum::findByName);
     }
 
     public void setStage(Stage stage) {
