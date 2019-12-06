@@ -22,10 +22,8 @@ import edus2.domain.Scan;
 import edus2.domain.ScanRepository;
 
 import javax.inject.Inject;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ScanFacade {
     private ScanRepository scanRepository;
@@ -77,6 +75,13 @@ public class ScanFacade {
 
     public int scanCount() {
         return getAllScans().size();
+    }
+
+    public Set<MannequinScanEnum> getUnusedScanEnums() {
+        Set<MannequinScanEnum> unusedScanEnums = new HashSet<>(Arrays.asList(MannequinScanEnum.values()));
+        Set<MannequinScanEnum> usedScanEnums = getAllScans().stream().map(Scan::getScanEnum).collect(Collectors.toSet());
+        unusedScanEnums.removeAll(usedScanEnums);
+        return unusedScanEnums;
     }
 
     public String toCSV() {
