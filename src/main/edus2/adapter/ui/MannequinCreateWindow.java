@@ -15,4 +15,9 @@ public class MannequinCreateWindow extends MannequinEntryWindow {
     protected void saveMannequin(Mannequin mannequin) {
         mannequinFacade.create(mannequin);
     }
+
+    @Override
+    protected boolean shouldClearFieldsAfterSave() {
+        return true;
+    }
 }
