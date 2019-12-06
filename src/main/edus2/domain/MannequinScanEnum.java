@@ -8,7 +8,7 @@ public enum MannequinScanEnum {
     CARDIAC_SC("Cardiac SC"),
     IVC("IVC"),
     RUQ("RUQ"),
-    LUQ("LUQ"),
+    LUQ("Left Upper Quadrant"),
     ABDOMINAL_AORTA("Abdominal Aorta"),
     PELVIS("Pelvis");
 

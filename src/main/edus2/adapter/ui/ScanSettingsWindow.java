@@ -38,6 +38,8 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Purpose: Display a settings window for EDUS2.
@@ -69,19 +71,42 @@ public class ScanSettingsWindow extends VBox {
 
         // When add is clicked, run through the process of adding a new scan
         btnAdd.setOnAction(event -> {
-            FileChooser browser = new FileChooser();
-            File selected = browser.showOpenDialog(stage);
-            if (selected != null) {
-                promptForScanIdAndSaveScan(selected);
+            if (scanFacade.getUnusedScanEnums().isEmpty()) {
+                Alert alert = new Alert(AlertType.ERROR, "All mannequin scan locations have been linked to scans already!");
+                alert.showAndWait();
+            } else {
+                FileChooser browser = new FileChooser();
+                File selected = browser.showOpenDialog(stage);
+                if (selected != null) {
+                    promptForScanIdAndSaveScan(selected);
+                }
             }
         });
 
         // When bulk add is clicked, the user can select multiple files to add.
         // Then we run through each selected file and set ID's for all of them.
         btnBulkAdd.setOnAction(event -> {
+            if (scanFacade.getUnusedScanEnums().isEmpty()) {
+                Alert alert = new Alert(AlertType.ERROR, "All mannequin scan locations have been linked to scans already!");
+                alert.showAndWait();
+                return;
+            }
+            
             FileChooser browser = new FileChooser();
             List<File> selected = browser.showOpenMultipleDialog(stage);
-            if (selected != null) {
+            if (selected == null) {
+                return;
+            }
+
+            if (selected.size() > scanFacade.getUnusedScanEnums().size()) {
+                Set<String> unusedScanEnumNames = scanFacade.getUnusedScanEnums()
+                        .stream()
+                        .map(MannequinScanEnum::getName)
+                        .collect(Collectors.toSet());
+                String unusedLocations = String.join(",", unusedScanEnumNames);
+                Alert alert = new Alert(AlertType.ERROR, String.format("You've selected too many videos: you can only link videos to the following locations: %s", unusedLocations));
+                alert.showAndWait();
+            } else {
                 for (File current : selected) {
                     promptForScanIdAndSaveScan(current);
                 }
@@ -152,7 +177,8 @@ public class ScanSettingsWindow extends VBox {
     }
 
     private Optional<MannequinScanEnum> promptForScanLocation(String prompt) {
-        ChoiceDialog<MannequinScanEnum> scanLocationDialog = new ChoiceDialog<>();
+        Set<MannequinScanEnum> unusedScanEnums = scanFacade.getUnusedScanEnums();
+        ChoiceDialog<MannequinScanEnum> scanLocationDialog = new ChoiceDialog<>(unusedScanEnums.iterator().next(), unusedScanEnums);
         scanLocationDialog.setHeaderText("Choose Scan Location");
         scanLocationDialog.setContentText(prompt);
 //        scanLocationDialog.getDialogPane().lookupButton(ButtonType.CANCEL).addEventFilter(ActionEvent.ACTION, e -> added.set(false));
