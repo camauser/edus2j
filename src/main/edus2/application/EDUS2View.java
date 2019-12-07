@@ -158,6 +158,7 @@ public class EDUS2View extends Application {
         btnMannequinSettings.setOnAction(event -> {
             MannequinSettingsWindow mannequinSettingsWindow = new MannequinSettingsWindow(mannequinFacade);
             Stage mannequinSettingStage = new Stage();
+            mannequinSettingsWindow.setStage(mannequinSettingStage);
             Scene mannequinWindowScene = new Scene(mannequinSettingsWindow);
             mannequinSettingStage.setScene(mannequinWindowScene);
             mannequinSettingStage.show();
