@@ -1,5 +1,6 @@
 package edus2.adapter.persistence;
 
+import edus2.adapter.repository.file.FileScanImportExportRepository;
 import edus2.adapter.repository.memory.InMemoryScanRepository;
 import edus2.application.ScanFacade;
 import edus2.domain.MannequinScanEnum;

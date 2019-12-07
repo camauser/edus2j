@@ -1,4 +1,4 @@
-package edus2.adapter.persistence;
+package edus2.adapter.repository.file;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
