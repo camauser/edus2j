@@ -1,5 +1,6 @@
 package edus2.adapter.ui;
 
+import edus2.adapter.repository.file.FileMannequinImportExportRepository;
 import edus2.application.MannequinFacade;
 import edus2.domain.InvalidMannequinNameException;
 import edus2.domain.Mannequin;
@@ -10,22 +11,29 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.util.Optional;
 
 public class MannequinSettingsWindow extends VBox{
     private MannequinsWindow mannequinDisplay;
+    private FileMannequinImportExportRepository importExportRepository;
+    private Stage stage;
 
     public MannequinSettingsWindow(MannequinFacade mannequinFacade) {
         super(10);
         mannequinDisplay = new MannequinsWindow(mannequinFacade);
+        importExportRepository = new FileMannequinImportExportRepository(mannequinFacade);
         HBox scanSettingButtonsBox = new HBox();
 
         Button btnAdd = new Button("Add");
         Button btnUpdate = new Button("Update Scan Tags");
         Button btnChangeName = new Button("Update Name");
         Button btnDelete = new Button("Delete");
+        Button btnImport = new Button("Import");
+        Button btnExport = new Button("Export");
 
         btnAdd.setOnAction(event -> {
             MannequinCreateWindow mannequinCreateWindow = new MannequinCreateWindow(mannequinFacade);
@@ -80,12 +88,49 @@ public class MannequinSettingsWindow extends VBox{
             mannequinDisplay.refreshTableItems();
         });
 
+        btnImport.setOnAction(event -> importMannequins());
+
+        btnExport.setOnAction(event -> exportMannequins());
+
         scanSettingButtonsBox.setAlignment(Pos.CENTER);
-        scanSettingButtonsBox.getChildren().addAll(btnAdd, btnUpdate, btnChangeName, btnDelete);
+        scanSettingButtonsBox.getChildren().addAll(btnAdd, btnUpdate, btnChangeName, btnDelete, btnImport, btnExport);
 
         mannequinDisplay.setAlignment(Pos.CENTER);
         this.getChildren().addAll(mannequinDisplay, scanSettingButtonsBox);
 
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
+    private void importMannequins() {
+        FileChooser browser = new FileChooser();
+        File scanFile = browser.showOpenDialog(stage);
+        if (scanFile != null) {
+            try {
+                importExportRepository.importMannequinsFromFile(scanFile);
+            } catch (Exception e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, String.format("Encountered error while importing mannequins: %s", e.getMessage()));
+                alert.showAndWait();
+            }
+            mannequinDisplay.refreshTableItems();
+        }
+    }
+
+    private void exportMannequins() {
+        FileChooser browser = new FileChooser();
+        File selected = browser.showSaveDialog(stage);
+        if (selected != null) {
+            try {
+                importExportRepository.exportMannequinsToFile(selected);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Mannequins exported successfully!");
+                alert.showAndWait();
+            } catch (Exception e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, String.format("Encountered error while exporting mannequins: %s", e.getMessage()));
+                alert.showAndWait();
+            }
+        }
     }
 
 }
