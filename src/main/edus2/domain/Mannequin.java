@@ -1,6 +1,8 @@
 package edus2.domain;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -48,5 +50,27 @@ public class Mannequin {
             }
             scans.add(scan);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Mannequin mannequin = (Mannequin) o;
+
+        return new EqualsBuilder()
+                .append(name, mannequin.name)
+                .append(tagMap, mannequin.tagMap)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(name)
+                .append(tagMap)
+                .toHashCode();
     }
 }
