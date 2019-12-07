@@ -15,7 +15,7 @@ package edus2.adapter.ui;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import edus2.adapter.persistence.FileScanImportExportRepository;
+import edus2.adapter.repository.file.FileScanImportExportRepository;
 import edus2.application.AuthenticationFacade;
 import edus2.application.EDUS2View;
 import edus2.application.ScanFacade;
