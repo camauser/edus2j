@@ -269,6 +269,7 @@ public class EDUS2View extends Application {
     }
 
     private void playScan(Scan scan) {
+        stopPlayer();
         String scanPath = scan.getPath();
         currentLocationPlaying = scan.getScanEnum();
         Media video = new Media(scanPath);
@@ -285,11 +286,10 @@ public class EDUS2View extends Application {
             videoView.setFitWidth(calculateVideoDimension(minVideoWidth, video.getWidth(), windowWidth));
             videoView.setFitHeight(calculateVideoDimension(minVideoHeight, video.getHeight(), windowHeight));
             ScanProgressUpdater scanProgressUpdater = new ScanProgressUpdater(player, playbackProgress);
-            player.setOnEndOfMedia(() -> player.stop());
-            player.setOnStopped(() -> {
+            player.setOnEndOfMedia(() -> {
                 currentLocationPlaying = null;
-                scanProgressUpdater.finish();
             });
+            player.setOnStopped(scanProgressUpdater::finish);
 
             player.play();
             scanProgressUpdater.start();
