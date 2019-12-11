@@ -62,14 +62,14 @@ public abstract class MannequinEntryWindow extends HBox {
 
     private void generateInputFields() {
         mannequinName = generateEntryBox("Mannequin Name");
-        rightLungScan = generateEntryBox("(1) Right Lung Scan");
-        leftLungScan = generateEntryBox("(2) Left Lung Scan");
+        leftLungScan = generateEntryBox("(1) Left Lung Scan");
+        rightLungScan = generateEntryBox("(2) Right Lung Scan");
         cardiacPslPss = generateEntryBox("(3) Cardiac PSL/PSS Scan");
         cardiacA4c = generateEntryBox("(4) Cardiac A4C");
         cardiacSc = generateEntryBox("(5) Cardiac SC");
         ivc = generateEntryBox("(6) IVC");
-        ruq = generateEntryBox("(7) Right Upper Quadrant");
-        luq = generateEntryBox("(8) Left Upper Quadrant");
+        luq = generateEntryBox("(7) Left Upper Quadrant");
+        ruq = generateEntryBox("(8) Right Upper Quadrant");
         abdominalAorta = generateEntryBox("(9) Abdominal Aorta");
         pelvis = generateEntryBox("(10) Pelvis");
         Button btnSaveMannequin = new Button("Save Mannequin");

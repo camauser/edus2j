@@ -67,11 +67,11 @@ public class EDUS2View extends Application {
     private MediaPlayer player;
     private BorderPane main;
     private static final Font BUTTON_FONT = new Font("Calibri", 18);
-    private ScanFacade scanFacade;
+    private edus2.application.ScanFacade scanFacade;
     private static Injector injector;
     private EDUS2Configuration configuration;
-    private AuthenticationFacade authenticationFacade;
-    private MannequinFacade mannequinFacade;
+    private edus2.application.AuthenticationFacade authenticationFacade;
+    private edus2.application.MannequinFacade mannequinFacade;
 
     public static void main(String[] args) {
         // Run the start method, and open up the GUI
