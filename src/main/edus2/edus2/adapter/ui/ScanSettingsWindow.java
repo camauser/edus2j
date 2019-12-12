@@ -52,11 +52,12 @@ public class ScanSettingsWindow extends VBox {
     private ScanFacade scanFacade;
     private FileScanImportExportRepository importExportRepository;
 
-    public ScanSettingsWindow(ScanFacade scanFacade, AuthenticationFacade authenticationFacade, EDUS2Configuration configuration) {
+    public ScanSettingsWindow(ScanFacade scanFacade, AuthenticationFacade authenticationFacade, EDUS2Configuration configuration, EDUS2IconStage stage) {
         // Just set up a settings window, which is then shown on-screen
         super(10);
         this.scanFacade = scanFacade;
         this.importExportRepository = new FileScanImportExportRepository(scanFacade);
+        this.stage = stage;
         scanList = new ScansWindow(scanFacade);
         HBox scanSettingButtonsBox = new HBox();
         HBox configurationButtonBox = new HBox();
@@ -146,11 +147,10 @@ public class ScanSettingsWindow extends VBox {
 
         Button btnConfigSettings = new Button("Configuration Settings");
         btnConfigSettings.setOnAction(e -> {
-            ConfigurationWindow configurationWindow = new ConfigurationWindow(configuration, authenticationFacade);
             EDUS2IconStage configurationStage = new EDUS2IconStage();
+            ConfigurationWindow configurationWindow = new ConfigurationWindow(configuration, authenticationFacade, configurationStage);
             Scene configurationScene = new Scene(configurationWindow);
             configurationStage.setScene(configurationScene);
-            configurationWindow.setStage(configurationStage);
             configurationStage.showAndWait();
             // needed to keep scan list up-to-date if scan file is changed
             scanList.refreshTableItems();
@@ -181,10 +181,6 @@ public class ScanSettingsWindow extends VBox {
         scanLocationDialog.setHeaderText("Choose Scan Location");
         scanLocationDialog.setContentText(prompt);
         return scanLocationDialog.showAndWait().map(MannequinScanEnum::findByName);
-    }
-
-    public void setStage(EDUS2IconStage stage) {
-        this.stage = stage;
     }
 
     private void importScans() {

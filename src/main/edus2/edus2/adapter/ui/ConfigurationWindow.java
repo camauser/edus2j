@@ -24,9 +24,10 @@ public class ConfigurationWindow extends VBox {
     private EDUS2Configuration configuration;
     private AuthenticationFacade authenticationFacade;
 
-    public ConfigurationWindow(EDUS2Configuration configuration, AuthenticationFacade authenticationFacade) {
+    public ConfigurationWindow(EDUS2Configuration configuration, AuthenticationFacade authenticationFacade, EDUS2IconStage stage) {
         super(10);
         this.authenticationFacade = authenticationFacade;
+        this.stage = stage;
         UnaryOperator<TextFormatter.Change> integerFilter = entry -> {
             String text = entry.getText();
             if (text.matches("^\\d*$")) {
@@ -151,7 +152,4 @@ public class ConfigurationWindow extends VBox {
         configuration.setMinimumVideoHeight(Integer.parseInt(rawText));
     }
 
-    public void setStage(EDUS2IconStage stage) {
-        this.stage = stage;
-    }
 }

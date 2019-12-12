@@ -21,10 +21,11 @@ public class MannequinSettingsWindow extends VBox{
     private FileMannequinImportExportRepository importExportRepository;
     private EDUS2IconStage stage;
 
-    public MannequinSettingsWindow(MannequinFacade mannequinFacade) {
+    public MannequinSettingsWindow(MannequinFacade mannequinFacade, EDUS2IconStage stage) {
         super(10);
         mannequinDisplay = new MannequinsWindow(mannequinFacade);
         importExportRepository = new FileMannequinImportExportRepository(mannequinFacade);
+        this.stage = stage;
         HBox scanSettingButtonsBox = new HBox();
 
         Button btnAdd = new Button("Add");
@@ -36,10 +37,10 @@ public class MannequinSettingsWindow extends VBox{
 
         btnAdd.setOnAction(event -> {
             MannequinCreateWindow mannequinCreateWindow = new MannequinCreateWindow(mannequinFacade);
-            EDUS2IconStage stage = new EDUS2IconStage();
+            EDUS2IconStage addStage = new EDUS2IconStage();
             Scene scene = new Scene(mannequinCreateWindow);
-            stage.setScene(scene);
-            stage.showAndWait();
+            addStage.setScene(scene);
+            addStage.showAndWait();
             mannequinDisplay.refreshTableItems();
         });
 
@@ -50,10 +51,10 @@ public class MannequinSettingsWindow extends VBox{
             }
             MannequinUpdateWindow mannequinUpdateWindow = new MannequinUpdateWindow(mannequinFacade);
             mannequinUpdateWindow.bindMannequin(mannequinFacade.getMannequin(selected.getName()).orElseThrow(() -> new InvalidMannequinNameException(String.format("Mannequin %s does not exist!", selected.getName()))));
-            EDUS2IconStage stage = new EDUS2IconStage();
+            EDUS2IconStage updateStage = new EDUS2IconStage();
             Scene scene = new Scene(mannequinUpdateWindow);
-            stage.setScene(scene);
-            stage.showAndWait();
+            updateStage.setScene(scene);
+            updateStage.showAndWait();
             mannequinDisplay.refreshTableItems();
         });
 
@@ -97,10 +98,6 @@ public class MannequinSettingsWindow extends VBox{
         mannequinDisplay.setAlignment(Pos.CENTER);
         this.getChildren().addAll(mannequinDisplay, scanSettingButtonsBox);
 
-    }
-
-    public void setStage(EDUS2IconStage stage) {
-        this.stage = stage;
     }
 
     private void importMannequins() {
