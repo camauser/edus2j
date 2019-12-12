@@ -1,7 +1,6 @@
 package edus2.adapter.ui;
 
 import edus2.application.AuthenticationFacade;
-import edus2.application.EDUS2View;
 import edus2.domain.EDUS2Configuration;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -12,7 +11,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -22,7 +20,7 @@ import java.util.function.UnaryOperator;
 public class ConfigurationWindow extends VBox {
     private final TextField minVideoWidth;
     private final TextField minVideoHeight;
-    private Stage stage;
+    private EDUS2IconStage stage;
     private EDUS2Configuration configuration;
     private AuthenticationFacade authenticationFacade;
 
@@ -153,8 +151,7 @@ public class ConfigurationWindow extends VBox {
         configuration.setMinimumVideoHeight(Integer.parseInt(rawText));
     }
 
-    public void setStage(Stage stage) {
+    public void setStage(EDUS2IconStage stage) {
         this.stage = stage;
-        this.stage.getIcons().add(EDUS2View.getThumbnailImage());
     }
 }

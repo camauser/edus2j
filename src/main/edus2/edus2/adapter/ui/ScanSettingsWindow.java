@@ -33,7 +33,6 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 
 import java.io.File;
 import java.util.List;
@@ -48,7 +47,7 @@ import java.util.stream.Collectors;
  * @version 1.0
  */
 public class ScanSettingsWindow extends VBox {
-    private Stage stage;
+    private EDUS2IconStage stage;
     private ScansWindow scanList;
     private ScanFacade scanFacade;
     private FileScanImportExportRepository importExportRepository;
@@ -148,7 +147,7 @@ public class ScanSettingsWindow extends VBox {
         Button btnConfigSettings = new Button("Configuration Settings");
         btnConfigSettings.setOnAction(e -> {
             ConfigurationWindow configurationWindow = new ConfigurationWindow(configuration, authenticationFacade);
-            Stage configurationStage = new Stage();
+            EDUS2IconStage configurationStage = new EDUS2IconStage();
             Scene configurationScene = new Scene(configurationWindow);
             configurationStage.setScene(configurationScene);
             configurationWindow.setStage(configurationStage);
@@ -184,9 +183,8 @@ public class ScanSettingsWindow extends VBox {
         return scanLocationDialog.showAndWait().map(MannequinScanEnum::findByName);
     }
 
-    public void setStage(Stage stage) {
+    public void setStage(EDUS2IconStage stage) {
         this.stage = stage;
-        this.stage.getIcons().add(EDUS2View.getThumbnailImage());
     }
 
     private void importScans() {
