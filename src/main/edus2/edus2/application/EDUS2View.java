@@ -18,10 +18,7 @@ package edus2.application;/*
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import edus2.adapter.guice.EDUS2JModule;
-import edus2.adapter.ui.MannequinSettingsWindow;
-import edus2.adapter.ui.PasswordInputDialog;
-import edus2.adapter.ui.ScanProgressUpdater;
-import edus2.adapter.ui.ScanSettingsWindow;
+import edus2.adapter.ui.*;
 import edus2.domain.EDUS2Configuration;
 import edus2.domain.MannequinScanEnum;
 import edus2.domain.Scan;
@@ -49,6 +46,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -80,7 +78,7 @@ public class EDUS2View extends Application {
     }
 
     public static Image getThumbnailImage() {
-        File imageFile = new File("img/edus2-icon.png");
+        File imageFile = new File(Objects.requireNonNull(EDUS2View.class.getClassLoader().getResource("edus2-icon.png")).getFile());
         return new Image("file:///" + imageFile.getAbsolutePath());
     }
 

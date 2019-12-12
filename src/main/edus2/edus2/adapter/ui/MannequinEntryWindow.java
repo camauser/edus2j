@@ -14,6 +14,7 @@ import javafx.scene.text.Text;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Objects;
 
 public abstract class MannequinEntryWindow extends HBox {
     private GridPane mannequinFieldEntry;
@@ -35,13 +36,17 @@ public abstract class MannequinEntryWindow extends HBox {
         this.mannequinFieldEntry = new GridPane();
         mannequinFieldEntry.setHgap(10.0);
         mannequinFieldEntry.setVgap(5.0);
-        File imageFile = new File("img/mannequin-scanpoints.png");
+
+        File imageFile = new File(Objects.requireNonNull(this.getClass().getClassLoader().getResource("mannequin-scanpoints.png")).getFile());
         Image scanPointImage = new Image("file:///" + imageFile.getAbsolutePath());
 
         generateInputFields();
         ImageView imageView = new ImageView(scanPointImage);
+        HBox imageHbox = new HBox(imageView);
+        imageHbox.setAlignment(Pos.CENTER);
         mannequinFieldEntry.setAlignment(Pos.CENTER);
-        this.getChildren().addAll(mannequinFieldEntry, imageView);
+        this.getChildren().addAll(mannequinFieldEntry, imageHbox);
+        this.setAlignment(Pos.CENTER);
     }
 
     public void bindMannequin(Mannequin mannequin) {
