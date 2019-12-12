@@ -134,14 +134,10 @@ public class EDUS2View extends Application {
 
         btnScanSettings.setOnAction(event -> {
             if (isAuthenticated()) {
-                ScanSettingsWindow scanSettingsWindow = new ScanSettingsWindow(scanFacade, authenticationFacade, configuration);
                 EDUS2IconStage scanWindowStage = new EDUS2IconStage();
+                ScanSettingsWindow scanSettingsWindow = new ScanSettingsWindow(scanFacade, authenticationFacade, configuration, scanWindowStage);
                 Scene scanWindowScene = new Scene(scanSettingsWindow);
                 scanWindowStage.setScene(scanWindowScene);
-
-                // Set the stage ref in our settings window so that we
-                // can show on-screen pop-ups for adding scans
-                scanSettingsWindow.setStage(scanWindowStage);
 
                 scanWindowStage.show();
             } else {
@@ -154,9 +150,8 @@ public class EDUS2View extends Application {
         });
 
         btnMannequinSettings.setOnAction(event -> {
-            MannequinSettingsWindow mannequinSettingsWindow = new MannequinSettingsWindow(mannequinFacade);
             EDUS2IconStage mannequinSettingStage = new EDUS2IconStage();
-            mannequinSettingsWindow.setStage(mannequinSettingStage);
+            MannequinSettingsWindow mannequinSettingsWindow = new MannequinSettingsWindow(mannequinFacade, mannequinSettingStage);
             Scene mannequinWindowScene = new Scene(mannequinSettingsWindow);
             mannequinSettingStage.setScene(mannequinWindowScene);
             mannequinSettingStage.show();
