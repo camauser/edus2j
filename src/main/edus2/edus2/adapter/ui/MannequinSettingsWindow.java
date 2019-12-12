@@ -12,7 +12,6 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 
 import java.io.File;
 import java.util.Optional;
@@ -20,7 +19,7 @@ import java.util.Optional;
 public class MannequinSettingsWindow extends VBox{
     private MannequinsWindow mannequinDisplay;
     private FileMannequinImportExportRepository importExportRepository;
-    private Stage stage;
+    private EDUS2IconStage stage;
 
     public MannequinSettingsWindow(MannequinFacade mannequinFacade) {
         super(10);
@@ -37,7 +36,7 @@ public class MannequinSettingsWindow extends VBox{
 
         btnAdd.setOnAction(event -> {
             MannequinCreateWindow mannequinCreateWindow = new MannequinCreateWindow(mannequinFacade);
-            Stage stage = new Stage();
+            EDUS2IconStage stage = new EDUS2IconStage();
             Scene scene = new Scene(mannequinCreateWindow);
             stage.setScene(scene);
             stage.showAndWait();
@@ -51,7 +50,7 @@ public class MannequinSettingsWindow extends VBox{
             }
             MannequinUpdateWindow mannequinUpdateWindow = new MannequinUpdateWindow(mannequinFacade);
             mannequinUpdateWindow.bindMannequin(mannequinFacade.getMannequin(selected.getName()).orElseThrow(() -> new InvalidMannequinNameException(String.format("Mannequin %s does not exist!", selected.getName()))));
-            Stage stage = new Stage();
+            EDUS2IconStage stage = new EDUS2IconStage();
             Scene scene = new Scene(mannequinUpdateWindow);
             stage.setScene(scene);
             stage.showAndWait();
@@ -100,7 +99,7 @@ public class MannequinSettingsWindow extends VBox{
 
     }
 
-    public void setStage(Stage stage) {
+    public void setStage(EDUS2IconStage stage) {
         this.stage = stage;
     }
 

@@ -135,7 +135,7 @@ public class EDUS2View extends Application {
         btnScanSettings.setOnAction(event -> {
             if (isAuthenticated()) {
                 ScanSettingsWindow scanSettingsWindow = new ScanSettingsWindow(scanFacade, authenticationFacade, configuration);
-                Stage scanWindowStage = new Stage();
+                EDUS2IconStage scanWindowStage = new EDUS2IconStage();
                 Scene scanWindowScene = new Scene(scanSettingsWindow);
                 scanWindowStage.setScene(scanWindowScene);
 
@@ -155,7 +155,7 @@ public class EDUS2View extends Application {
 
         btnMannequinSettings.setOnAction(event -> {
             MannequinSettingsWindow mannequinSettingsWindow = new MannequinSettingsWindow(mannequinFacade);
-            Stage mannequinSettingStage = new Stage();
+            EDUS2IconStage mannequinSettingStage = new EDUS2IconStage();
             mannequinSettingsWindow.setStage(mannequinSettingStage);
             Scene mannequinWindowScene = new Scene(mannequinSettingsWindow);
             mannequinSettingStage.setScene(mannequinWindowScene);
@@ -232,8 +232,7 @@ public class EDUS2View extends Application {
 
         Scene creditScene = new Scene(credits);
 
-        Stage creditStage = new Stage();
-        creditStage.getIcons().add(getThumbnailImage());
+        EDUS2IconStage creditStage = new EDUS2IconStage();
         creditStage.setScene(creditScene);
         creditStage.setTitle("EDUS2J Credits");
         creditStage.show();
