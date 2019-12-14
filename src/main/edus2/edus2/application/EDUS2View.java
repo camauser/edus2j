@@ -138,7 +138,6 @@ public class EDUS2View extends Application {
                 ScanSettingsWindow scanSettingsWindow = new ScanSettingsWindow(scanFacade, authenticationFacade, configuration, scanWindowStage);
                 Scene scanWindowScene = new Scene(scanSettingsWindow);
                 scanWindowStage.setScene(scanWindowScene);
-
                 scanWindowStage.show();
             } else {
                 Alert invalidPasswordAlert = new Alert(Alert.AlertType.ERROR);
