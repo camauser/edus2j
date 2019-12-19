@@ -32,21 +32,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.InputStream;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -92,8 +88,23 @@ public class EDUS2View extends Application {
         mannequinFacade = injector.getInstance(MannequinFacade.class);
 
         main = new BorderPane();
-        main.setTop(generateTop());
-        main.setBottom(generateBottom(stage));
+        Text txtTitle = new Text("EDUS2J Simulator");
+        txtTitle.setFont(Font.font("Calibri", FontWeight.BOLD, FontPosture.ITALIC, 36.0));
+
+        HBox titleBox = new HBox(txtTitle);
+        titleBox.setAlignment(Pos.BOTTOM_LEFT);
+        VBox playbackPositionBox = generatePlaybackPositionControl();
+        HBox controlButtons = generateButtonControls(stage);
+
+        BorderPane bottomControlsPane = new BorderPane();
+        bottomControlsPane.setLeft(titleBox);
+        bottomControlsPane.setCenter(playbackPositionBox);
+        bottomControlsPane.setRight(controlButtons);
+        BorderPane.setAlignment(txtTitle, Pos.BOTTOM_LEFT);
+        BorderPane.setAlignment(playbackPositionBox, Pos.BOTTOM_CENTER);
+        BorderPane.setAlignment(controlButtons, Pos.BOTTOM_RIGHT);
+
+        main.setBottom(bottomControlsPane);
 
         Scene scene = new Scene(main);
         stage.setHeight(720);
@@ -102,6 +113,9 @@ public class EDUS2View extends Application {
         stage.getIcons().add(getThumbnailImage());
         stage.setTitle("EDUS2J");
         stage.show();
+
+        // Need to set the width after controls have been shown otherwise getWidth returns 0 - set width to center playback position
+        titleBox.setMinWidth(controlButtons.getWidth());
 
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
@@ -112,7 +126,7 @@ public class EDUS2View extends Application {
         });
     }
 
-    private Node generateBottom(Stage stage) {
+    private HBox generateButtonControls(Stage stage) {
         Button btnAbout = new Button("About");
         btnAbout.setFont(BUTTON_FONT);
         Button btnFullscreen = new Button("Toggle Fullscreen");
@@ -179,31 +193,18 @@ public class EDUS2View extends Application {
         return passwordEntryBox.showAndWait();
     }
 
-    private VBox generateTop() {
-        Text txtTitle = new Text("EDUS2J Simulator");
-        txtTitle.setFont(Font.font("Calibri", FontWeight.BOLD,
-                FontPosture.ITALIC, 36.0));
-        AnchorPane top = new AnchorPane();
-
-        VBox topThird = new VBox();
+    private VBox generatePlaybackPositionControl() {
+        VBox playbackElements = new VBox();
         Text txtPlaybackPosition = new Text("Playback Position");
-        txtPlaybackPosition.setFont(Font.font("Calibri", FontWeight.BOLD,
-                FontPosture.ITALIC, 20.0));
-        playbackProgress = new ProgressBar();
+        txtPlaybackPosition.setFont(Font.font("Calibri", FontWeight.BOLD, FontPosture.ITALIC, 20.0));
+        playbackProgress = new ProgressBar(0.0);
         playbackProgress.setMinHeight(18.0);
         playbackProgress.setMinWidth(150.0);
-        playbackProgress.setProgress(0.0);
-        topThird.getChildren().addAll(txtTitle, txtPlaybackPosition,
-                playbackProgress);
-        VBox.setMargin(txtTitle, new Insets(5.0));
+        playbackElements.getChildren().addAll(txtPlaybackPosition, playbackProgress);
         VBox.setMargin(txtPlaybackPosition, new Insets(5.0));
         VBox.setMargin(playbackProgress, new Insets(5.0));
-        topThird.setAlignment(Pos.TOP_RIGHT);
-
-        top.getChildren().add(topThird);
-        AnchorPane.setRightAnchor(topThird, 5.0);
-        BorderPane.setAlignment(topThird, Pos.TOP_RIGHT);
-        return topThird;
+        playbackElements.setAlignment(Pos.BOTTOM_CENTER);
+        return playbackElements;
     }
 
     private void showCredits() {
@@ -277,9 +278,7 @@ public class EDUS2View extends Application {
             videoView.setFitWidth(calculateVideoDimension(minVideoWidth, video.getWidth(), windowWidth));
             videoView.setFitHeight(calculateVideoDimension(minVideoHeight, video.getHeight(), windowHeight));
             ScanProgressUpdater scanProgressUpdater = new ScanProgressUpdater(player, playbackProgress);
-            player.setOnEndOfMedia(() -> {
-                currentLocationPlaying = null;
-            });
+            player.setOnEndOfMedia(() -> currentLocationPlaying = null);
             player.setOnStopped(scanProgressUpdater::finish);
 
             player.play();
