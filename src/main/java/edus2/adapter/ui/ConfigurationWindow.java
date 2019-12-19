@@ -64,7 +64,7 @@ public class ConfigurationWindow extends VBox {
 
     private void setSaveFileLocation() {
         FileChooser fileChooser = new FileChooser();
-        File saveFile = fileChooser.showOpenDialog(this.stage);
+        File saveFile = fileChooser.showSaveDialog(this.stage);
         if (saveFile != null) {
             configuration.setSaveFileLocation(saveFile.getAbsolutePath());
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Save file location updated.");
