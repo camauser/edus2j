@@ -113,6 +113,7 @@ public class EDUS2View extends Application {
         stage.getIcons().add(getThumbnailImage());
         stage.setTitle("EDUS2J");
         stage.show();
+        stage.setFullScreen(true);
 
         // Need to set the width after controls have been shown otherwise getWidth returns 0 - set width to center playback position
         titleBox.setMinWidth(controlButtons.getWidth());
