@@ -13,6 +13,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -37,8 +38,7 @@ public abstract class MannequinEntryWindow extends HBox {
         mannequinFieldEntry.setHgap(10.0);
         mannequinFieldEntry.setVgap(5.0);
 
-        File imageFile = new File(Objects.requireNonNull(this.getClass().getClassLoader().getResource("mannequin-scanpoints.png")).getFile());
-        Image scanPointImage = new Image("file:///" + imageFile.getAbsolutePath());
+        Image scanPointImage = new Image(Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream("mannequin-scanpoints.png")));
 
         generateInputFields();
         ImageView imageView = new ImageView(scanPointImage);

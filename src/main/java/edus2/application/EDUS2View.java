@@ -46,6 +46,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -78,8 +79,7 @@ public class EDUS2View extends Application {
     }
 
     public static Image getThumbnailImage() {
-        File imageFile = new File(Objects.requireNonNull(EDUS2View.class.getClassLoader().getResource("edus2-icon.png")).getFile());
-        return new Image("file:///" + imageFile.getAbsolutePath());
+        return new Image(Objects.requireNonNull(EDUS2View.class.getClassLoader().getResourceAsStream("edus2-icon.png")));
     }
 
     /**
