@@ -66,8 +66,8 @@ public class ScanSettingsWindow extends VBox {
         Button btnBulkAdd = new Button("Bulk Add");
         Button btnDelete = new Button("Delete");
         Button btnDeleteAll = new Button("Delete All");
-        Button btnImport = new Button("Import from File");
-        Button btnExport = new Button("Export to File");
+        Button btnLoadScenario = new Button("Load Scenario");
+        Button btnSaveScenario = new Button("Save Scenario");
 
         // When add is clicked, run through the process of adding a new scan
         btnAdd.setOnAction(event -> {
@@ -91,7 +91,7 @@ public class ScanSettingsWindow extends VBox {
                 alert.showAndWait();
                 return;
             }
-            
+
             FileChooser browser = new FileChooser();
             List<File> selected = browser.showOpenMultipleDialog(stage);
             if (selected == null) {
@@ -136,14 +136,12 @@ public class ScanSettingsWindow extends VBox {
             }
         });
 
-        // Import scans from a file
-        btnImport.setOnAction(event -> importScans());
+        btnLoadScenario.setOnAction(event -> loadScenario());
 
-        // Export all the current scans to a file
-        btnExport.setOnAction(event -> exportScans());
+        btnSaveScenario.setOnAction(event -> saveScenario());
 
         scanSettingButtonsBox.setAlignment(Pos.CENTER);
-        scanSettingButtonsBox.getChildren().addAll(btnAdd, btnBulkAdd, btnDelete, btnDeleteAll, btnImport, btnExport);
+        scanSettingButtonsBox.getChildren().addAll(btnAdd, btnBulkAdd, btnDelete, btnDeleteAll, btnLoadScenario, btnSaveScenario);
 
         Button btnConfigSettings = new Button("Configuration Settings");
         btnConfigSettings.setOnAction(e -> {
@@ -183,7 +181,7 @@ public class ScanSettingsWindow extends VBox {
         return scanLocationDialog.showAndWait().map(MannequinScanEnum::findByName);
     }
 
-    private void importScans() {
+    private void loadScenario() {
         FileChooser browser = new FileChooser();
         File scanFile = browser.showOpenDialog(stage);
         if (scanFile != null) {
@@ -191,26 +189,22 @@ public class ScanSettingsWindow extends VBox {
                 importExportRepository.importScansFromFile(scanFile);
                 scanList.refreshTableItems();
             } catch (Exception e) {
-                Alert alert = new Alert(AlertType.ERROR, String.format("Encountered error while importing scans: %s", e.getMessage()));
+                Alert alert = new Alert(AlertType.ERROR, String.format("Encountered error while loading scenario: %s", e.getMessage()));
                 alert.showAndWait();
             }
         }
     }
 
-    /**
-     * Purpose: Export all scans to a file of the user's choice.
-     */
-    private void exportScans() {
-        // Show a file browser, so the user can select a file to save to.
+    private void saveScenario() {
         FileChooser browser = new FileChooser();
         File selected = browser.showSaveDialog(stage);
         if (selected != null) {
             try {
                 importExportRepository.exportScansToFile(selected);
-                Alert alert = new Alert(AlertType.INFORMATION, "Scans exported successfully!");
+                Alert alert = new Alert(AlertType.INFORMATION, "Scenario saved successfully!");
                 alert.showAndWait();
             } catch (Exception e) {
-                Alert alert = new Alert(AlertType.ERROR, String.format("Encountered error while exporting scans: %s", e.getMessage()));
+                Alert alert = new Alert(AlertType.ERROR, String.format("Encountered error while saving scenario: %s", e.getMessage()));
                 alert.showAndWait();
             }
         }
