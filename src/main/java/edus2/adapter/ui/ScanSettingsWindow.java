@@ -62,10 +62,10 @@ public class ScanSettingsWindow extends VBox {
         HBox scanSettingButtonsBox = new HBox();
         HBox configurationButtonBox = new HBox();
 
-        Button btnAdd = new Button("Add");
-        Button btnBulkAdd = new Button("Bulk Add");
-        Button btnDelete = new Button("Delete");
-        Button btnDeleteAll = new Button("Delete All");
+        Button btnAdd = new Button("Add Video");
+        Button btnBulkAdd = new Button("Bulk Add Videos");
+        Button btnDelete = new Button("Delete Video");
+        Button btnDeleteAll = new Button("Delete All Videos");
         Button btnLoadScenario = new Button("Load Scenario");
         Button btnSaveScenario = new Button("Save Scenario");
 
