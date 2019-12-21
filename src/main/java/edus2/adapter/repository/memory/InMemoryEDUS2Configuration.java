@@ -9,6 +9,7 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     private Integer minimumVideoWidth;
     private String hashedPassword;
     private String saveFileLocation;
+    private String defaultScenarioDirectory;
 
     @Override
     public Optional<Integer> getMinimumVideoHeight() {
@@ -31,6 +32,11 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     }
 
     @Override
+    public Optional<String> getDefaultScenarioDirectory() {
+        return Optional.ofNullable(defaultScenarioDirectory);
+    }
+
+    @Override
     public void setMinimumVideoHeight(int minimumVideoHeight) {
         this.minimumVideoHeight = minimumVideoHeight;
     }
@@ -48,5 +54,10 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     @Override
     public void setSaveFileLocation(String saveFileLocation) {
         this.saveFileLocation = saveFileLocation;
+    }
+
+    @Override
+    public void setDefaultScenarioDirectory(String defaultScenarioDirectory) {
+        this.defaultScenarioDirectory = defaultScenarioDirectory;
     }
 }

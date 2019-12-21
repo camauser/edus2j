@@ -43,6 +43,11 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
     }
 
     @Override
+    public Optional<String> getDefaultScenarioDirectory() {
+        return getDto().map(dto -> dto.defaultScenarioDirectory);
+    }
+
+    @Override
     public void setMinimumVideoHeight(int minimumVideoHeight) {
         Optional<EDUS2ConfigurationDto> dtoOptional = getDto();
         EDUS2ConfigurationDto dto = dtoOptional.orElseGet(EDUS2ConfigurationDto::new);
@@ -74,6 +79,14 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         saveToFile(gson.toJson(dto), filePath);
     }
 
+    @Override
+    public void setDefaultScenarioDirectory(String defaultScenarioDirectory) {
+        Optional<EDUS2ConfigurationDto> dtoOptional = getDto();
+        EDUS2ConfigurationDto dto = dtoOptional.orElseGet(EDUS2ConfigurationDto::new);
+        dto.defaultScenarioDirectory = defaultScenarioDirectory;
+        saveToFile(gson.toJson(dto), filePath);
+    }
+
     private Optional<EDUS2ConfigurationDto> getDto() {
         Optional<String> fileContents = readFileContents(filePath);
         return fileContents.map(s -> gson.fromJson(s, EDUS2ConfigurationDto.class));
@@ -84,5 +97,6 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         protected Integer minimumVideoWidth;
         protected String hashedPassword;
         protected String saveFileLocation;
+        protected String defaultScenarioDirectory;
     }
 }

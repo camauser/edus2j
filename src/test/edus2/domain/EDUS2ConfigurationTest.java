@@ -104,4 +104,40 @@ public abstract class EDUS2ConfigurationTest {
         // Assert
         assertEquals(Optional.of("file/scan/location.json"), actual);
     }
+
+    @Test
+    public void getDefaultScenarioDirectory_shouldReturnEmpty_whenLocationNotSet() {
+        // Act
+        Optional<String> actual = configuration.getDefaultScenarioDirectory();
+
+        // Assert
+        assertFalse(actual.isPresent());
+    }
+
+    @Test
+    public void getDefaultScenarioDirectory_shouldReturnScenarioDirectory_whenDirectorySet() {
+        // Arrange
+        String expected = "scenario/directory";
+        configuration.setDefaultScenarioDirectory(expected);
+
+        // Act
+        Optional<String> actual = configuration.getDefaultScenarioDirectory();
+
+        // Assert
+        assertEquals(Optional.of(expected), actual);
+    }
+
+    @Test
+    public void setDefaultScenarioDirectory_shouldOverwriteDirectory_whenDirectoryAlreadySet() {
+        // Arrange
+        String expected = "expected/directory";
+        configuration.setDefaultScenarioDirectory("first/directory");
+
+        // Act
+        configuration.setDefaultScenarioDirectory(expected);
+
+        // Assert
+        Optional<String> actual = configuration.getDefaultScenarioDirectory();
+        assertEquals(Optional.of(expected), actual);
+    }
 }
