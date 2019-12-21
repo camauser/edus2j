@@ -73,6 +73,11 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
     }
 
     @Override
+    public boolean displayedPhoneHomeWarning() {
+        return getDto().shownPhoneHomeWarning;
+    }
+
+    @Override
     public void setMinimumVideoHeight(int minimumVideoHeight) {
         EDUS2ConfigurationDto dto = getDto();
         dto.minimumVideoHeight = minimumVideoHeight;
@@ -107,6 +112,13 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         saveToFile(gson.toJson(dto), filePath);
     }
 
+    @Override
+    public void tripDisplayedPhoneHomeWarning() {
+        EDUS2ConfigurationDto dto = getDto();
+        dto.shownPhoneHomeWarning = true;
+        saveToFile(gson.toJson(dto), filePath);
+    }
+
     private EDUS2ConfigurationDto getDto() {
         Optional<String> fileContents = readFileContents(filePath);
         return fileContents
@@ -121,5 +133,6 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         String saveFileLocation;
         String defaultScenarioDirectory;
         String systemIdentifier;
+        boolean shownPhoneHomeWarning;
     }
 }
