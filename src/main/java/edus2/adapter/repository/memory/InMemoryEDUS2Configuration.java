@@ -2,6 +2,7 @@ package edus2.adapter.repository.memory;
 
 import edus2.domain.EDUS2Configuration;
 
+import java.io.File;
 import java.util.Optional;
 
 public class InMemoryEDUS2Configuration implements EDUS2Configuration {
@@ -32,8 +33,11 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     }
 
     @Override
-    public Optional<String> getDefaultScenarioDirectory() {
-        return Optional.ofNullable(defaultScenarioDirectory);
+    public Optional<File> getDefaultScenarioDirectory() {
+        if (defaultScenarioDirectory == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new File(defaultScenarioDirectory));
     }
 
     @Override
@@ -57,7 +61,7 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     }
 
     @Override
-    public void setDefaultScenarioDirectory(String defaultScenarioDirectory) {
-        this.defaultScenarioDirectory = defaultScenarioDirectory;
+    public void setDefaultScenarioDirectory(File defaultScenarioDirectory) {
+        this.defaultScenarioDirectory = defaultScenarioDirectory.getAbsolutePath();
     }
 }

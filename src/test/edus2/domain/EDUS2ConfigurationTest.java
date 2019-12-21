@@ -3,6 +3,7 @@ package edus2.domain;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.Optional;
 
 import static edus2.TestUtil.randomInt;
@@ -108,7 +109,7 @@ public abstract class EDUS2ConfigurationTest {
     @Test
     public void getDefaultScenarioDirectory_shouldReturnEmpty_whenLocationNotSet() {
         // Act
-        Optional<String> actual = configuration.getDefaultScenarioDirectory();
+        Optional<File> actual = configuration.getDefaultScenarioDirectory();
 
         // Assert
         assertFalse(actual.isPresent());
@@ -117,11 +118,11 @@ public abstract class EDUS2ConfigurationTest {
     @Test
     public void getDefaultScenarioDirectory_shouldReturnScenarioDirectory_whenDirectorySet() {
         // Arrange
-        String expected = "scenario/directory";
+        File expected = new File("C:\\scenario\\directory");
         configuration.setDefaultScenarioDirectory(expected);
 
         // Act
-        Optional<String> actual = configuration.getDefaultScenarioDirectory();
+        Optional<File> actual = configuration.getDefaultScenarioDirectory();
 
         // Assert
         assertEquals(Optional.of(expected), actual);
@@ -130,14 +131,14 @@ public abstract class EDUS2ConfigurationTest {
     @Test
     public void setDefaultScenarioDirectory_shouldOverwriteDirectory_whenDirectoryAlreadySet() {
         // Arrange
-        String expected = "expected/directory";
-        configuration.setDefaultScenarioDirectory("first/directory");
+        File expected = new File("C:\\expected\\directory");
+        configuration.setDefaultScenarioDirectory(new File("C:\\first\\directory"));
 
         // Act
         configuration.setDefaultScenarioDirectory(expected);
 
         // Assert
-        Optional<String> actual = configuration.getDefaultScenarioDirectory();
+        Optional<File> actual = configuration.getDefaultScenarioDirectory();
         assertEquals(Optional.of(expected), actual);
     }
 }
