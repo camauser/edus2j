@@ -185,8 +185,8 @@ public class ScanSettingsWindow extends VBox {
 
     private void loadScenario() {
         FileChooser browser = new FileChooser();
-        Optional<String> defaultScenarioDirectory = configuration.getDefaultScenarioDirectory();
-        defaultScenarioDirectory.ifPresent(s -> browser.setInitialDirectory(new File(s)));
+        Optional<File> defaultScenarioDirectory = configuration.getDefaultScenarioDirectory();
+        defaultScenarioDirectory.filter(File::exists).ifPresent(browser::setInitialDirectory);
         File scanFile = browser.showOpenDialog(stage);
         if (scanFile != null) {
             try {
@@ -201,8 +201,8 @@ public class ScanSettingsWindow extends VBox {
 
     private void saveScenario() {
         FileChooser browser = new FileChooser();
-        Optional<String> defaultScenarioDirectory = configuration.getDefaultScenarioDirectory();
-        defaultScenarioDirectory.ifPresent(s -> browser.setInitialDirectory(new File(s)));
+        Optional<File> defaultScenarioDirectory = configuration.getDefaultScenarioDirectory();
+        defaultScenarioDirectory.filter(File::exists).ifPresent(browser::setInitialDirectory);
         File selected = browser.showSaveDialog(stage);
         if (selected != null) {
             try {
