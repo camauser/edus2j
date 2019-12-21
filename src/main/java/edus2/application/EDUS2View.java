@@ -25,18 +25,19 @@ import edus2.domain.Scan;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -125,6 +126,24 @@ public class EDUS2View extends Application {
                 currentScanLocation += event.getText();
             }
         });
+
+        ensurePhoneHomeWarningAccepted(stage);
+    }
+
+    private void ensurePhoneHomeWarningAccepted(Stage stage) {
+        if (!configuration.acceptedPhoneHomeWarning()) {
+            Alert phoneHomeAlert = new Alert(Alert.AlertType.INFORMATION, "This application will periodically \"phone home\" to report anonymous usage statistics. By using this application, you consent to " +
+                    "having your usage data collected for the purpose of determining how many EDUS2J instances are being used worldwide. If you do not agree to these terms, please close the application now and do not click \"OK\".");
+            phoneHomeAlert.setHeaderText("Application Usage Data Collection Warning");
+            phoneHomeAlert.setTitle("Application Usage Data Collection Warning");
+            Optional<ButtonType> response = phoneHomeAlert.showAndWait();
+            boolean warningAccepted = response.isPresent();
+            if (warningAccepted) {
+                configuration.acceptPhoneHomeWarning();
+            } else {
+                stage.close();
+            }
+        }
     }
 
     private HBox generateButtonControls(Stage stage) {
