@@ -10,6 +10,7 @@ import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.apache.commons.lang3.StringUtils;
 
@@ -51,15 +52,28 @@ public class ConfigurationWindow extends VBox {
         Button btnSetPassword = new Button("Set Password");
         Button btnClearPassword = new Button("Clear Password");
         Button btnSaveFileLocation = new Button("Set Save File Location");
+        Button btnSetDefaultScenarioDirectory = new Button("Set Default Scenario Directory");
         btnSetPassword.setOnAction(a -> setPassword());
         btnClearPassword.setOnAction(a -> clearPassword());
         btnSaveFileLocation.setOnAction(a -> setSaveFileLocation());
+        btnSetDefaultScenarioDirectory.setOnAction(a -> setDefaultScenarioDirectory());
         btnSaveChanges.setOnAction(a -> saveChanges());
         HBox saveBox = new HBox(btnSaveChanges);
         saveBox.setAlignment(Pos.CENTER);
-        HBox auxiliaryControls = new HBox(10, btnSetPassword, btnClearPassword, btnSaveFileLocation);
+        HBox auxiliaryControls = new HBox(10, btnSetPassword, btnClearPassword, btnSaveFileLocation, btnSetDefaultScenarioDirectory);
         auxiliaryControls.setAlignment(Pos.CENTER);
         this.getChildren().addAll(saveBox, auxiliaryControls);
+    }
+
+    private void setDefaultScenarioDirectory() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File defaultScenarioDirectory = directoryChooser.showDialog(this.stage);
+        if (defaultScenarioDirectory != null) {
+            configuration.setDefaultScenarioDirectory(defaultScenarioDirectory);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Default scenario directory updated.");
+            alert.setHeaderText("Default Scenario Directory Successfully Updated");
+            alert.showAndWait();
+        }
     }
 
     private void setSaveFileLocation() {
