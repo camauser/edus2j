@@ -13,9 +13,11 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     private String saveFileLocation;
     private String defaultScenarioDirectory;
     private SystemIdentifier systemIdentifier;
+    private boolean displayedPhoneHomeWarning;
 
     public InMemoryEDUS2Configuration() {
         this.systemIdentifier = SystemIdentifier.ofRandom();
+        this.displayedPhoneHomeWarning = false;
     }
 
     @Override
@@ -52,6 +54,11 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     }
 
     @Override
+    public boolean displayedPhoneHomeWarning() {
+        return displayedPhoneHomeWarning;
+    }
+
+    @Override
     public void setMinimumVideoHeight(int minimumVideoHeight) {
         this.minimumVideoHeight = minimumVideoHeight;
     }
@@ -74,5 +81,10 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     @Override
     public void setDefaultScenarioDirectory(File defaultScenarioDirectory) {
         this.defaultScenarioDirectory = defaultScenarioDirectory.getAbsolutePath();
+    }
+
+    @Override
+    public void tripDisplayedPhoneHomeWarning() {
+        this.displayedPhoneHomeWarning = true;
     }
 }

@@ -7,8 +7,7 @@ import java.io.File;
 import java.util.Optional;
 
 import static edus2.TestUtil.randomInt;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 public abstract class EDUS2ConfigurationTest {
     private EDUS2Configuration configuration;
@@ -140,5 +139,39 @@ public abstract class EDUS2ConfigurationTest {
         // Assert
         Optional<File> actual = configuration.getDefaultScenarioDirectory();
         assertEquals(Optional.of(expected), actual);
+    }
+
+    @Test
+    public void displayedPhoneHomeWarning_shouldInitiallyReturnFalse() {
+        // Act
+        boolean actual = configuration.displayedPhoneHomeWarning();
+
+        // Assert
+        assertFalse(actual);
+    }
+
+    @Test
+    public void tripDisplayedPhoneHomeWarning_shouldSetPhoneHomeWarningShownToTrue() {
+        // Arrange
+        configuration.tripDisplayedPhoneHomeWarning();
+
+        // Act
+        boolean actual = configuration.displayedPhoneHomeWarning();
+
+        // Assert
+        assertTrue(actual);
+    }
+
+    @Test
+    public void tripDisplayedPhoneHomeWarning_shouldDoNothing_whenCalledMultipleTimes() {
+        // Arrange
+        configuration.tripDisplayedPhoneHomeWarning();
+
+        // Act
+        configuration.tripDisplayedPhoneHomeWarning();
+
+        // Assert
+        boolean actual = configuration.displayedPhoneHomeWarning();
+        assertTrue(actual);
     }
 }
