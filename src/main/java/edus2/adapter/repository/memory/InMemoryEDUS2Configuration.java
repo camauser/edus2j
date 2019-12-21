@@ -1,6 +1,7 @@
 package edus2.adapter.repository.memory;
 
 import edus2.domain.EDUS2Configuration;
+import edus2.domain.SystemIdentifier;
 
 import java.io.File;
 import java.util.Optional;
@@ -11,6 +12,11 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     private String hashedPassword;
     private String saveFileLocation;
     private String defaultScenarioDirectory;
+    private SystemIdentifier systemIdentifier;
+
+    public InMemoryEDUS2Configuration() {
+        this.systemIdentifier = SystemIdentifier.ofRandom();
+    }
 
     @Override
     public Optional<Integer> getMinimumVideoHeight() {
@@ -38,6 +44,11 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
             return Optional.empty();
         }
         return Optional.of(new File(defaultScenarioDirectory));
+    }
+
+    @Override
+    public SystemIdentifier getSystemIdentifier() {
+        return systemIdentifier;
     }
 
     @Override

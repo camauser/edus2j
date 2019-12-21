@@ -14,6 +14,8 @@ public interface EDUS2Configuration {
 
      Optional<File> getDefaultScenarioDirectory();
 
+     SystemIdentifier getSystemIdentifier();
+
      void setMinimumVideoHeight(int minimumVideoHeight);
 
      void setMinimumVideoWidth(int minimumVideoWidth);
