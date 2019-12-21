@@ -51,6 +51,7 @@ public class ScanSettingsWindow extends VBox {
     private ScansWindow scanList;
     private ScanFacade scanFacade;
     private FileScanImportExportRepository importExportRepository;
+    private EDUS2Configuration configuration;
 
     public ScanSettingsWindow(ScanFacade scanFacade, AuthenticationFacade authenticationFacade, EDUS2Configuration configuration, EDUS2IconStage stage) {
         // Just set up a settings window, which is then shown on-screen
@@ -58,6 +59,7 @@ public class ScanSettingsWindow extends VBox {
         this.scanFacade = scanFacade;
         this.importExportRepository = new FileScanImportExportRepository(scanFacade);
         this.stage = stage;
+        this.configuration = configuration;
         scanList = new ScansWindow(scanFacade);
         HBox scanSettingButtonsBox = new HBox();
         HBox configurationButtonBox = new HBox();
@@ -183,6 +185,8 @@ public class ScanSettingsWindow extends VBox {
 
     private void loadScenario() {
         FileChooser browser = new FileChooser();
+        Optional<String> defaultScenarioDirectory = configuration.getDefaultScenarioDirectory();
+        defaultScenarioDirectory.ifPresent(s -> browser.setInitialDirectory(new File(s)));
         File scanFile = browser.showOpenDialog(stage);
         if (scanFile != null) {
             try {
@@ -197,6 +201,8 @@ public class ScanSettingsWindow extends VBox {
 
     private void saveScenario() {
         FileChooser browser = new FileChooser();
+        Optional<String> defaultScenarioDirectory = configuration.getDefaultScenarioDirectory();
+        defaultScenarioDirectory.ifPresent(s -> browser.setInitialDirectory(new File(s)));
         File selected = browser.showSaveDialog(stage);
         if (selected != null) {
             try {

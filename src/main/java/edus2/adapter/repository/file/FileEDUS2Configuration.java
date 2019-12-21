@@ -92,11 +92,11 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         return fileContents.map(s -> gson.fromJson(s, EDUS2ConfigurationDto.class));
     }
 
-    private class EDUS2ConfigurationDto {
-        protected Integer minimumVideoHeight;
-        protected Integer minimumVideoWidth;
-        protected String hashedPassword;
-        protected String saveFileLocation;
-        protected String defaultScenarioDirectory;
+    private static class EDUS2ConfigurationDto {
+        Integer minimumVideoHeight;
+        Integer minimumVideoWidth;
+        String hashedPassword;
+        String saveFileLocation;
+        String defaultScenarioDirectory;
     }
 }
