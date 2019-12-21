@@ -11,6 +11,8 @@ public interface EDUS2Configuration {
 
      Optional<String> getSaveFileLocation();
 
+     Optional<String> getDefaultScenarioDirectory();
+
      void setMinimumVideoHeight(int minimumVideoHeight);
 
      void setMinimumVideoWidth(int minimumVideoWidth);
@@ -18,4 +20,6 @@ public interface EDUS2Configuration {
      void setHashedPassword(String hashedPassword);
 
      void setSaveFileLocation(String saveFileLocation);
+
+     void setDefaultScenarioDirectory(String defaultScenarioDirectory);
 }
