@@ -1,5 +1,6 @@
 package edus2.domain;
 
+import java.io.File;
 import java.util.Optional;
 
 public interface EDUS2Configuration {
@@ -11,7 +12,7 @@ public interface EDUS2Configuration {
 
      Optional<String> getSaveFileLocation();
 
-     Optional<String> getDefaultScenarioDirectory();
+     Optional<File> getDefaultScenarioDirectory();
 
      void setMinimumVideoHeight(int minimumVideoHeight);
 
@@ -21,5 +22,5 @@ public interface EDUS2Configuration {
 
      void setSaveFileLocation(String saveFileLocation);
 
-     void setDefaultScenarioDirectory(String defaultScenarioDirectory);
+     void setDefaultScenarioDirectory(File defaultScenarioDirectory);
 }

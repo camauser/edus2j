@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import edus2.domain.EDUS2Configuration;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.Optional;
 
@@ -43,8 +44,8 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
     }
 
     @Override
-    public Optional<String> getDefaultScenarioDirectory() {
-        return getDto().map(dto -> dto.defaultScenarioDirectory);
+    public Optional<File> getDefaultScenarioDirectory() {
+        return getDto().map(dto -> dto.defaultScenarioDirectory).map(File::new);
     }
 
     @Override
@@ -80,10 +81,10 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
     }
 
     @Override
-    public void setDefaultScenarioDirectory(String defaultScenarioDirectory) {
+    public void setDefaultScenarioDirectory(File defaultScenarioDirectory) {
         Optional<EDUS2ConfigurationDto> dtoOptional = getDto();
         EDUS2ConfigurationDto dto = dtoOptional.orElseGet(EDUS2ConfigurationDto::new);
-        dto.defaultScenarioDirectory = defaultScenarioDirectory;
+        dto.defaultScenarioDirectory = defaultScenarioDirectory.getAbsolutePath();
         saveToFile(gson.toJson(dto), filePath);
     }
 
