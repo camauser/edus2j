@@ -73,8 +73,8 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
     }
 
     @Override
-    public boolean displayedPhoneHomeWarning() {
-        return getDto().shownPhoneHomeWarning;
+    public boolean acceptedPhoneHomeWarning() {
+        return getDto().acceptedPhoneHomeWarning;
     }
 
     @Override
@@ -113,9 +113,9 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
     }
 
     @Override
-    public void tripDisplayedPhoneHomeWarning() {
+    public void acceptPhoneHomeWarning() {
         EDUS2ConfigurationDto dto = getDto();
-        dto.shownPhoneHomeWarning = true;
+        dto.acceptedPhoneHomeWarning = true;
         saveToFile(gson.toJson(dto), filePath);
     }
 
@@ -133,6 +133,6 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         String saveFileLocation;
         String defaultScenarioDirectory;
         String systemIdentifier;
-        boolean shownPhoneHomeWarning;
+        boolean acceptedPhoneHomeWarning;
     }
 }

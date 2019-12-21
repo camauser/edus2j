@@ -16,7 +16,7 @@ public interface EDUS2Configuration {
 
      SystemIdentifier getSystemIdentifier();
 
-     boolean displayedPhoneHomeWarning();
+     boolean acceptedPhoneHomeWarning();
 
      void setMinimumVideoHeight(int minimumVideoHeight);
 
@@ -28,5 +28,5 @@ public interface EDUS2Configuration {
 
      void setDefaultScenarioDirectory(File defaultScenarioDirectory);
 
-     void tripDisplayedPhoneHomeWarning();
+     void acceptPhoneHomeWarning();
 }

@@ -13,11 +13,11 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     private String saveFileLocation;
     private String defaultScenarioDirectory;
     private SystemIdentifier systemIdentifier;
-    private boolean displayedPhoneHomeWarning;
+    private boolean acceptedPhoneHomeWarning;
 
     public InMemoryEDUS2Configuration() {
         this.systemIdentifier = SystemIdentifier.ofRandom();
-        this.displayedPhoneHomeWarning = false;
+        this.acceptedPhoneHomeWarning = false;
     }
 
     @Override
@@ -54,8 +54,8 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     }
 
     @Override
-    public boolean displayedPhoneHomeWarning() {
-        return displayedPhoneHomeWarning;
+    public boolean acceptedPhoneHomeWarning() {
+        return acceptedPhoneHomeWarning;
     }
 
     @Override
@@ -84,7 +84,7 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     }
 
     @Override
-    public void tripDisplayedPhoneHomeWarning() {
-        this.displayedPhoneHomeWarning = true;
+    public void acceptPhoneHomeWarning() {
+        this.acceptedPhoneHomeWarning = true;
     }
 }

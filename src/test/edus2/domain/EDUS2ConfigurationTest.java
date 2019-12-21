@@ -142,36 +142,34 @@ public abstract class EDUS2ConfigurationTest {
     }
 
     @Test
-    public void displayedPhoneHomeWarning_shouldInitiallyReturnFalse() {
+    public void acceptedPhoneHomeWarning_shouldInitiallyReturnFalse() {
         // Act
-        boolean actual = configuration.displayedPhoneHomeWarning();
+        boolean actual = configuration.acceptedPhoneHomeWarning();
 
         // Assert
         assertFalse(actual);
     }
 
     @Test
-    public void tripDisplayedPhoneHomeWarning_shouldSetPhoneHomeWarningShownToTrue() {
-        // Arrange
-        configuration.tripDisplayedPhoneHomeWarning();
-
+    public void acceptPhoneHomeWarning_shouldSetPhoneHomeWarningShownToTrue() {
         // Act
-        boolean actual = configuration.displayedPhoneHomeWarning();
+        configuration.acceptPhoneHomeWarning();
 
         // Assert
+        boolean actual = configuration.acceptedPhoneHomeWarning();
         assertTrue(actual);
     }
 
     @Test
-    public void tripDisplayedPhoneHomeWarning_shouldDoNothing_whenCalledMultipleTimes() {
+    public void acceptPhoneHomeWarning_shouldDoNothing_whenCalledMultipleTimes() {
         // Arrange
-        configuration.tripDisplayedPhoneHomeWarning();
+        configuration.acceptPhoneHomeWarning();
 
         // Act
-        configuration.tripDisplayedPhoneHomeWarning();
+        configuration.acceptPhoneHomeWarning();
 
         // Assert
-        boolean actual = configuration.displayedPhoneHomeWarning();
+        boolean actual = configuration.acceptedPhoneHomeWarning();
         assertTrue(actual);
     }
 }
