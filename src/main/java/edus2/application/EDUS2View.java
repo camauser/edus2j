@@ -35,6 +35,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -95,6 +96,7 @@ public class EDUS2View extends Application {
         main = new BorderPane();
         Text txtTitle = new Text("EDUS2J Simulator");
         txtTitle.setFont(Font.font("Calibri", FontWeight.BOLD, FontPosture.ITALIC, 36.0));
+        txtTitle.setOnMouseClicked((e) -> showCredits());
 
         HBox titleBox = new HBox(txtTitle);
         titleBox.setAlignment(Pos.BOTTOM_LEFT);
@@ -109,9 +111,10 @@ public class EDUS2View extends Application {
         BorderPane.setAlignment(playbackPositionBox, Pos.BOTTOM_CENTER);
         BorderPane.setAlignment(controlButtons, Pos.BOTTOM_RIGHT);
 
-        main.setBottom(bottomControlsPane);
+        StackPane controlOverlayPane = new StackPane();
+        controlOverlayPane.getChildren().addAll(main, bottomControlsPane);
 
-        Scene scene = new Scene(main);
+        Scene scene = new Scene(controlOverlayPane);
         stage.setHeight(720);
         stage.setWidth(1280);
         stage.setScene(scene);
@@ -156,8 +159,6 @@ public class EDUS2View extends Application {
     }
 
     private HBox generateButtonControls(Stage stage) {
-        Button btnAbout = new Button("About");
-        btnAbout.setFont(BUTTON_FONT);
         Button btnFullscreen = new Button("Toggle Fullscreen");
         btnFullscreen.setFont(BUTTON_FONT);
         Button btnScanSettings = new Button("Scan Settings");
@@ -168,10 +169,8 @@ public class EDUS2View extends Application {
         btnQuit.setFont(BUTTON_FONT);
 
         HBox buttons = new HBox();
-        buttons.getChildren().addAll(btnAbout, btnFullscreen, btnScanSettings, btnMannequinSettings, btnQuit);
+        buttons.getChildren().addAll(btnFullscreen, btnScanSettings, btnMannequinSettings, btnQuit);
         buttons.setAlignment(Pos.BOTTOM_RIGHT);
-
-        btnAbout.setOnAction(event -> showCredits());
 
         btnFullscreen.setOnAction(event -> stage.setFullScreen(!stage.isFullScreen()));
 
