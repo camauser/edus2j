@@ -19,6 +19,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import edus2.adapter.guice.EDUS2JModule;
 import edus2.adapter.ui.*;
+import edus2.application.usagereporting.UsageReportingService;
 import edus2.domain.EDUS2Configuration;
 import edus2.domain.MannequinScanEnum;
 import edus2.domain.Scan;
@@ -68,6 +69,7 @@ public class EDUS2View extends Application {
     private EDUS2Configuration configuration;
     private edus2.application.AuthenticationFacade authenticationFacade;
     private edus2.application.MannequinFacade mannequinFacade;
+    private UsageReportingService usageReportingService;
 
     public static void main(String[] args) {
         // Run the start method, and open up the GUI
@@ -87,6 +89,8 @@ public class EDUS2View extends Application {
         configuration = injector.getInstance(EDUS2Configuration.class);
         authenticationFacade = injector.getInstance(AuthenticationFacade.class);
         mannequinFacade = injector.getInstance(MannequinFacade.class);
+        usageReportingService = injector.getInstance(UsageReportingService.class);
+        stage.setOnCloseRequest(e -> handleShutdown());
 
         main = new BorderPane();
         Text txtTitle = new Text("EDUS2J Simulator");
@@ -128,6 +132,7 @@ public class EDUS2View extends Application {
         });
 
         ensurePhoneHomeWarningAccepted(stage);
+        usageReportingService.reportStartup();
     }
 
     private void ensurePhoneHomeWarningAccepted(Stage stage) {
@@ -144,6 +149,10 @@ public class EDUS2View extends Application {
                 stage.close();
             }
         }
+    }
+
+    private void handleShutdown() {
+        usageReportingService.stop();
     }
 
     private HBox generateButtonControls(Stage stage) {
@@ -190,7 +199,10 @@ public class EDUS2View extends Application {
             mannequinSettingStage.show();
         });
 
-        btnQuit.setOnAction(event -> stage.close());
+        btnQuit.setOnAction(event -> {
+            stage.close();
+            handleShutdown();
+        });
 
         return buttons;
     }
