@@ -19,6 +19,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import edus2.adapter.guice.EDUS2JModule;
 import edus2.adapter.ui.*;
+import edus2.adapter.ui.usagereporting.ReportStartupTask;
 import edus2.application.usagereporting.UsageReportingService;
 import edus2.domain.EDUS2Configuration;
 import edus2.domain.MannequinScanEnum;
@@ -48,6 +49,8 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Purpose: The main class used to run the EDUS2J program.
@@ -91,7 +94,6 @@ public class EDUS2View extends Application {
         authenticationFacade = injector.getInstance(AuthenticationFacade.class);
         mannequinFacade = injector.getInstance(MannequinFacade.class);
         usageReportingService = injector.getInstance(UsageReportingService.class);
-        stage.setOnCloseRequest(e -> handleShutdown());
 
         main = new BorderPane();
         Text txtTitle = new Text("EDUS2J Simulator");
@@ -135,7 +137,24 @@ public class EDUS2View extends Application {
         });
 
         ensurePhoneHomeWarningAccepted(stage);
-        usageReportingService.reportStartup();
+        reportStartupToServer();
+    }
+
+    private void reportStartupToServer() {
+        ReportStartupTask task = new ReportStartupTask(usageReportingService);
+        task.setOnSucceeded(wse -> {
+            Optional<String> serverResponseMessage = task.getValue();
+            if (serverResponseMessage.isPresent()) {
+                Alert serverMessage = new Alert(Alert.AlertType.INFORMATION, serverResponseMessage.get());
+                serverMessage.setTitle("EDUS2J Information");
+                serverMessage.setHeaderText("EDUS2J Information");
+                serverMessage.showAndWait();
+            }
+        });
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(task);
+        executorService.shutdown();
     }
 
     private void ensurePhoneHomeWarningAccepted(Stage stage) {
@@ -154,10 +173,6 @@ public class EDUS2View extends Application {
                 stage.close();
             }
         }
-    }
-
-    private void handleShutdown() {
-        usageReportingService.stop();
     }
 
     private HBox generateButtonControls(Stage stage) {
@@ -202,7 +217,6 @@ public class EDUS2View extends Application {
 
         btnQuit.setOnAction(event -> {
             stage.close();
-            handleShutdown();
         });
 
         return buttons;
