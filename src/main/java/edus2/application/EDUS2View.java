@@ -140,10 +140,12 @@ public class EDUS2View extends Application {
 
     private void ensurePhoneHomeWarningAccepted(Stage stage) {
         if (!configuration.acceptedPhoneHomeWarning()) {
-            Alert phoneHomeAlert = new Alert(Alert.AlertType.INFORMATION, "This application will periodically \"phone home\" to report anonymous usage statistics. By using this application, you consent to " +
-                    "having your usage data collected for the purpose of determining how many EDUS2J instances are being used worldwide. If you do not agree to these terms, please close the application now and do not click \"OK\".");
-            phoneHomeAlert.setHeaderText("Application Usage Data Collection Warning");
-            phoneHomeAlert.setTitle("Application Usage Data Collection Warning");
+            Alert phoneHomeAlert = new Alert(Alert.AlertType.INFORMATION, "Please note, as a means of tracking" +
+                    " uptake/dissemination/impact, we are collecting metrics on downloads and usage of the software." +
+                    " This information/data may be collated and shared in aggregate form with our stakeholders." +
+                    " If you do not agree to these terms, please close the application now and do not click \"OK\".");
+            phoneHomeAlert.setHeaderText("Data Collection Warning");
+            phoneHomeAlert.setTitle("Data Collection Warning");
             Optional<ButtonType> response = phoneHomeAlert.showAndWait();
             boolean warningAccepted = response.isPresent();
             if (warningAccepted) {

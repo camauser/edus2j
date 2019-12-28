@@ -54,7 +54,7 @@ public class UsageReportingService {
             // TODO: Remove after testing
             System.out.println(EntityUtils.toString(response.getEntity()));
         } catch (Exception e) {
-            System.err.println(String.format("Error reporting startup to server: %s", e.getMessage()));
+            System.err.println(String.format("Error reporting startup to server: %s", e));
         }
     }
 
