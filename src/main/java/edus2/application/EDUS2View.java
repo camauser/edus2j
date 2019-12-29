@@ -21,6 +21,7 @@ import edus2.adapter.guice.EDUS2JModule;
 import edus2.adapter.ui.*;
 import edus2.adapter.ui.usagereporting.ReportStartupTask;
 import edus2.application.usagereporting.UsageReportingService;
+import edus2.application.version.ApplicationInfo;
 import edus2.domain.EDUS2Configuration;
 import edus2.domain.MannequinScanEnum;
 import edus2.domain.Scan;
@@ -51,6 +52,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static java.lang.String.format;
 
 /**
  * Purpose: The main class used to run the EDUS2J program.
@@ -262,12 +265,12 @@ public class EDUS2View extends Application {
         header.setFont(Font.font("Calibri", FontWeight.BOLD,
                 FontPosture.ITALIC, 36.0));
         BorderPane.setAlignment(header, Pos.TOP_CENTER);
-        Text details = new Text(
+        Text details = new Text(format(
                 "Credits for this project go to: \n"
                         + "Java Porting: Cameron Auser\n"
                         + "Original Design: Paul Kulyk, Paul Olsynski\n"
                         + "EDUS2 is an emergency department ultrasound simulator, "
-                        + "and EDUS2J is a port of this original software to Java.");
+                        + "and EDUS2J is a port of this original software to Java.\nEDUS2J version: %s", ApplicationInfo.getVersion()));
         details.setFont(new Font("Calibri", 18.0));
         credits.setCenter(details);
         BorderPane.setAlignment(credits, Pos.CENTER);
