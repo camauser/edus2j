@@ -16,7 +16,7 @@ import javafx.stage.FileChooser;
 import java.io.File;
 import java.util.Optional;
 
-public class MannequinSettingsWindow extends VBox{
+public class MannequinSettingsWindow extends VBox {
     private MannequinsWindow mannequinDisplay;
     private FileMannequinImportExportRepository importExportRepository;
     private EDUS2IconStage stage;
@@ -38,6 +38,7 @@ public class MannequinSettingsWindow extends VBox{
         btnAdd.setOnAction(event -> {
             MannequinCreateWindow mannequinCreateWindow = new MannequinCreateWindow(mannequinFacade);
             EDUS2IconStage addStage = new EDUS2IconStage();
+            addStage.widthProperty().addListener((ob, oldVal, newVal) -> mannequinCreateWindow.handleWindowResize(newVal.intValue()));
             Scene scene = new Scene(mannequinCreateWindow);
             addStage.setScene(scene);
             addStage.showAndWait();
@@ -49,9 +50,11 @@ public class MannequinSettingsWindow extends VBox{
             if (selected == null) {
                 return;
             }
+
+            EDUS2IconStage updateStage = new EDUS2IconStage();
             MannequinUpdateWindow mannequinUpdateWindow = new MannequinUpdateWindow(mannequinFacade);
             mannequinUpdateWindow.bindMannequin(mannequinFacade.getMannequin(selected.getName()).orElseThrow(() -> new InvalidMannequinNameException(String.format("Mannequin %s does not exist!", selected.getName()))));
-            EDUS2IconStage updateStage = new EDUS2IconStage();
+            updateStage.widthProperty().addListener((ob, oldVal, newVal) -> mannequinUpdateWindow.handleWindowResize(newVal.intValue()));
             Scene scene = new Scene(mannequinUpdateWindow);
             updateStage.setScene(scene);
             updateStage.showAndWait();
