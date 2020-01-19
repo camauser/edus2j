@@ -12,8 +12,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 
-import java.io.File;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -31,6 +29,7 @@ public abstract class MannequinEntryWindow extends HBox {
     private TextField cardiacPslPss;
     private TextField cardiacA4c;
     private int fieldsAdded = 0;
+    private final ImageView imageView;
 
     public MannequinEntryWindow() {
         super(20.0);
@@ -38,10 +37,10 @@ public abstract class MannequinEntryWindow extends HBox {
         mannequinFieldEntry.setHgap(10.0);
         mannequinFieldEntry.setVgap(5.0);
 
-        Image scanPointImage = new Image(Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream("mannequin-scanpoints.png")));
-
         generateInputFields();
-        ImageView imageView = new ImageView(scanPointImage);
+        Image scanPointImage = new Image(Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream("mannequin-scanpoints.png")));
+        imageView = new ImageView(scanPointImage);
+
         HBox imageHbox = new HBox(imageView);
         imageHbox.setAlignment(Pos.CENTER);
         mannequinFieldEntry.setAlignment(Pos.CENTER);
@@ -100,6 +99,11 @@ public abstract class MannequinEntryWindow extends HBox {
     protected abstract void saveMannequin(Mannequin mannequin);
 
     protected abstract boolean shouldClearFieldsAfterSave();
+
+    protected void handleWindowResize(int newWidth) {
+        imageView.setPreserveRatio(true);
+        imageView.setFitWidth(Math.min(imageView.getImage().getWidth(), newWidth / 2));
+    }
 
     private Mannequin generateMannequin() {
         HashMap<MannequinScanEnum, String> tagMap = new HashMap<>();
