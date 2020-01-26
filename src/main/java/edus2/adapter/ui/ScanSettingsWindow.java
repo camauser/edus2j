@@ -253,6 +253,7 @@ public class ScanSettingsWindow extends VBox {
 
     private void loadScenario() {
         FileChooser browser = new FileChooser();
+        browser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Scenario file format (*.scn)", "*.scn"));
         Optional<File> defaultScenarioDirectory = configuration.getDefaultScenarioDirectory();
         defaultScenarioDirectory.filter(File::exists).ifPresent(browser::setInitialDirectory);
         File scanFile = browser.showOpenDialog(stage);
@@ -269,6 +270,7 @@ public class ScanSettingsWindow extends VBox {
 
     private void saveScenario() {
         FileChooser browser = new FileChooser();
+        browser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Scenario file format (*.scn)", "*.scn"));
         Optional<File> defaultScenarioDirectory = configuration.getDefaultScenarioDirectory();
         defaultScenarioDirectory.filter(File::exists).ifPresent(browser::setInitialDirectory);
         File selected = browser.showSaveDialog(stage);
