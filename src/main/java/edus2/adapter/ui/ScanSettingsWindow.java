@@ -66,6 +66,8 @@ public class ScanSettingsWindow extends VBox {
 
         Button btnAdd = new Button("Add Video");
         Button btnBulkAdd = new Button("Bulk Add Videos");
+        Button btnEditManikinLocation = new Button("Edit Manikin Location");
+        Button btnEditFile = new Button("Edit Video Path");
         Button btnDelete = new Button("Delete Video");
         Button btnDeleteAll = new Button("Delete All Videos");
         Button btnLoadScenario = new Button("Load Scenario");
@@ -115,9 +117,41 @@ public class ScanSettingsWindow extends VBox {
             }
         });
 
+        btnEditManikinLocation.setOnAction(event -> {
+            if (scanList.getSelectedItem() == null) {
+                return;
+            }
+
+            if (scanFacade.getUnusedScanEnums().isEmpty()) {
+                Alert alert = new Alert(AlertType.ERROR, "All mannequin scan locations have been linked to scans already!");
+                alert.showAndWait();
+            } else {
+                updateScanManikinLocation(scanList.getSelectedItem());
+            }
+        });
+
+        btnEditFile.setOnAction(event -> {
+            Scan selectedScan = scanList.getSelectedItem();
+            if (selectedScan == null) {
+                return;
+            }
+
+            FileChooser browser = new FileChooser();
+            File selected = browser.showOpenDialog(stage);
+            if (selected != null) {
+                String convertedFilePath = EDUS2View.convertFilePath(selected.getPath());
+                scanFacade.removeScan(selectedScan);
+                addScan(selectedScan.getScanEnum(), convertedFilePath);
+            }
+        });
+
         // Delete the selected scan when the delete button is clicked.
         btnDelete.setOnAction(event -> {
             Scan selected = scanList.getSelectedItem();
+            if (selected == null) {
+                return;
+            }
+
             scanFacade.removeScan(selected);
             scanList.refreshTableItems();
         });
@@ -143,7 +177,7 @@ public class ScanSettingsWindow extends VBox {
         btnSaveScenario.setOnAction(event -> saveScenario());
 
         scanSettingButtonsBox.setAlignment(Pos.CENTER);
-        scanSettingButtonsBox.getChildren().addAll(btnAdd, btnBulkAdd, btnDelete, btnDeleteAll, btnLoadScenario, btnSaveScenario);
+        scanSettingButtonsBox.getChildren().addAll(btnAdd, btnBulkAdd, btnEditManikinLocation, btnEditFile, btnDelete, btnDeleteAll, btnLoadScenario, btnSaveScenario);
 
         Button btnConfigSettings = new Button("Configuration Settings");
         btnConfigSettings.setOnAction(e -> {
@@ -175,9 +209,22 @@ public class ScanSettingsWindow extends VBox {
         }
     }
 
+    private void updateScanManikinLocation(Scan scan) {
+        boolean added = false;
+        while (!added) {
+            Optional<MannequinScanEnum> scanLocationOptional = promptForScanLocation("What location would you like to link the video to?");
+            if (!scanLocationOptional.isPresent()) {
+                break;
+            }
+
+            scanFacade.removeScan(scan);
+            added = addScan(scanLocationOptional.get(), scan.getPath());
+        }
+    }
+
     private Optional<MannequinScanEnum> promptForScanLocation(String prompt) {
-        Set<MannequinScanEnum> unusedScanEnums = scanFacade.getUnusedScanEnums();
-        ChoiceDialog<String> scanLocationDialog = new ChoiceDialog<>(unusedScanEnums.iterator().next().getName(), unusedScanEnums.stream().map(MannequinScanEnum::getName).collect(Collectors.toSet()));
+        Set<MannequinScanEnum> availableValues = scanFacade.getUnusedScanEnums();
+        ChoiceDialog<String> scanLocationDialog = new ChoiceDialog<>(availableValues.iterator().next().getName(), availableValues.stream().map(MannequinScanEnum::getName).collect(Collectors.toSet()));
         scanLocationDialog.setHeaderText("Choose Scan Location");
         scanLocationDialog.setContentText(prompt);
         return scanLocationDialog.showAndWait().map(MannequinScanEnum::findByName);
