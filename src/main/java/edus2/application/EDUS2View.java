@@ -127,6 +127,8 @@ public class EDUS2View extends Application {
         stage.setTitle("EDUS2J");
         stage.show();
         stage.setFullScreen(true);
+        // Ensure control buttons aren't highlighted
+        main.requestFocus();
 
         // Need to set the width after controls have been shown otherwise getWidth returns 0 - set width to center playback position
         titleBox.setMinWidth(controlButtons.getWidth());
@@ -192,9 +194,13 @@ public class EDUS2View extends Application {
         buttons.getChildren().addAll(btnFullscreen, btnScanSettings, btnMannequinSettings, btnQuit);
         buttons.setAlignment(Pos.BOTTOM_RIGHT);
 
-        btnFullscreen.setOnAction(event -> stage.setFullScreen(!stage.isFullScreen()));
+        btnFullscreen.setOnAction(event -> {
+            main.requestFocus();
+            stage.setFullScreen(!stage.isFullScreen());
+        });
 
         btnScanSettings.setOnAction(event -> {
+            main.requestFocus();
             if (isAuthenticated()) {
                 EDUS2IconStage scanWindowStage = new EDUS2IconStage();
                 ScanSettingsWindow scanSettingsWindow = new ScanSettingsWindow(scanFacade, authenticationFacade, configuration, scanWindowStage);
@@ -207,10 +213,10 @@ public class EDUS2View extends Application {
                 invalidPasswordAlert.setContentText("Invalid password entered.");
                 invalidPasswordAlert.showAndWait();
             }
-
         });
 
         btnMannequinSettings.setOnAction(event -> {
+            main.requestFocus();
             EDUS2IconStage mannequinSettingStage = new EDUS2IconStage();
             MannequinSettingsWindow mannequinSettingsWindow = new MannequinSettingsWindow(mannequinFacade, mannequinSettingStage);
             Scene mannequinWindowScene = new Scene(mannequinSettingsWindow);
@@ -219,6 +225,7 @@ public class EDUS2View extends Application {
         });
 
         btnQuit.setOnAction(event -> {
+            main.requestFocus();
             stage.close();
         });
 
