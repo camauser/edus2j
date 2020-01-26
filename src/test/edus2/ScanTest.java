@@ -1,11 +1,11 @@
 package edus2;
 
-import edus2.domain.MannequinScanEnum;
+import edus2.domain.ManikinScanEnum;
 import edus2.domain.Scan;
 import org.junit.Test;
 
 import static edus2.TestUtil.randomAlphanumericString;
-import static edus2.TestUtil.randomMannequinScanEnum;
+import static edus2.TestUtil.randomManikinScanEnum;
 import static org.junit.Assert.assertEquals;
 
 public class ScanTest {
@@ -13,19 +13,19 @@ public class ScanTest {
     @Test
     public void getScanEnum_shouldReturnLocationOfScan() {
         // Arrange
-        Scan scan = new Scan(MannequinScanEnum.RIGHT_LUNG, randomAlphanumericString());
+        Scan scan = new Scan(ManikinScanEnum.RIGHT_LUNG, randomAlphanumericString());
 
         // Act
-        MannequinScanEnum actual = scan.getScanEnum();
+        ManikinScanEnum actual = scan.getScanEnum();
 
         // Assert
-        assertEquals(MannequinScanEnum.RIGHT_LUNG, actual);
+        assertEquals(ManikinScanEnum.RIGHT_LUNG, actual);
     }
 
     @Test
     public void getPath_shouldReturnPathOfScan() {
         // Arrange
-        Scan scan = new Scan(randomMannequinScanEnum(), "sample/path");
+        Scan scan = new Scan(randomManikinScanEnum(), "sample/path");
 
         // Act
         String actual = scan.getPath();

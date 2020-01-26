@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static edus2.TestUtil.randomAlphanumericString;
-import static edus2.TestUtil.randomMannequinScanEnum;
+import static edus2.TestUtil.randomManikinScanEnum;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -81,8 +81,8 @@ public class FileCentralRepositoryTest {
         Gson gson = new GsonBuilder().create();
         Type type = new TypeToken<List<Scan>>(){}.getType();
         ArrayList<Scan> scans = new ArrayList<>();
-        scans.add(new Scan(randomMannequinScanEnum(), "path"));
-        scans.add(new Scan(randomMannequinScanEnum(), "path2"));
+        scans.add(new Scan(randomManikinScanEnum(), "path"));
+        scans.add(new Scan(randomManikinScanEnum(), "path2"));
 
         // Act
         repository.saveSection(gson.toJson(scans));

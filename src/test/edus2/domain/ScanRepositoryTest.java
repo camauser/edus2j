@@ -66,8 +66,8 @@ public abstract class ScanRepositoryTest {
 
     @Test
     public void remove_shouldNotRemoveDuplicateScan_whenSameVideoUnderMultipleIds() {
-        Scan scan = new Scan(MannequinScanEnum.RIGHT_LUNG, randomAlphanumericString());
-        Scan duplicateScan = new Scan(MannequinScanEnum.LEFT_LUNG, scan.getPath());
+        Scan scan = new Scan(ManikinScanEnum.RIGHT_LUNG, randomAlphanumericString());
+        Scan duplicateScan = new Scan(ManikinScanEnum.LEFT_LUNG, scan.getPath());
         scanRepository.save(scan);
         scanRepository.save(duplicateScan);
 

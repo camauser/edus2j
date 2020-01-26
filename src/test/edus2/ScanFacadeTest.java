@@ -5,7 +5,7 @@ import edus2.adapter.repository.memory.InMemoryEDUS2Configuration;
 import edus2.application.ScanFacade;
 import edus2.application.exception.EmptyScanIdException;
 import edus2.application.exception.ScanAlreadyExistsException;
-import edus2.domain.MannequinScanEnum;
+import edus2.domain.ManikinScanEnum;
 import edus2.domain.Scan;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,14 +30,14 @@ public class ScanFacadeTest {
         InMemoryEDUS2Configuration configuration = new InMemoryEDUS2Configuration();
         configuration.setSaveFileLocation(randomTempFile());
         scanFacade = new ScanFacade(new FileScanRepository(configuration));
-        scan = new Scan(MannequinScanEnum.RIGHT_LUNG, randomAlphanumericString());
-        scanTwo = new Scan(MannequinScanEnum.LEFT_LUNG, randomAlphanumericString());
+        scan = new Scan(ManikinScanEnum.RIGHT_LUNG, randomAlphanumericString());
+        scanTwo = new Scan(ManikinScanEnum.LEFT_LUNG, randomAlphanumericString());
     }
 
     @Test
     public void getScan_shouldReturnEmpty_whenScanDoesNotExist() {
         // Assert
-        assertEquals(Optional.empty(), scanFacade.getScan(randomMannequinScanEnum()));
+        assertEquals(Optional.empty(), scanFacade.getScan(randomManikinScanEnum()));
     }
 
     @Test
@@ -56,7 +56,7 @@ public class ScanFacadeTest {
     public void containsScan_shouldReturnFalse_whenScanDoesNotExist() {
         // Act
         // Assert
-        assertFalse(scanFacade.containsScan(randomMannequinScanEnum()));
+        assertFalse(scanFacade.containsScan(randomManikinScanEnum()));
     }
 
     @Test
@@ -170,24 +170,24 @@ public class ScanFacadeTest {
     @Test
     public void getUnusedScanEnums_shouldReturnAllEnums_whenNoScansExist() {
         // Act
-        Set<MannequinScanEnum> actual = scanFacade.getUnusedScanEnums();
+        Set<ManikinScanEnum> actual = scanFacade.getUnusedScanEnums();
 
         // Assert
-        assertEquals(MannequinScanEnum.values().length, actual.size());
-        assertTrue(actual.containsAll(Arrays.asList(MannequinScanEnum.values())));
+        assertEquals(ManikinScanEnum.values().length, actual.size());
+        assertTrue(actual.containsAll(Arrays.asList(ManikinScanEnum.values())));
     }
 
     @Test
     public void getUnusedScanEnums_shouldExcludeScanEnum_whenEnumUsed() {
         // Arrange
-        scanFacade.addScan(new Scan(MannequinScanEnum.RIGHT_LUNG, randomAlphanumericString()));
+        scanFacade.addScan(new Scan(ManikinScanEnum.RIGHT_LUNG, randomAlphanumericString()));
 
         // Act
-        Set<MannequinScanEnum> actual = scanFacade.getUnusedScanEnums();
+        Set<ManikinScanEnum> actual = scanFacade.getUnusedScanEnums();
 
         // Assert
-        assertEquals(MannequinScanEnum.values().length - 1, actual.size());
-        assertFalse(actual.contains(MannequinScanEnum.RIGHT_LUNG));
+        assertEquals(ManikinScanEnum.values().length - 1, actual.size());
+        assertFalse(actual.contains(ManikinScanEnum.RIGHT_LUNG));
     }
 
     @Test

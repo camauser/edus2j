@@ -23,16 +23,16 @@ import java.io.Serializable;
 
 public class Scan implements Serializable
 {
-    private MannequinScanEnum scanEnum;
+    private ManikinScanEnum scanEnum;
     private String path;
 
-    public Scan(MannequinScanEnum scanEnum, String path)
+    public Scan(ManikinScanEnum scanEnum, String path)
     {
         this.scanEnum = scanEnum;
         this.path = path;
     }
 
-    public MannequinScanEnum getScanEnum()
+    public ManikinScanEnum getScanEnum()
     {
         return scanEnum;
     }

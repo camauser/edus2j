@@ -1,6 +1,6 @@
 package edus2.domain;
 
-public enum MannequinScanEnum {
+public enum ManikinScanEnum {
     RIGHT_LUNG("Right Lung"),
     LEFT_LUNG("Left Lung"),
     CARDIAC_PSL_PSS("Cardiac PSL/PSS"),
@@ -14,7 +14,7 @@ public enum MannequinScanEnum {
 
     private String name;
 
-    MannequinScanEnum(String name) {
+    ManikinScanEnum(String name) {
         this.name = name;
     }
 
@@ -22,13 +22,13 @@ public enum MannequinScanEnum {
         return name;
     }
 
-    public static MannequinScanEnum findByName(String name) {
-        for (MannequinScanEnum scanEnum : MannequinScanEnum.values()) {
+    public static ManikinScanEnum findByName(String name) {
+        for (ManikinScanEnum scanEnum : ManikinScanEnum.values()) {
             if (scanEnum.getName().equals(name)) {
                 return scanEnum;
             }
         }
 
-        throw new InvalidMannequinScanEnumException(String.format("No scan enum found for '%s'", name));
+        throw new InvalidManikinScanEnumException(String.format("No scan enum found for '%s'", name));
     }
 }

@@ -22,7 +22,7 @@ import edus2.application.ScanFacade;
 import edus2.application.exception.EmptyScanIdException;
 import edus2.application.exception.ScanAlreadyExistsException;
 import edus2.domain.EDUS2Configuration;
-import edus2.domain.MannequinScanEnum;
+import edus2.domain.ManikinScanEnum;
 import edus2.domain.Scan;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -77,7 +77,7 @@ public class ScanSettingsWindow extends VBox {
         // When add is clicked, run through the process of adding a new scan
         btnAdd.setOnAction(event -> {
             if (scanFacade.getUnusedScanEnums().isEmpty()) {
-                Alert alert = new Alert(AlertType.ERROR, "All mannequin scan locations have been linked to scans already!");
+                Alert alert = new Alert(AlertType.ERROR, "All manikin scan locations have been linked to scans already!");
                 alert.showAndWait();
             } else {
                 FileChooser browser = new FileChooser();
@@ -92,7 +92,7 @@ public class ScanSettingsWindow extends VBox {
         // Then we run through each selected file and set ID's for all of them.
         btnBulkAdd.setOnAction(event -> {
             if (scanFacade.getUnusedScanEnums().isEmpty()) {
-                Alert alert = new Alert(AlertType.ERROR, "All mannequin scan locations have been linked to scans already!");
+                Alert alert = new Alert(AlertType.ERROR, "All manikin scan locations have been linked to scans already!");
                 alert.showAndWait();
                 return;
             }
@@ -106,7 +106,7 @@ public class ScanSettingsWindow extends VBox {
             if (selected.size() > scanFacade.getUnusedScanEnums().size()) {
                 Set<String> unusedScanEnumNames = scanFacade.getUnusedScanEnums()
                         .stream()
-                        .map(MannequinScanEnum::getName)
+                        .map(ManikinScanEnum::getName)
                         .collect(Collectors.toSet());
                 String unusedLocations = String.join(",", unusedScanEnumNames);
                 Alert alert = new Alert(AlertType.ERROR, String.format("You've selected too many videos: you can only link videos to the following locations: %s", unusedLocations));
@@ -132,7 +132,7 @@ public class ScanSettingsWindow extends VBox {
             Scan scan = scanList.getSelectedItems().get(0);
 
             if (scanFacade.getUnusedScanEnums().isEmpty()) {
-                Alert alert = new Alert(AlertType.ERROR, "All mannequin scan locations have been linked to scans already!");
+                Alert alert = new Alert(AlertType.ERROR, "All manikin scan locations have been linked to scans already!");
                 alert.showAndWait();
             } else {
                 updateScanManikinLocation(scan);
@@ -221,7 +221,7 @@ public class ScanSettingsWindow extends VBox {
         boolean added = false;
         while (!added) {
             String convertedFilePath = EDUS2View.convertFilePath(file.getPath());
-            Optional<MannequinScanEnum> scanLocationOptional = promptForScanLocation("Filename: " + file.getName() + "\nWhat location would you like to link the video to?");
+            Optional<ManikinScanEnum> scanLocationOptional = promptForScanLocation("Filename: " + file.getName() + "\nWhat location would you like to link the video to?");
             if (!scanLocationOptional.isPresent()) {
                 break;
             }
@@ -233,7 +233,7 @@ public class ScanSettingsWindow extends VBox {
     private void updateScanManikinLocation(Scan scan) {
         boolean added = false;
         while (!added) {
-            Optional<MannequinScanEnum> scanLocationOptional = promptForScanLocation("What location would you like to link the video to?");
+            Optional<ManikinScanEnum> scanLocationOptional = promptForScanLocation("What location would you like to link the video to?");
             if (!scanLocationOptional.isPresent()) {
                 break;
             }
@@ -243,12 +243,12 @@ public class ScanSettingsWindow extends VBox {
         }
     }
 
-    private Optional<MannequinScanEnum> promptForScanLocation(String prompt) {
-        Set<MannequinScanEnum> availableValues = scanFacade.getUnusedScanEnums();
-        ChoiceDialog<String> scanLocationDialog = new ChoiceDialog<>(availableValues.iterator().next().getName(), availableValues.stream().map(MannequinScanEnum::getName).collect(Collectors.toSet()));
+    private Optional<ManikinScanEnum> promptForScanLocation(String prompt) {
+        Set<ManikinScanEnum> availableValues = scanFacade.getUnusedScanEnums();
+        ChoiceDialog<String> scanLocationDialog = new ChoiceDialog<>(availableValues.iterator().next().getName(), availableValues.stream().map(ManikinScanEnum::getName).collect(Collectors.toSet()));
         scanLocationDialog.setHeaderText("Choose Scan Location");
         scanLocationDialog.setContentText(prompt);
-        return scanLocationDialog.showAndWait().map(MannequinScanEnum::findByName);
+        return scanLocationDialog.showAndWait().map(ManikinScanEnum::findByName);
     }
 
     private void loadScenario() {
@@ -284,7 +284,7 @@ public class ScanSettingsWindow extends VBox {
         }
     }
 
-    private boolean addScan(MannequinScanEnum scanEnum, String path) {
+    private boolean addScan(ManikinScanEnum scanEnum, String path) {
         Scan toAdd = new Scan(scanEnum, path);
         try {
             scanFacade.addScan(toAdd);
