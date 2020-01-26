@@ -19,6 +19,7 @@ import edus2.application.ScanFacade;
 import edus2.domain.Scan;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -27,6 +28,7 @@ import javafx.scene.layout.Pane;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class ScansWindow extends Pane {
     private TableView<Scan> records;
@@ -35,6 +37,7 @@ public class ScansWindow extends Pane {
     public ScansWindow(ScanFacade scanFacade) {
         this.scanFacade = scanFacade;
         records = new TableView<>();
+        records.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         TableColumn<Scan, String> scanEnum = new TableColumn<>("Mannequin Location");
         scanEnum.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getScanEnum().getName()));
         scanEnum.setMinWidth(130);
@@ -62,8 +65,8 @@ public class ScansWindow extends Pane {
         records.setItems(FXCollections.observableArrayList(scanFacade.getAllScans()));
     }
 
-    public Scan getSelectedItem() {
-        return records.getSelectionModel().getSelectedItem();
+    public List<Scan> getSelectedItems() {
+        return records.getSelectionModel().getSelectedItems();
     }
 
 }
