@@ -1,6 +1,6 @@
 package edus2;
 
-import edus2.domain.MannequinScanEnum;
+import edus2.domain.ManikinScanEnum;
 import edus2.domain.Scan;
 
 import java.io.File;
@@ -42,11 +42,11 @@ public class TestUtil {
     }
 
     public static Scan randomScan() {
-        return new Scan(randomMannequinScanEnum(), randomAlphanumericString());
+        return new Scan(randomManikinScanEnum(), randomAlphanumericString());
     }
 
-    public static MannequinScanEnum randomMannequinScanEnum() {
-        MannequinScanEnum[] values = MannequinScanEnum.values();
+    public static ManikinScanEnum randomManikinScanEnum() {
+        ManikinScanEnum[] values = ManikinScanEnum.values();
         return values[ThreadLocalRandom.current().nextInt(0, values.length)];
     }
 

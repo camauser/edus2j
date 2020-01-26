@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import edus2.application.ScanFacade;
-import edus2.domain.MannequinScanEnum;
+import edus2.domain.ManikinScanEnum;
 import edus2.domain.Scan;
 
 import java.io.File;
@@ -39,7 +39,7 @@ public class FileScanImportExportRepository {
     }
 
     private static class ScanDto {
-        private MannequinScanEnum scanEnum;
+        private ManikinScanEnum scanEnum;
         private String path;
         ScanDto(Scan scan) {
             this.scanEnum = scan.getScanEnum();

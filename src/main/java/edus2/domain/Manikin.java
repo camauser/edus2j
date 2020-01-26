@@ -8,11 +8,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class Mannequin {
+public class Manikin {
     private final String name;
-    private final Map<MannequinScanEnum, String> tagMap;
+    private final Map<ManikinScanEnum, String> tagMap;
 
-    public Mannequin(Map<MannequinScanEnum, String> tagMap, String name) {
+    public Manikin(Map<ManikinScanEnum, String> tagMap, String name) {
         validateName(name);
         validateAllScanPointsPresent(tagMap);
         this.name = name;
@@ -23,18 +23,18 @@ public class Mannequin {
         return name;
     }
 
-    public Map<MannequinScanEnum, String> getTagMap() {
+    public Map<ManikinScanEnum, String> getTagMap() {
         return tagMap;
     }
 
     private void validateName(String name) {
         if (StringUtils.isEmpty(name)) {
-            throw new InvalidMannequinNameException("Empty mannequin name given.");
+            throw new InvalidManikinNameException("Empty manikin name given.");
         }
     }
 
-    private void validateAllScanPointsPresent(Map<MannequinScanEnum, String> tagMap) {
-        for (MannequinScanEnum scanPoint : MannequinScanEnum.values()) {
+    private void validateAllScanPointsPresent(Map<ManikinScanEnum, String> tagMap) {
+        for (ManikinScanEnum scanPoint : ManikinScanEnum.values()) {
             if (!tagMap.containsKey(scanPoint)) {
                 throw new MissingRequiredScanPointException(String.format("Missing entry for %s", scanPoint.getName()));
             }
@@ -58,11 +58,11 @@ public class Mannequin {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        Mannequin mannequin = (Mannequin) o;
+        Manikin manikin = (Manikin) o;
 
         return new EqualsBuilder()
-                .append(name, mannequin.name)
-                .append(tagMap, mannequin.tagMap)
+                .append(name, manikin.name)
+                .append(tagMap, manikin.tagMap)
                 .isEquals();
     }
 

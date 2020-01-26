@@ -17,7 +17,7 @@ package edus2.application;/*
 
 import edus2.application.exception.EmptyScanIdException;
 import edus2.application.exception.ScanAlreadyExistsException;
-import edus2.domain.MannequinScanEnum;
+import edus2.domain.ManikinScanEnum;
 import edus2.domain.Scan;
 import edus2.domain.ScanRepository;
 
@@ -33,11 +33,11 @@ public class ScanFacade {
         this.scanRepository = scanRepository;
     }
 
-    public Optional<Scan> getScan(MannequinScanEnum scanEnum) {
+    public Optional<Scan> getScan(ManikinScanEnum scanEnum) {
         return getAllScans().stream().filter(s -> s.getScanEnum().equals(scanEnum)).findFirst();
     }
 
-    public boolean containsScan(MannequinScanEnum scanEnum) {
+    public boolean containsScan(ManikinScanEnum scanEnum) {
         return getAllScans().stream().anyMatch(s -> s.getScanEnum().equals(scanEnum));
     }
 
@@ -53,7 +53,7 @@ public class ScanFacade {
         scanRepository.save(scan);
     }
 
-    private boolean containsScanEnum(MannequinScanEnum scanEnum) {
+    private boolean containsScanEnum(ManikinScanEnum scanEnum) {
         return getAllScans().stream().map(Scan::getScanEnum).anyMatch(e -> e.equals(scanEnum));
     }
 
@@ -77,9 +77,9 @@ public class ScanFacade {
         return getAllScans().size();
     }
 
-    public Set<MannequinScanEnum> getUnusedScanEnums() {
-        Set<MannequinScanEnum> unusedScanEnums = new HashSet<>(Arrays.asList(MannequinScanEnum.values()));
-        Set<MannequinScanEnum> usedScanEnums = getAllScans().stream().map(Scan::getScanEnum).collect(Collectors.toSet());
+    public Set<ManikinScanEnum> getUnusedScanEnums() {
+        Set<ManikinScanEnum> unusedScanEnums = new HashSet<>(Arrays.asList(ManikinScanEnum.values()));
+        Set<ManikinScanEnum> usedScanEnums = getAllScans().stream().map(Scan::getScanEnum).collect(Collectors.toSet());
         unusedScanEnums.removeAll(usedScanEnums);
         return unusedScanEnums;
     }
@@ -99,7 +99,7 @@ public class ScanFacade {
         Scanner scanner = new Scanner(csv);
         while (scanner.hasNextLine()) {
             String currentLine = scanner.nextLine();
-            MannequinScanEnum scanEnum = MannequinScanEnum.valueOf(currentLine.split(",")[0]);
+            ManikinScanEnum scanEnum = ManikinScanEnum.valueOf(currentLine.split(",")[0]);
             String path = currentLine.split(",")[1];
             if (!containsScan(scanEnum)) {
                 Scan scan = new Scan(scanEnum, path);

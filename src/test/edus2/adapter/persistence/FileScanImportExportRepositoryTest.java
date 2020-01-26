@@ -3,7 +3,7 @@ package edus2.adapter.persistence;
 import edus2.adapter.repository.file.FileScanImportExportRepository;
 import edus2.adapter.repository.memory.InMemoryScanRepository;
 import edus2.application.ScanFacade;
-import edus2.domain.MannequinScanEnum;
+import edus2.domain.ManikinScanEnum;
 import edus2.domain.Scan;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,15 +42,15 @@ public class FileScanImportExportRepositoryTest {
         // Assert
         List<Scan> scans = scanFacade.getAllScans();
         assertEquals(2, scans.size());
-        assertTrue(scans.contains(new Scan(MannequinScanEnum.RIGHT_LUNG, "/path/to/scan")));
-        assertTrue(scans.contains(new Scan(MannequinScanEnum.LEFT_LUNG, "/path/to/second/scan")));
+        assertTrue(scans.contains(new Scan(ManikinScanEnum.RIGHT_LUNG, "/path/to/scan")));
+        assertTrue(scans.contains(new Scan(ManikinScanEnum.LEFT_LUNG, "/path/to/second/scan")));
     }
 
     @Test
     public void exportScans_shouldExportScansToFile() throws IOException {
         // Arrange
         String fileName = randomTempFile();
-        scanFacade.addScans(Lst(new Scan(MannequinScanEnum.RIGHT_LUNG, "/scan/path"), new Scan(MannequinScanEnum.LEFT_LUNG, "/second/path")));
+        scanFacade.addScans(Lst(new Scan(ManikinScanEnum.RIGHT_LUNG, "/scan/path"), new Scan(ManikinScanEnum.LEFT_LUNG, "/second/path")));
 
         // Act
         repository.exportScansToFile(new File(fileName));
@@ -64,7 +64,7 @@ public class FileScanImportExportRepositoryTest {
     public void exportImport_endToEnd() throws IOException {
         // Arrange
         String fileName = randomTempFile();
-        List<Scan> scans = Lst(new Scan(MannequinScanEnum.RIGHT_LUNG, "/scan/path"), new Scan(MannequinScanEnum.LEFT_LUNG, "/second/path"));
+        List<Scan> scans = Lst(new Scan(ManikinScanEnum.RIGHT_LUNG, "/scan/path"), new Scan(ManikinScanEnum.LEFT_LUNG, "/second/path"));
         scanFacade.addScans(scans);
         repository.exportScansToFile(new File(fileName));
         scanFacade.removeAllScans();

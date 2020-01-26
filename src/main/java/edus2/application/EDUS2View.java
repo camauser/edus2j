@@ -23,7 +23,7 @@ import edus2.adapter.ui.usagereporting.ReportStartupTask;
 import edus2.application.usagereporting.UsageReportingService;
 import edus2.application.version.ApplicationInfo;
 import edus2.domain.EDUS2Configuration;
-import edus2.domain.MannequinScanEnum;
+import edus2.domain.ManikinScanEnum;
 import edus2.domain.Scan;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -66,7 +66,7 @@ public class EDUS2View extends Application {
     private static final int DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS = 720;
     private static final double MAX_VIDEO_TO_SCREEN_SIZE_RATIO = 0.8;
     private String currentScanLocation = "";
-    private MannequinScanEnum currentLocationPlaying = null;
+    private ManikinScanEnum currentLocationPlaying = null;
     private static ProgressBar playbackProgress;
     private MediaPlayer player;
     private BorderPane main;
@@ -75,7 +75,7 @@ public class EDUS2View extends Application {
     private static Injector injector;
     private EDUS2Configuration configuration;
     private edus2.application.AuthenticationFacade authenticationFacade;
-    private edus2.application.MannequinFacade mannequinFacade;
+    private ManikinFacade manikinFacade;
     private UsageReportingService usageReportingService;
 
     public static void main(String[] args) {
@@ -95,7 +95,7 @@ public class EDUS2View extends Application {
         scanFacade = injector.getInstance(ScanFacade.class);
         configuration = injector.getInstance(EDUS2Configuration.class);
         authenticationFacade = injector.getInstance(AuthenticationFacade.class);
-        mannequinFacade = injector.getInstance(MannequinFacade.class);
+        manikinFacade = injector.getInstance(ManikinFacade.class);
         usageReportingService = injector.getInstance(UsageReportingService.class);
 
         main = new BorderPane();
@@ -185,13 +185,13 @@ public class EDUS2View extends Application {
         btnFullscreen.setFont(BUTTON_FONT);
         Button btnScanSettings = new Button("Scan Settings");
         btnScanSettings.setFont(BUTTON_FONT);
-        Button btnMannequinSettings = new Button("Mannequin Settings");
-        btnMannequinSettings.setFont(BUTTON_FONT);
+        Button btnManikinSettings = new Button("Manikin Settings");
+        btnManikinSettings.setFont(BUTTON_FONT);
         Button btnQuit = new Button("Quit");
         btnQuit.setFont(BUTTON_FONT);
 
         HBox buttons = new HBox();
-        buttons.getChildren().addAll(btnFullscreen, btnScanSettings, btnMannequinSettings, btnQuit);
+        buttons.getChildren().addAll(btnFullscreen, btnScanSettings, btnManikinSettings, btnQuit);
         buttons.setAlignment(Pos.BOTTOM_RIGHT);
 
         btnFullscreen.setOnAction(event -> {
@@ -215,13 +215,13 @@ public class EDUS2View extends Application {
             }
         });
 
-        btnMannequinSettings.setOnAction(event -> {
+        btnManikinSettings.setOnAction(event -> {
             main.requestFocus();
-            EDUS2IconStage mannequinSettingStage = new EDUS2IconStage();
-            MannequinSettingsWindow mannequinSettingsWindow = new MannequinSettingsWindow(mannequinFacade, mannequinSettingStage);
-            Scene mannequinWindowScene = new Scene(mannequinSettingsWindow);
-            mannequinSettingStage.setScene(mannequinWindowScene);
-            mannequinSettingStage.show();
+            EDUS2IconStage manikinSettingStage = new EDUS2IconStage();
+            ManikinSettingsWindow manikinSettingsWindow = new ManikinSettingsWindow(manikinFacade, manikinSettingStage);
+            Scene manikinWindowScene = new Scene(manikinSettingsWindow);
+            manikinSettingStage.setScene(manikinWindowScene);
+            manikinSettingStage.show();
         });
 
         btnQuit.setOnAction(event -> {
@@ -291,7 +291,7 @@ public class EDUS2View extends Application {
     }
 
     private void processScanRequest() {
-        Optional<MannequinScanEnum> scanTagLocationOptional = mannequinFacade.getScanTagLocation(currentScanLocation);
+        Optional<ManikinScanEnum> scanTagLocationOptional = manikinFacade.getScanTagLocation(currentScanLocation);
         if (!scanTagLocationOptional.isPresent()) {
             currentScanLocation = "";
             return;

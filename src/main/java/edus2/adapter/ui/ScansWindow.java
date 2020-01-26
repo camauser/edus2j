@@ -38,7 +38,7 @@ public class ScansWindow extends Pane {
         this.scanFacade = scanFacade;
         records = new TableView<>();
         records.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        TableColumn<Scan, String> scanEnum = new TableColumn<>("Mannequin Location");
+        TableColumn<Scan, String> scanEnum = new TableColumn<>("Manikin Location");
         scanEnum.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getScanEnum().getName()));
         scanEnum.setMinWidth(130);
 
