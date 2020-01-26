@@ -114,6 +114,7 @@ public class ManikinSettingsWindow extends VBox {
 
     private void importManikins() {
         FileChooser browser = new FileChooser();
+        browser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Manikin file format (*.kin)", "*.kin"));
         File scanFile = browser.showOpenDialog(stage);
         if (scanFile != null) {
             try {
@@ -128,6 +129,7 @@ public class ManikinSettingsWindow extends VBox {
 
     private void exportManikins() {
         FileChooser browser = new FileChooser();
+        browser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Manikin file format (*.kin)", "*.kin"));
         File selected = browser.showSaveDialog(stage);
         if (selected != null) {
             try {
