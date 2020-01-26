@@ -24,6 +24,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+
 public class ScansWindow extends Pane {
     private TableView<Scan> records;
     private ScanFacade scanFacade;
@@ -37,8 +41,15 @@ public class ScansWindow extends Pane {
 
         TableColumn<Scan, String> path = new TableColumn<>("File Path");
         path.setCellValueFactory(new PropertyValueFactory<>("path"));
+        path.setCellValueFactory(cell -> {
+            try {
+                return new SimpleStringProperty(Paths.get(new URI(cell.getValue().getPath())).getFileName().toString());
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+                return new SimpleStringProperty("Unknown");
+            }
+        });
         path.setMinWidth(450);
-
 
         refreshTableItems();
         //noinspection unchecked
