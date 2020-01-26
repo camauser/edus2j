@@ -53,6 +53,7 @@ public class ScanSettingsWindow extends VBox {
     private FileScanImportExportRepository importExportRepository;
     private EDUS2Configuration configuration;
 
+    // TODO: Try breaking this class into handler classes for each button to clean up logic
     public ScanSettingsWindow(ScanFacade scanFacade, AuthenticationFacade authenticationFacade, EDUS2Configuration configuration, EDUS2IconStage stage) {
         // Just set up a settings window, which is then shown on-screen
         super(10);
@@ -118,21 +119,39 @@ public class ScanSettingsWindow extends VBox {
         });
 
         btnEditManikinLocation.setOnAction(event -> {
-            if (scanList.getSelectedItem() == null) {
+            if (scanList.getSelectedItems().isEmpty()) {
                 return;
             }
+
+            if (scanList.getSelectedItems().size() > 1) {
+                Alert alert = new Alert(AlertType.ERROR, "Only one manikin location can be changed at a time!");
+                alert.showAndWait();
+                return;
+            }
+
+            Scan scan = scanList.getSelectedItems().get(0);
 
             if (scanFacade.getUnusedScanEnums().isEmpty()) {
                 Alert alert = new Alert(AlertType.ERROR, "All mannequin scan locations have been linked to scans already!");
                 alert.showAndWait();
             } else {
-                updateScanManikinLocation(scanList.getSelectedItem());
+                updateScanManikinLocation(scan);
             }
         });
 
         btnEditFile.setOnAction(event -> {
-            Scan selectedScan = scanList.getSelectedItem();
-            if (selectedScan == null) {
+            if (scanList.getSelectedItems().isEmpty()) {
+                return;
+            }
+
+            if (scanList.getSelectedItems().size() > 1) {
+                Alert alert = new Alert(AlertType.ERROR, "Only one video path can be changed at a time!");
+                alert.showAndWait();
+                return;
+            }
+
+            Scan selectedScan = scanList.getSelectedItems().get(0);
+            if (scanList.getSelectedItems() == null) {
                 return;
             }
 
@@ -147,12 +166,14 @@ public class ScanSettingsWindow extends VBox {
 
         // Delete the selected scan when the delete button is clicked.
         btnDelete.setOnAction(event -> {
-            Scan selected = scanList.getSelectedItem();
-            if (selected == null) {
+            List<Scan> selectedScans = scanList.getSelectedItems();
+            if (selectedScans.isEmpty()) {
                 return;
             }
 
-            scanFacade.removeScan(selected);
+            for (Scan scan : selectedScans) {
+                scanFacade.removeScan(scan);
+            }
             scanList.refreshTableItems();
         });
 
