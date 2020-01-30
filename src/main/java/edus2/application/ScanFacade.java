@@ -37,10 +37,6 @@ public class ScanFacade {
         return getAllScans().stream().filter(s -> s.getScanEnum().equals(scanEnum)).findFirst();
     }
 
-    public boolean containsScan(ManikinScanEnum scanEnum) {
-        return getAllScans().stream().anyMatch(s -> s.getScanEnum().equals(scanEnum));
-    }
-
     public void addScan(Scan scan) {
         if (scan.getScanEnum() == null) {
             throw new EmptyScanIdException();
@@ -73,38 +69,10 @@ public class ScanFacade {
         return scanRepository.retrieveAll();
     }
 
-    public int scanCount() {
-        return getAllScans().size();
-    }
-
     public Set<ManikinScanEnum> getUnusedScanEnums() {
         Set<ManikinScanEnum> unusedScanEnums = new HashSet<>(Arrays.asList(ManikinScanEnum.values()));
         Set<ManikinScanEnum> usedScanEnums = getAllScans().stream().map(Scan::getScanEnum).collect(Collectors.toSet());
         unusedScanEnums.removeAll(usedScanEnums);
         return unusedScanEnums;
-    }
-
-    public String toCSV() {
-        StringBuilder stringBuffer = new StringBuilder();
-        for (Scan scan : getAllScans()) {
-            stringBuffer.append(scan.getScanEnum());
-            stringBuffer.append(',');
-            stringBuffer.append(scan.getPath());
-            stringBuffer.append('\n');
-        }
-        return stringBuffer.toString();
-    }
-
-    public void importCSV(String csv) {
-        Scanner scanner = new Scanner(csv);
-        while (scanner.hasNextLine()) {
-            String currentLine = scanner.nextLine();
-            ManikinScanEnum scanEnum = ManikinScanEnum.valueOf(currentLine.split(",")[0]);
-            String path = currentLine.split(",")[1];
-            if (!containsScan(scanEnum)) {
-                Scan scan = new Scan(scanEnum, path);
-                scanRepository.save(scan);
-            }
-        }
     }
 }

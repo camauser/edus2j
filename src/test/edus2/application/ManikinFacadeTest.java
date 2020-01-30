@@ -8,7 +8,6 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -21,32 +20,6 @@ public class ManikinFacadeTest extends ManikinTestBase {
     public void setup() {
         manikinRepository = new InMemoryManikinRepository();
         this.facade = new ManikinFacade(manikinRepository);
-    }
-
-    @Test
-    public void getManikinNames_shouldReturnEmptySet_whenNoManikinsExist() {
-        // Act
-        Set<String> actual = facade.getManikinNames();
-
-        // Assert
-        assertTrue(actual.isEmpty());
-    }
-
-    @Test
-    public void getManikinNames_shouldReturnManikinNames_whenManikinsExist() {
-        // Arrange
-        Manikin manikin = new Manikin(generateTagMap(), "first");
-        Manikin secondManikin = new Manikin(generateTagMap(), "second");
-        manikinRepository.save(manikin);
-        manikinRepository.save(secondManikin);
-
-        // Act
-        Set<String> actual = facade.getManikinNames();
-
-        // Assert
-        assertTrue(actual.contains("first"));
-        assertTrue(actual.contains("second"));
-        assertEquals(2, actual.size());
     }
 
     @Test (expected = DuplicateScanTagException.class)

@@ -53,32 +53,15 @@ public class ScanFacadeTest {
     }
 
     @Test
-    public void containsScan_shouldReturnFalse_whenScanDoesNotExist() {
-        // Act
-        // Assert
-        assertFalse(scanFacade.containsScan(randomManikinScanEnum()));
-    }
-
-    @Test
-    public void containsScan_shouldReturnTrue_whenScanExists() {
-        // Arrange
-        scanFacade.addScan(scan);
-
-        // Act
-        // Assert
-        assertTrue(scanFacade.containsScan(scan.getScanEnum()));
-    }
-
-    @Test
     public void addScan_shouldSaveScan() {
         /// Act
         scanFacade.addScan(scan);
 
         // Assert
-        assertTrue(scanFacade.containsScan(scan.getScanEnum()));
+        assertTrue(scanFacade.getScan(scan.getScanEnum()).isPresent());
     }
 
-    @Test (expected = ScanAlreadyExistsException.class)
+    @Test(expected = ScanAlreadyExistsException.class)
     public void addScan_shouldThrowScanAlreadyExistsException_whenScanAlreadyExists() {
         // Arrange
         scanFacade.addScan(scan);
@@ -87,7 +70,7 @@ public class ScanFacadeTest {
         scanFacade.addScan(scan);
     }
 
-    @Test (expected = EmptyScanIdException.class)
+    @Test(expected = EmptyScanIdException.class)
     public void addScan_shouldThrowEmptyScanIdException_whenEmptyScanIdGiven() {
         // Arrange
         Scan emptyScanIdScan = new Scan(null, randomAlphanumericString());
@@ -103,8 +86,8 @@ public class ScanFacadeTest {
         scanFacade.addScans(Lst(scan, scanTwo));
 
         // Assert
-        assertTrue(scanFacade.containsScan(scan.getScanEnum()));
-        assertTrue(scanFacade.containsScan(scanTwo.getScanEnum()));
+        assertTrue(scanFacade.getScan(scan.getScanEnum()).isPresent());
+        assertTrue(scanFacade.getScan(scanTwo.getScanEnum()).isPresent());
     }
 
     @Test
@@ -116,7 +99,7 @@ public class ScanFacadeTest {
         scanFacade.removeScan(scan);
 
         // Assert
-        assertFalse(scanFacade.containsScan(scan.getScanEnum()));
+        assertFalse(scanFacade.getScan(scan.getScanEnum()).isPresent());
     }
 
     @Test
@@ -128,8 +111,8 @@ public class ScanFacadeTest {
         scanFacade.removeScan(scan);
 
         // Assert
-        assertFalse(scanFacade.containsScan(scan.getScanEnum()));
-        assertTrue(scanFacade.containsScan(scanTwo.getScanEnum()));
+        assertFalse(scanFacade.getScan(scan.getScanEnum()).isPresent());
+        assertTrue(scanFacade.getScan(scanTwo.getScanEnum()).isPresent());
     }
 
     @Test
@@ -141,7 +124,7 @@ public class ScanFacadeTest {
         scanFacade.removeAllScans();
 
         // Assert
-        assertEquals(0, scanFacade.scanCount());
+        assertTrue(scanFacade.getAllScans().isEmpty());
     }
 
     @Test
@@ -188,28 +171,6 @@ public class ScanFacadeTest {
         // Assert
         assertEquals(ManikinScanEnum.values().length - 1, actual.size());
         assertFalse(actual.contains(ManikinScanEnum.RIGHT_LUNG));
-    }
-
-    @Test
-    public void ToCSV_shouldCorrectlySerializeScans() {
-        // Arrange
-        scanFacade.addScans(Lst(scan, scanTwo));
-
-        // Act
-        String actual = scanFacade.toCSV();
-
-        // Assert
-        assertEquals(scan.getScanEnum() + "," + scan.getPath() + "\n" + scanTwo.getScanEnum() + "," + scanTwo.getPath() + "\n", actual);
-    }
-
-    @Test
-    public void importCSV_shouldImportAllScanFromCSV() {
-        // Act
-        scanFacade.importCSV(scan.getScanEnum() + "," + scan.getPath() + "\n" + scanTwo.getScanEnum() + "," + scanTwo.getPath() + "\n");
-
-        // Assert
-        assertEquals(scan, scanFacade.getScan(scan.getScanEnum()).get());
-        assertEquals(scanTwo, scanFacade.getScan(scanTwo.getScanEnum()).get());
     }
 
 }
