@@ -16,29 +16,15 @@ package edus2.adapter.ui;/*
  */
 
 import edus2.adapter.repository.file.FileScanImportExportRepository;
+import edus2.adapter.ui.handler.*;
 import edus2.application.AuthenticationFacade;
-import edus2.application.EDUS2View;
 import edus2.application.ScanFacade;
-import edus2.application.exception.EmptyScanIdException;
-import edus2.application.exception.ScanAlreadyExistsException;
 import edus2.domain.EDUS2Configuration;
-import edus2.domain.ManikinScanEnum;
-import edus2.domain.Scan;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceDialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
-
-import java.io.File;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Purpose: Display a settings window for EDUS2.
@@ -53,7 +39,6 @@ public class ScanSettingsWindow extends VBox {
     private FileScanImportExportRepository importExportRepository;
     private EDUS2Configuration configuration;
 
-    // TODO: Try breaking this class into handler classes for each button to clean up logic
     public ScanSettingsWindow(ScanFacade scanFacade, AuthenticationFacade authenticationFacade, EDUS2Configuration configuration, EDUS2IconStage stage) {
         // Just set up a settings window, which is then shown on-screen
         super(10);
@@ -62,143 +47,8 @@ public class ScanSettingsWindow extends VBox {
         this.stage = stage;
         this.configuration = configuration;
         scanList = new ScansWindow(scanFacade);
-        HBox scanSettingButtonsBox = new HBox();
-        HBox configurationButtonBox = new HBox();
 
-        Button btnAdd = new Button("Add Video");
-        Button btnBulkAdd = new Button("Bulk Add Videos");
-        Button btnEditManikinLocation = new Button("Edit Manikin Location");
-        Button btnEditFile = new Button("Edit Video Path");
-        Button btnDelete = new Button("Delete Video");
-        Button btnDeleteAll = new Button("Delete All Videos");
-        Button btnLoadScenario = new Button("Load Scenario");
-        Button btnSaveScenario = new Button("Save Scenario");
-
-        // When add is clicked, run through the process of adding a new scan
-        btnAdd.setOnAction(event -> {
-            if (scanFacade.getUnusedScanEnums().isEmpty()) {
-                Alert alert = new Alert(AlertType.ERROR, "All manikin scan locations have been linked to scans already!");
-                alert.showAndWait();
-            } else {
-                FileChooser browser = new FileChooser();
-                File selected = browser.showOpenDialog(stage);
-                if (selected != null) {
-                    promptForScanIdAndSaveScan(selected);
-                }
-            }
-        });
-
-        // When bulk add is clicked, the user can select multiple files to add.
-        // Then we run through each selected file and set ID's for all of them.
-        btnBulkAdd.setOnAction(event -> {
-            if (scanFacade.getUnusedScanEnums().isEmpty()) {
-                Alert alert = new Alert(AlertType.ERROR, "All manikin scan locations have been linked to scans already!");
-                alert.showAndWait();
-                return;
-            }
-
-            FileChooser browser = new FileChooser();
-            List<File> selected = browser.showOpenMultipleDialog(stage);
-            if (selected == null) {
-                return;
-            }
-
-            if (selected.size() > scanFacade.getUnusedScanEnums().size()) {
-                Set<String> unusedScanEnumNames = scanFacade.getUnusedScanEnums()
-                        .stream()
-                        .map(ManikinScanEnum::getName)
-                        .collect(Collectors.toSet());
-                String unusedLocations = String.join(",", unusedScanEnumNames);
-                Alert alert = new Alert(AlertType.ERROR, String.format("You've selected too many videos: you can only link videos to the following locations: %s", unusedLocations));
-                alert.showAndWait();
-            } else {
-                for (File current : selected) {
-                    promptForScanIdAndSaveScan(current);
-                }
-            }
-        });
-
-        btnEditManikinLocation.setOnAction(event -> {
-            if (scanList.getSelectedItems().isEmpty()) {
-                return;
-            }
-
-            if (scanList.getSelectedItems().size() > 1) {
-                Alert alert = new Alert(AlertType.ERROR, "Only one manikin location can be changed at a time!");
-                alert.showAndWait();
-                return;
-            }
-
-            Scan scan = scanList.getSelectedItems().get(0);
-
-            if (scanFacade.getUnusedScanEnums().isEmpty()) {
-                Alert alert = new Alert(AlertType.ERROR, "All manikin scan locations have been linked to scans already!");
-                alert.showAndWait();
-            } else {
-                updateScanManikinLocation(scan);
-            }
-        });
-
-        btnEditFile.setOnAction(event -> {
-            if (scanList.getSelectedItems().isEmpty()) {
-                return;
-            }
-
-            if (scanList.getSelectedItems().size() > 1) {
-                Alert alert = new Alert(AlertType.ERROR, "Only one video path can be changed at a time!");
-                alert.showAndWait();
-                return;
-            }
-
-            Scan selectedScan = scanList.getSelectedItems().get(0);
-            if (scanList.getSelectedItems() == null) {
-                return;
-            }
-
-            FileChooser browser = new FileChooser();
-            File selected = browser.showOpenDialog(stage);
-            if (selected != null) {
-                String convertedFilePath = EDUS2View.convertFilePath(selected.getPath());
-                scanFacade.removeScan(selectedScan);
-                addScan(selectedScan.getScanEnum(), convertedFilePath);
-            }
-        });
-
-        // Delete the selected scan when the delete button is clicked.
-        btnDelete.setOnAction(event -> {
-            List<Scan> selectedScans = scanList.getSelectedItems();
-            if (selectedScans.isEmpty()) {
-                return;
-            }
-
-            for (Scan scan : selectedScans) {
-                scanFacade.removeScan(scan);
-            }
-            scanList.refreshTableItems();
-        });
-
-        // Delete ALL the scans when the delete all button is clicked.
-        btnDeleteAll.setOnAction(event -> {
-            // Show the user a warning, to let them know they're going
-            // to permanently remove all scans from the program by doing this
-            Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setContentText("It is suggested to export all scans before doing this.\nAre you sure you want to remove ALL scans?\n");
-            alert.setHeaderText("Proceed with removing all scans?");
-            alert.setTitle("Proceed with removing all scans?");
-            alert.showAndWait();
-            if (alert.getResult().getText().equals("OK")) {
-                // If OK was clicked, we'll nuke all the scans
-                scanFacade.removeAllScans();
-                scanList.refreshTableItems();
-            }
-        });
-
-        btnLoadScenario.setOnAction(event -> loadScenario());
-
-        btnSaveScenario.setOnAction(event -> saveScenario());
-
-        scanSettingButtonsBox.setAlignment(Pos.CENTER);
-        scanSettingButtonsBox.getChildren().addAll(btnAdd, btnBulkAdd, btnEditManikinLocation, btnEditFile, btnDelete, btnDeleteAll, btnLoadScenario, btnSaveScenario);
+        HBox scanSettingButtonsBox = setupControlButtons();
 
         Button btnConfigSettings = new Button("Configuration Settings");
         btnConfigSettings.setOnAction(e -> {
@@ -211,91 +61,74 @@ public class ScanSettingsWindow extends VBox {
             scanList.refreshTableItems();
         });
 
+        HBox configurationButtonBox = new HBox();
         configurationButtonBox.setAlignment(Pos.CENTER);
         configurationButtonBox.getChildren().add(btnConfigSettings);
         this.getChildren().addAll(scanList, scanSettingButtonsBox, configurationButtonBox);
 
     }
 
-    private void promptForScanIdAndSaveScan(File file) {
-        boolean added = false;
-        while (!added) {
-            String convertedFilePath = EDUS2View.convertFilePath(file.getPath());
-            Optional<ManikinScanEnum> scanLocationOptional = promptForScanLocation("Filename: " + file.getName() + "\nWhat location would you like to link the video to?");
-            if (!scanLocationOptional.isPresent()) {
-                break;
-            }
+    private HBox setupControlButtons() {
+        HBox scanSettingButtonsBox = new HBox();
+        Button btnAdd = new Button("Add Video");
+        Button btnBulkAdd = new Button("Bulk Add Videos");
+        Button btnEditManikinLocation = new Button("Edit Manikin Location");
+        Button btnEditFile = new Button("Edit Video Path");
+        Button btnDelete = new Button("Delete Video");
+        Button btnDeleteAll = new Button("Delete All Videos");
+        Button btnLoadScenario = new Button("Load Scenario");
+        Button btnSaveScenario = new Button("Save Scenario");
 
-            added = addScan(scanLocationOptional.get(), convertedFilePath);
-        }
-    }
+        AddScanHandler addScanHandler = new AddScanHandler(scanFacade);
+        BulkAddScanHandler bulkAddScanHandler = new BulkAddScanHandler(scanFacade);
+        EditManikinLocationHandler editManikinLocationHandler = new EditManikinLocationHandler(scanFacade);
+        EditScanFileHandler editScanFileHandler = new EditScanFileHandler(scanFacade);
+        DeleteScanHandler deleteScanHandler = new DeleteScanHandler(scanFacade);
+        DeleteAllScanHandler deleteAllScanHandler = new DeleteAllScanHandler(scanFacade);
+        LoadScenarioHandler loadScenarioHandler = new LoadScenarioHandler(scanFacade, configuration, importExportRepository);
+        SaveScenarioHandler saveScenarioHandler = new SaveScenarioHandler(scanFacade, configuration, importExportRepository);
 
-    private void updateScanManikinLocation(Scan scan) {
-        boolean added = false;
-        while (!added) {
-            Optional<ManikinScanEnum> scanLocationOptional = promptForScanLocation("What location would you like to link the video to?");
-            if (!scanLocationOptional.isPresent()) {
-                break;
-            }
-
-            scanFacade.removeScan(scan);
-            added = addScan(scanLocationOptional.get(), scan.getPath());
-        }
-    }
-
-    private Optional<ManikinScanEnum> promptForScanLocation(String prompt) {
-        Set<ManikinScanEnum> availableValues = scanFacade.getUnusedScanEnums();
-        ChoiceDialog<String> scanLocationDialog = new ChoiceDialog<>(availableValues.iterator().next().getName(), availableValues.stream().map(ManikinScanEnum::getName).collect(Collectors.toSet()));
-        scanLocationDialog.setHeaderText("Choose Scan Location");
-        scanLocationDialog.setContentText(prompt);
-        return scanLocationDialog.showAndWait().map(ManikinScanEnum::findByName);
-    }
-
-    private void loadScenario() {
-        FileChooser browser = new FileChooser();
-        browser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Scenario file format (*.scn)", "*.scn"));
-        Optional<File> defaultScenarioDirectory = configuration.getDefaultScenarioDirectory();
-        defaultScenarioDirectory.filter(File::exists).ifPresent(browser::setInitialDirectory);
-        File scanFile = browser.showOpenDialog(stage);
-        if (scanFile != null) {
-            try {
-                importExportRepository.importScansFromFile(scanFile);
-                scanList.refreshTableItems();
-            } catch (Exception e) {
-                Alert alert = new Alert(AlertType.ERROR, String.format("Encountered error while loading scenario: %s", e.getMessage()));
-                alert.showAndWait();
-            }
-        }
-    }
-
-    private void saveScenario() {
-        FileChooser browser = new FileChooser();
-        browser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Scenario file format (*.scn)", "*.scn"));
-        Optional<File> defaultScenarioDirectory = configuration.getDefaultScenarioDirectory();
-        defaultScenarioDirectory.filter(File::exists).ifPresent(browser::setInitialDirectory);
-        File selected = browser.showSaveDialog(stage);
-        if (selected != null) {
-            try {
-                importExportRepository.exportScansToFile(selected);
-                Alert alert = new Alert(AlertType.INFORMATION, "Scenario saved successfully!");
-                alert.showAndWait();
-            } catch (Exception e) {
-                Alert alert = new Alert(AlertType.ERROR, String.format("Encountered error while saving scenario: %s", e.getMessage()));
-                alert.showAndWait();
-            }
-        }
-    }
-
-    private boolean addScan(ManikinScanEnum scanEnum, String path) {
-        Scan toAdd = new Scan(scanEnum, path);
-        try {
-            scanFacade.addScan(toAdd);
+        btnAdd.setOnAction(event -> {
+            addScanHandler.handle(scanList.getSelectedItems(), stage);
             scanList.refreshTableItems();
-            return true;
-        } catch (EmptyScanIdException | ScanAlreadyExistsException e) {
-            Alert alert = new Alert(AlertType.ERROR, e.getMessage());
-            alert.showAndWait();
-            return false;
-        }
+        });
+
+        btnBulkAdd.setOnAction(event -> {
+            bulkAddScanHandler.handle(scanList.getSelectedItems(), stage);
+            scanList.refreshTableItems();
+        });
+
+        btnEditManikinLocation.setOnAction(event -> {
+            editManikinLocationHandler.handle(scanList.getSelectedItems(), stage);
+            scanList.refreshTableItems();
+        });
+
+        btnEditFile.setOnAction(event -> {
+            editScanFileHandler.handle(scanList.getSelectedItems(), stage);
+            scanList.refreshTableItems();
+        });
+
+        btnDelete.setOnAction(event -> {
+            deleteScanHandler.handle(scanList.getSelectedItems(), stage);
+            scanList.refreshTableItems();
+        });
+
+        btnDeleteAll.setOnAction(event -> {
+            deleteAllScanHandler.handle(scanList.getSelectedItems(), stage);
+            scanList.refreshTableItems();
+        });
+
+        btnLoadScenario.setOnAction(event -> {
+            loadScenarioHandler.handle(scanList.getSelectedItems(), stage);
+            scanList.refreshTableItems();
+        });
+
+        btnSaveScenario.setOnAction(event -> saveScenarioHandler.handle(scanList.getSelectedItems(), stage));
+
+        scanSettingButtonsBox.setAlignment(Pos.CENTER);
+        scanSettingButtonsBox.getChildren().addAll(btnAdd, btnBulkAdd, btnEditManikinLocation, btnEditFile, btnDelete, btnDeleteAll, btnLoadScenario, btnSaveScenario);
+
+        return scanSettingButtonsBox;
     }
+
 }

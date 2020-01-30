@@ -16,8 +16,7 @@ import java.util.List;
 
 import static edus2.TestUtil.Lst;
 import static edus2.TestUtil.randomTempFile;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class FileScanImportExportRepositoryTest {
 
@@ -44,6 +43,23 @@ public class FileScanImportExportRepositoryTest {
         assertEquals(2, scans.size());
         assertTrue(scans.contains(new Scan(ManikinScanEnum.RIGHT_LUNG, "/path/to/scan")));
         assertTrue(scans.contains(new Scan(ManikinScanEnum.LEFT_LUNG, "/path/to/second/scan")));
+    }
+
+    @Test
+    public void importScans_shouldClearExistingScans() throws IOException {
+        // Arrange
+        Scan unexpectedScan = new Scan(ManikinScanEnum.IVC, "scan/to/delete");
+        scanFacade.addScan(unexpectedScan);
+        String fileName = randomTempFile();
+        Files.write(Paths.get(fileName), "[{\"scanEnum\": \"RIGHT_LUNG\", \"path\": \"/path/to/scan\"}, {\"scanEnum\": \"LEFT_LUNG\", \"path\": \"/path/to/second/scan\"}]".getBytes());
+
+        // Act
+        repository.importScansFromFile(new File(fileName));
+
+        // Assert
+        List<Scan> scans = scanFacade.getAllScans();
+        assertEquals(2, scans.size());
+        assertFalse(scans.contains(unexpectedScan));
     }
 
     @Test
