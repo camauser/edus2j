@@ -35,6 +35,7 @@ public class FileScanImportExportRepository {
         Type type = new TypeToken<List<ScanDto>>(){}.getType();
         List<ScanDto> scanDtos = gson.fromJson(new String(fileContents), type);
         List<Scan> scans = scanDtos.stream().map(ScanDto::toScan).collect(Collectors.toList());
+        scanFacade.removeAllScans();
         scanFacade.addScans(scans);
     }
 
