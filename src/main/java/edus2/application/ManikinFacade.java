@@ -16,10 +16,6 @@ public class ManikinFacade {
         this.manikinRepository = manikinRepository;
     }
 
-    public Set<String> getManikinNames() {
-        return manikinRepository.retrieveAll().stream().map(Manikin::getName).collect(Collectors.toSet());
-    }
-
     public Optional<Manikin> getManikin(String name) {
         return manikinRepository.retrieve(name);
     }
@@ -113,26 +109,26 @@ public class ManikinFacade {
         }
     }
 
-    private class ManikinScanTagIdentifier {
+    private static class ManikinScanTagIdentifier {
         private final String manikinName;
         private final String scanTag;
         private final ManikinScanEnum scanLocation;
 
-        public ManikinScanTagIdentifier(String manikinName, String scanTag, ManikinScanEnum scanLocation) {
+        ManikinScanTagIdentifier(String manikinName, String scanTag, ManikinScanEnum scanLocation) {
             this.manikinName = manikinName;
             this.scanTag = scanTag;
             this.scanLocation = scanLocation;
         }
 
-        public String getManikinName() {
+        String getManikinName() {
             return manikinName;
         }
 
-        public String getScanTag() {
+        String getScanTag() {
             return scanTag;
         }
 
-        public ManikinScanEnum getScanLocation() {
+        ManikinScanEnum getScanLocation() {
             return scanLocation;
         }
 
