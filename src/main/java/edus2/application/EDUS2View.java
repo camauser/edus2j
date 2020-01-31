@@ -201,27 +201,40 @@ public class EDUS2View extends Application {
 
         btnScanSettings.setOnAction(event -> {
             main.requestFocus();
-            if (isAuthenticated()) {
-                EDUS2IconStage scanWindowStage = new EDUS2IconStage();
-                ScanSettingsWindow scanSettingsWindow = new ScanSettingsWindow(scanFacade, authenticationFacade, configuration, scanWindowStage);
-                Scene scanWindowScene = new Scene(scanSettingsWindow);
-                scanWindowStage.setScene(scanWindowScene);
-                scanWindowStage.show();
-            } else {
-                Alert invalidPasswordAlert = new Alert(Alert.AlertType.ERROR);
-                invalidPasswordAlert.setTitle("Invalid password");
-                invalidPasswordAlert.setContentText("Invalid password entered.");
-                invalidPasswordAlert.showAndWait();
+            try {
+                if (isAuthenticated()) {
+                    EDUS2IconStage scanWindowStage = new EDUS2IconStage();
+                    ScanSettingsWindow scanSettingsWindow = new ScanSettingsWindow(scanFacade, authenticationFacade, configuration, scanWindowStage);
+                    Scene scanWindowScene = new Scene(scanSettingsWindow);
+                    scanWindowStage.setScene(scanWindowScene);
+                    scanWindowStage.show();
+                } else {
+                    Alert invalidPasswordAlert = new Alert(Alert.AlertType.ERROR);
+                    invalidPasswordAlert.setTitle("Invalid password");
+                    invalidPasswordAlert.setContentText("Invalid password entered.");
+                    invalidPasswordAlert.showAndWait();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR, String.format("An error has occurred: %s", e.getMessage()));
+                alert.showAndWait();
             }
+
         });
 
         btnManikinSettings.setOnAction(event -> {
-            main.requestFocus();
-            EDUS2IconStage manikinSettingStage = new EDUS2IconStage();
-            ManikinSettingsWindow manikinSettingsWindow = new ManikinSettingsWindow(manikinFacade, manikinSettingStage);
-            Scene manikinWindowScene = new Scene(manikinSettingsWindow);
-            manikinSettingStage.setScene(manikinWindowScene);
-            manikinSettingStage.show();
+            try {
+                main.requestFocus();
+                EDUS2IconStage manikinSettingStage = new EDUS2IconStage();
+                ManikinSettingsWindow manikinSettingsWindow = new ManikinSettingsWindow(manikinFacade, manikinSettingStage);
+                Scene manikinWindowScene = new Scene(manikinSettingsWindow);
+                manikinSettingStage.setScene(manikinWindowScene);
+                manikinSettingStage.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR, String.format("An error has occurred: %s", e.getMessage()));
+                alert.showAndWait();
+            }
         });
 
         btnQuit.setOnAction(event -> {
