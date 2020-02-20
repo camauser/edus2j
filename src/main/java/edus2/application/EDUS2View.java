@@ -19,6 +19,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import edus2.adapter.guice.EDUS2JModule;
 import edus2.adapter.ui.*;
+import edus2.adapter.ui.ListenableMediaPlayer.ListenableMediaPlayerEventEnum;
 import edus2.adapter.ui.usagereporting.ReportStartupTask;
 import edus2.application.usagereporting.UsageReportingService;
 import edus2.application.version.ApplicationInfo;
@@ -69,7 +70,7 @@ public class EDUS2View extends Application {
     private String currentScanLocation = "";
     private ManikinScanEnum currentLocationPlaying = null;
     private static ProgressBar playbackProgress;
-    private MediaPlayer player;
+    private ListenableMediaPlayer listenablePlayer = new ListenableMediaPlayer();
     private BorderPane main;
     private edus2.application.ScanFacade scanFacade;
     private static Injector injector;
@@ -77,6 +78,7 @@ public class EDUS2View extends Application {
     private edus2.application.AuthenticationFacade authenticationFacade;
     private ManikinFacade manikinFacade;
     private UsageReportingService usageReportingService;
+    private MainControlButton btnClearScreen = new MainControlButton("Clear Screen");
 
     public static void main(String[] args) {
         // Run the start method, and open up the GUI
@@ -270,6 +272,18 @@ public class EDUS2View extends Application {
         playbackElements.getChildren().addAll(txtPlaybackPosition, playbackProgress);
         VBox.setMargin(txtPlaybackPosition, new Insets(5.0));
         VBox.setMargin(playbackProgress, new Insets(5.0));
+        VBox.setMargin(btnClearScreen, new Insets(5.0, 0, 0, 0));
+        btnClearScreen.setOnAction(e -> {
+            if (main.getCenter() instanceof MediaView) {
+                MediaView mediaView = (MediaView) main.getCenter();
+                mediaView.getMediaPlayer().stop();
+                mediaView.setMediaPlayer(null);
+                playbackElements.getChildren().remove(btnClearScreen);
+            }
+        });
+
+        listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, () -> playbackElements.getChildren().add(btnClearScreen));
+        listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_PLAYING, () -> playbackElements.getChildren().remove(btnClearScreen));
         playbackElements.setAlignment(Pos.BOTTOM_CENTER);
         return playbackElements;
     }
@@ -316,14 +330,14 @@ public class EDUS2View extends Application {
     }
 
     private void stopPlayer() {
-        if (player != null) {
-            player.stop();
+        if (listenablePlayer.getMediaPlayer() != null) {
+            listenablePlayer.getMediaPlayer().stop();
         }
     }
 
     private boolean isScanPlaying(Scan scan) {
-        return player != null
-                && player.getStatus().equals(MediaPlayer.Status.PLAYING)
+        return listenablePlayer.getMediaPlayer() != null
+                && listenablePlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PLAYING)
                 && scan.getScanEnum().equals(currentLocationPlaying);
     }
 
@@ -332,11 +346,11 @@ public class EDUS2View extends Application {
         String scanPath = scan.getPath();
         currentLocationPlaying = scan.getScanEnum();
         Media video = new Media(scanPath);
-        player = new MediaPlayer(video);
-        MediaView videoView = new MediaView(player);
+        listenablePlayer.setMediaPlayer(new MediaPlayer(video));
+        MediaView videoView = new MediaView(listenablePlayer.getMediaPlayer());
         main.setCenter(videoView);
 
-        player.setOnReady(() -> {
+        listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_READY, (() -> {
             videoView.setPreserveRatio(false);
             int minVideoWidth = configuration.getMinimumVideoWidth().orElse(DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS);
             int minVideoHeight = configuration.getMinimumVideoHeight().orElse(DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS);
@@ -344,13 +358,14 @@ public class EDUS2View extends Application {
             double windowHeight = main.getHeight();
             videoView.setFitWidth(calculateVideoDimension(minVideoWidth, video.getWidth(), windowWidth));
             videoView.setFitHeight(calculateVideoDimension(minVideoHeight, video.getHeight(), windowHeight));
-            ScanProgressUpdater scanProgressUpdater = new ScanProgressUpdater(player, playbackProgress);
-            player.setOnEndOfMedia(() -> currentLocationPlaying = null);
+            ScanProgressUpdater scanProgressUpdater = new ScanProgressUpdater(listenablePlayer.getMediaPlayer(), playbackProgress);
+            listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, () -> currentLocationPlaying = null);
 
-            player.setOnStopped(scanProgressUpdater::finish);
-            player.play();
+            listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_STOPPED, scanProgressUpdater::finish);
+            listenablePlayer.getMediaPlayer().play();
+
             scanProgressUpdater.start();
-        });
+        }));
     }
 
     private double calculateVideoDimension(int minimumSize, int videoSize, double screenSize) {
