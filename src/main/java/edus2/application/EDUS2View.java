@@ -79,6 +79,9 @@ public class EDUS2View extends Application {
     private ManikinFacade manikinFacade;
     private UsageReportingService usageReportingService;
     private MainControlButton btnClearScreen = new MainControlButton("Clear Screen");
+    private HBox titleBox;
+    private HBox controlButtons;
+    private ScanProgressUpdater scanProgressUpdater;
 
     public static void main(String[] args) {
         // Run the start method, and open up the GUI
@@ -106,10 +109,10 @@ public class EDUS2View extends Application {
         txtTitle.setFont(Font.font("Calibri", FontWeight.BOLD, FontPosture.ITALIC, 36.0));
         txtTitle.setOnMouseClicked((e) -> showCredits());
 
-        HBox titleBox = new HBox(txtTitle);
+        titleBox = new HBox(txtTitle);
         titleBox.setAlignment(Pos.BOTTOM_LEFT);
         VBox playbackPositionBox = generatePlaybackPositionControl();
-        HBox controlButtons = generateButtonControls(stage);
+        controlButtons = generateButtonControls(stage);
 
         BorderPane bottomControlsPane = new BorderPane();
         bottomControlsPane.setLeft(titleBox);
@@ -146,9 +149,11 @@ public class EDUS2View extends Application {
             }
         });
 
+
         ensurePhoneHomeWarningAccepted(stage);
         reportStartupToServer();
         registerPlaybackListeners();
+        stage.setOnCloseRequest(e -> handleShutdown());
     }
 
     private void toggleVideoPlayStatus() {
@@ -215,6 +220,11 @@ public class EDUS2View extends Application {
             stage.setFullScreen(!stage.isFullScreen());
         });
 
+        stage.fullScreenProperty().addListener((obs, old, isFullScreen) -> {
+            titleBox.setVisible(!isFullScreen);
+            controlButtons.setVisible(!isFullScreen);
+        });
+
         btnScanSettings.setOnAction(event -> {
             main.requestFocus();
             try {
@@ -256,9 +266,14 @@ public class EDUS2View extends Application {
         btnQuit.setOnAction(event -> {
             main.requestFocus();
             stage.close();
+            handleShutdown();
         });
 
         return buttons;
+    }
+
+    private void handleShutdown() {
+        scanProgressUpdater.shutdown();
     }
 
     private boolean isAuthenticated() {
@@ -301,7 +316,7 @@ public class EDUS2View extends Application {
 
         listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, (mp) -> playbackElements.getChildren().add(btnClearScreen));
         listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_PLAYING, (mp) -> playbackElements.getChildren().remove(btnClearScreen));
-        ScanProgressUpdater scanProgressUpdater = new ScanProgressUpdater(listenablePlayer, playbackProgress);
+        scanProgressUpdater = new ScanProgressUpdater(listenablePlayer, playbackProgress);
         scanProgressUpdater.start();
         playbackElements.setAlignment(Pos.BOTTOM_CENTER);
         return playbackElements;
