@@ -30,7 +30,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
@@ -65,12 +64,13 @@ public class EDUS2View extends Application {
     private static final int DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS = 1280;
     private static final int DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS = 720;
     private static final double MAX_VIDEO_TO_SCREEN_SIZE_RATIO = 0.8;
+    private static final String DEFAULT_BACKGROUND_COLOR_HEX = "#575957";
+    private static final String BACKGROUND_COLOR_CSS_STYLE = String.format("-fx-background-color: %s", DEFAULT_BACKGROUND_COLOR_HEX);
     private String currentScanLocation = "";
     private ManikinScanEnum currentLocationPlaying = null;
     private static ProgressBar playbackProgress;
     private MediaPlayer player;
     private BorderPane main;
-    private static final Font BUTTON_FONT = new Font("Calibri", 18);
     private edus2.application.ScanFacade scanFacade;
     private static Injector injector;
     private EDUS2Configuration configuration;
@@ -99,6 +99,7 @@ public class EDUS2View extends Application {
         usageReportingService = injector.getInstance(UsageReportingService.class);
 
         main = new BorderPane();
+        main.setStyle(BACKGROUND_COLOR_CSS_STYLE);
         Text txtTitle = new Text("EDUS2J Simulator");
         txtTitle.setFont(Font.font("Calibri", FontWeight.BOLD, FontPosture.ITALIC, 36.0));
         txtTitle.setOnMouseClicked((e) -> showCredits());
@@ -181,14 +182,10 @@ public class EDUS2View extends Application {
     }
 
     private HBox generateButtonControls(Stage stage) {
-        Button btnFullscreen = new Button("Toggle Fullscreen");
-        btnFullscreen.setFont(BUTTON_FONT);
-        Button btnScanSettings = new Button("Scan Settings");
-        btnScanSettings.setFont(BUTTON_FONT);
-        Button btnManikinSettings = new Button("Manikin Settings");
-        btnManikinSettings.setFont(BUTTON_FONT);
-        Button btnQuit = new Button("Quit");
-        btnQuit.setFont(BUTTON_FONT);
+        MainControlButton btnFullscreen = new MainControlButton("Toggle Fullscreen");
+        MainControlButton btnScanSettings = new MainControlButton("Scan Settings");
+        MainControlButton btnManikinSettings = new MainControlButton("Manikin Settings");
+        MainControlButton btnQuit = new MainControlButton("Quit");
 
         HBox buttons = new HBox();
         buttons.getChildren().addAll(btnFullscreen, btnScanSettings, btnManikinSettings, btnQuit);
@@ -349,8 +346,8 @@ public class EDUS2View extends Application {
             videoView.setFitHeight(calculateVideoDimension(minVideoHeight, video.getHeight(), windowHeight));
             ScanProgressUpdater scanProgressUpdater = new ScanProgressUpdater(player, playbackProgress);
             player.setOnEndOfMedia(() -> currentLocationPlaying = null);
-            player.setOnStopped(scanProgressUpdater::finish);
 
+            player.setOnStopped(scanProgressUpdater::finish);
             player.play();
             scanProgressUpdater.start();
         });
