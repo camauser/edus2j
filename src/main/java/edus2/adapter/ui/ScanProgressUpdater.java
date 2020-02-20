@@ -58,7 +58,7 @@ public class ScanProgressUpdater extends Thread {
         }
     }
 
-    private void shutdown() {
+    public void shutdown() {
         shutdownRequested.set(true);
     }
 }
