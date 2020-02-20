@@ -1,5 +1,7 @@
 package edus2.adapter.ui;
 
+import javafx.scene.media.MediaPlayer;
+
 public interface MediaPlayerEventHandler {
-    void handleEvent();
+    void handleEvent(MediaPlayer mediaPlayer);
 }
