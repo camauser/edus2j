@@ -1,4 +1,4 @@
-package edus2.adapter.ui.handler;
+package edus2.adapter.ui.handler.settings;
 
 import edus2.application.ScanFacade;
 import edus2.domain.Scan;

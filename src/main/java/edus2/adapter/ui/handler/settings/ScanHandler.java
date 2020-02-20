@@ -1,4 +1,4 @@
-package edus2.adapter.ui.handler;
+package edus2.adapter.ui.handler.settings;
 
 import edus2.application.ScanFacade;
 import edus2.application.exception.EmptyScanIdException;
@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract class ScanHandler extends BaseHandler {
+public abstract class ScanHandler extends SettingsHandler {
 
     protected ScanFacade scanFacade;
 
