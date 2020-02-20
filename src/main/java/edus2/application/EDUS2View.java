@@ -18,34 +18,25 @@ package edus2.application;/*
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import edus2.adapter.guice.EDUS2JModule;
-import edus2.adapter.ui.*;
+import edus2.adapter.ui.ListenableMediaPlayer;
 import edus2.adapter.ui.ListenableMediaPlayer.ListenableMediaPlayerEventEnum;
+import edus2.adapter.ui.MainControlsPane;
 import edus2.adapter.ui.usagereporting.ReportStartupTask;
 import edus2.application.usagereporting.UsageReportingService;
-import edus2.application.version.ApplicationInfo;
 import edus2.domain.EDUS2Configuration;
 import edus2.domain.ManikinScanEnum;
 import edus2.domain.Scan;
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.Objects;
@@ -53,7 +44,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static java.lang.String.format;
 import static javafx.scene.media.MediaPlayer.Status.PLAYING;
 
 /**
@@ -75,17 +65,10 @@ public class EDUS2View extends Application {
     private edus2.application.ScanFacade scanFacade;
     private static Injector injector;
     private EDUS2Configuration configuration;
-    private edus2.application.AuthenticationFacade authenticationFacade;
     private ManikinFacade manikinFacade;
     private UsageReportingService usageReportingService;
-    private MainControlButton btnClearScreen = new MainControlButton("Clear Screen");
-    private HBox titleBox;
-    private HBox controlButtons;
-    private ScanProgressUpdater scanProgressUpdater;
 
     public static void main(String[] args) {
-        // Run the start method, and open up the GUI
-        injector = Guice.createInjector(new EDUS2JModule());
         Application.launch(args);
     }
 
@@ -97,31 +80,15 @@ public class EDUS2View extends Application {
      * Purpose: The default start method to start the JavaFX GUI.
      */
     public void start(Stage stage) {
-        scanFacade = injector.getInstance(ScanFacade.class);
-        configuration = injector.getInstance(EDUS2Configuration.class);
-        authenticationFacade = injector.getInstance(AuthenticationFacade.class);
-        manikinFacade = injector.getInstance(ManikinFacade.class);
-        usageReportingService = injector.getInstance(UsageReportingService.class);
-
         main = new BorderPane();
+        injector = Guice.createInjector(new EDUS2JModule(stage, main, listenablePlayer));
+        scanFacade = EDUS2View.injector.getInstance(ScanFacade.class);
+        configuration = EDUS2View.injector.getInstance(EDUS2Configuration.class);
+        manikinFacade = EDUS2View.injector.getInstance(ManikinFacade.class);
+        usageReportingService = EDUS2View.injector.getInstance(UsageReportingService.class);
+
         main.setStyle(BACKGROUND_COLOR_CSS_STYLE);
-        Text txtTitle = new Text("EDUS2J Simulator");
-        txtTitle.setFont(Font.font("Calibri", FontWeight.BOLD, FontPosture.ITALIC, 36.0));
-        txtTitle.setOnMouseClicked((e) -> showCredits());
-
-        titleBox = new HBox(txtTitle);
-        titleBox.setAlignment(Pos.BOTTOM_LEFT);
-        VBox playbackPositionBox = generatePlaybackPositionControl();
-        controlButtons = generateButtonControls(stage);
-
-        BorderPane bottomControlsPane = new BorderPane();
-        bottomControlsPane.setLeft(titleBox);
-        bottomControlsPane.setCenter(playbackPositionBox);
-        bottomControlsPane.setRight(controlButtons);
-        BorderPane.setAlignment(txtTitle, Pos.BOTTOM_LEFT);
-        BorderPane.setAlignment(playbackPositionBox, Pos.BOTTOM_CENTER);
-        BorderPane.setAlignment(controlButtons, Pos.BOTTOM_RIGHT);
-
+        BorderPane bottomControlsPane = EDUS2View.injector.getInstance(MainControlsPane.class);
         StackPane controlOverlayPane = new StackPane();
         controlOverlayPane.getChildren().addAll(main, bottomControlsPane);
 
@@ -136,9 +103,6 @@ public class EDUS2View extends Application {
         // Ensure control buttons aren't highlighted
         main.requestFocus();
 
-        // Need to set the width after controls have been shown otherwise getWidth returns 0 - set width to center playback position
-        titleBox.setMinWidth(controlButtons.getWidth());
-
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 processScanRequest();
@@ -149,11 +113,10 @@ public class EDUS2View extends Application {
             }
         });
 
-
         ensurePhoneHomeWarningAccepted(stage);
         reportStartupToServer();
         registerPlaybackListeners();
-        stage.setOnCloseRequest(e -> handleShutdown());
+
     }
 
     private void toggleVideoPlayStatus() {
@@ -203,149 +166,6 @@ public class EDUS2View extends Application {
                 stage.close();
             }
         }
-    }
-
-    private HBox generateButtonControls(Stage stage) {
-        MainControlButton btnFullscreen = new MainControlButton("Toggle Fullscreen");
-        MainControlButton btnScanSettings = new MainControlButton("Scan Settings");
-        MainControlButton btnManikinSettings = new MainControlButton("Manikin Settings");
-        MainControlButton btnQuit = new MainControlButton("Quit");
-
-        HBox buttons = new HBox();
-        buttons.getChildren().addAll(btnFullscreen, btnScanSettings, btnManikinSettings, btnQuit);
-        buttons.setAlignment(Pos.BOTTOM_RIGHT);
-
-        btnFullscreen.setOnAction(event -> {
-            main.requestFocus();
-            stage.setFullScreen(!stage.isFullScreen());
-        });
-
-        stage.fullScreenProperty().addListener((obs, old, isFullScreen) -> {
-            titleBox.setVisible(!isFullScreen);
-            controlButtons.setVisible(!isFullScreen);
-        });
-
-        btnScanSettings.setOnAction(event -> {
-            main.requestFocus();
-            try {
-                if (isAuthenticated()) {
-                    EDUS2IconStage scanWindowStage = new EDUS2IconStage();
-                    ScanSettingsWindow scanSettingsWindow = new ScanSettingsWindow(scanFacade, authenticationFacade, configuration, scanWindowStage);
-                    Scene scanWindowScene = new Scene(scanSettingsWindow);
-                    scanWindowStage.setScene(scanWindowScene);
-                    scanWindowStage.show();
-                } else {
-                    Alert invalidPasswordAlert = new Alert(Alert.AlertType.ERROR);
-                    invalidPasswordAlert.setTitle("Invalid password");
-                    invalidPasswordAlert.setContentText("Invalid password entered.");
-                    invalidPasswordAlert.showAndWait();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                Alert alert = new Alert(Alert.AlertType.ERROR, String.format("An error has occurred: %s", e.getMessage()));
-                alert.showAndWait();
-            }
-
-        });
-
-        btnManikinSettings.setOnAction(event -> {
-            try {
-                main.requestFocus();
-                EDUS2IconStage manikinSettingStage = new EDUS2IconStage();
-                ManikinSettingsWindow manikinSettingsWindow = new ManikinSettingsWindow(manikinFacade, manikinSettingStage);
-                Scene manikinWindowScene = new Scene(manikinSettingsWindow);
-                manikinSettingStage.setScene(manikinWindowScene);
-                manikinSettingStage.show();
-            } catch (Exception e) {
-                e.printStackTrace();
-                Alert alert = new Alert(Alert.AlertType.ERROR, String.format("An error has occurred: %s", e.getMessage()));
-                alert.showAndWait();
-            }
-        });
-
-        btnQuit.setOnAction(event -> {
-            main.requestFocus();
-            stage.close();
-            handleShutdown();
-        });
-
-        return buttons;
-    }
-
-    private void handleShutdown() {
-        scanProgressUpdater.shutdown();
-    }
-
-    private boolean isAuthenticated() {
-        if (!authenticationFacade.isAuthenticationEnabled()) {
-            return true;
-        }
-
-        Optional<String> passwordAttemptOptional = promptForPassword();
-
-        if (!passwordAttemptOptional.isPresent()) {
-            return false;
-        }
-        return authenticationFacade.isValidLogin(passwordAttemptOptional.get());
-    }
-
-    private Optional<String> promptForPassword() {
-        PasswordInputDialog passwordEntryBox = new PasswordInputDialog("Enter Password", "Please enter password to continue");
-        return passwordEntryBox.showAndWait();
-    }
-
-    private VBox generatePlaybackPositionControl() {
-        VBox playbackElements = new VBox();
-        Text txtPlaybackPosition = new Text("Playback Position");
-        txtPlaybackPosition.setFont(Font.font("Calibri", FontWeight.BOLD, FontPosture.ITALIC, 20.0));
-        ProgressBar playbackProgress = new ProgressBar(0.0);
-        playbackProgress.setMinHeight(18.0);
-        playbackProgress.setMinWidth(150.0);
-        playbackElements.getChildren().addAll(txtPlaybackPosition, playbackProgress);
-        VBox.setMargin(txtPlaybackPosition, new Insets(5.0));
-        VBox.setMargin(playbackProgress, new Insets(5.0));
-        VBox.setMargin(btnClearScreen, new Insets(5.0, 0, 0, 0));
-        btnClearScreen.setOnAction(e -> {
-            if (main.getCenter() instanceof MediaView) {
-                MediaView mediaView = (MediaView) main.getCenter();
-                mediaView.getMediaPlayer().stop();
-                mediaView.setMediaPlayer(null);
-                playbackElements.getChildren().remove(btnClearScreen);
-            }
-        });
-
-        listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, (mp) -> playbackElements.getChildren().add(btnClearScreen));
-        listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_PLAYING, (mp) -> playbackElements.getChildren().remove(btnClearScreen));
-        scanProgressUpdater = new ScanProgressUpdater(listenablePlayer, playbackProgress);
-        scanProgressUpdater.start();
-        playbackElements.setAlignment(Pos.BOTTOM_CENTER);
-        return playbackElements;
-    }
-
-    private void showCredits() {
-        BorderPane credits = new BorderPane();
-        Text header = new Text("EDUS2J Credits");
-        header.setFont(new Font(32.0));
-        credits.setTop(header);
-        header.setFont(Font.font("Calibri", FontWeight.BOLD,
-                FontPosture.ITALIC, 36.0));
-        BorderPane.setAlignment(header, Pos.TOP_CENTER);
-        Text details = new Text(format(
-                "Credits for this project go to: \n"
-                        + "Java Porting: Cameron Auser\n"
-                        + "Original Design: Paul Kulyk, Paul Olsynski\n"
-                        + "EDUS2 is an emergency department ultrasound simulator, "
-                        + "and EDUS2J is a port of this original software to Java.\nEDUS2J version: %s", ApplicationInfo.getVersion()));
-        details.setFont(new Font("Calibri", 18.0));
-        credits.setCenter(details);
-        BorderPane.setAlignment(credits, Pos.CENTER);
-
-        Scene creditScene = new Scene(credits);
-
-        EDUS2IconStage creditStage = new EDUS2IconStage();
-        creditStage.setScene(creditScene);
-        creditStage.setTitle("EDUS2J Credits");
-        creditStage.show();
     }
 
     private void processScanRequest() {

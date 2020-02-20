@@ -16,7 +16,7 @@ package edus2.adapter.ui;/*
  */
 
 import edus2.adapter.repository.file.FileScanImportExportRepository;
-import edus2.adapter.ui.handler.*;
+import edus2.adapter.ui.handler.settings.*;
 import edus2.application.AuthenticationFacade;
 import edus2.application.ScanFacade;
 import edus2.domain.EDUS2Configuration;
@@ -103,7 +103,7 @@ public class ScanSettingsWindow extends VBox {
         return scanSettingButtonsBox;
     }
 
-    private void registerHandler(Button button, BaseHandler handler) {
+    private void registerHandler(Button button, SettingsHandler handler) {
         button.setOnAction(event -> {
             handler.handle(scanList.getSelectedItems(), stage);
             scanList.refreshTableItems();
