@@ -19,32 +19,24 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import edus2.adapter.guice.EDUS2JModule;
 import edus2.adapter.ui.ListenableMediaPlayer;
-import edus2.adapter.ui.ListenableMediaPlayer.ListenableMediaPlayerEventEnum;
 import edus2.adapter.ui.MainControlsPane;
+import edus2.adapter.ui.handler.frontpage.ScanPlaybackHandler;
 import edus2.adapter.ui.usagereporting.ReportStartupTask;
 import edus2.application.usagereporting.UsageReportingService;
 import edus2.domain.EDUS2Configuration;
-import edus2.domain.ManikinScanEnum;
-import edus2.domain.Scan;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
 import javafx.stage.Stage;
 
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static javafx.scene.media.MediaPlayer.Status.PLAYING;
 
 /**
  * Purpose: The main class used to run the EDUS2J program.
@@ -53,19 +45,10 @@ import static javafx.scene.media.MediaPlayer.Status.PLAYING;
  * @version 1.0
  */
 public class EDUS2View extends Application {
-    private static final int DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS = 1280;
-    private static final int DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS = 720;
-    private static final double MAX_VIDEO_TO_SCREEN_SIZE_RATIO = 0.8;
     private static final String DEFAULT_BACKGROUND_COLOR_HEX = "#575957";
     private static final String BACKGROUND_COLOR_CSS_STYLE = String.format("-fx-background-color: %s", DEFAULT_BACKGROUND_COLOR_HEX);
-    private String currentScanLocation = "";
-    private ManikinScanEnum currentLocationPlaying = null;
     private ListenableMediaPlayer listenablePlayer = new ListenableMediaPlayer();
-    private BorderPane main;
-    private edus2.application.ScanFacade scanFacade;
-    private static Injector injector;
     private EDUS2Configuration configuration;
-    private ManikinFacade manikinFacade;
     private UsageReportingService usageReportingService;
 
     public static void main(String[] args) {
@@ -80,15 +63,14 @@ public class EDUS2View extends Application {
      * Purpose: The default start method to start the JavaFX GUI.
      */
     public void start(Stage stage) {
-        main = new BorderPane();
-        injector = Guice.createInjector(new EDUS2JModule(stage, main, listenablePlayer));
-        scanFacade = EDUS2View.injector.getInstance(ScanFacade.class);
-        configuration = EDUS2View.injector.getInstance(EDUS2Configuration.class);
-        manikinFacade = EDUS2View.injector.getInstance(ManikinFacade.class);
-        usageReportingService = EDUS2View.injector.getInstance(UsageReportingService.class);
+        BorderPane main = new BorderPane();
+        Injector injector = Guice.createInjector(new EDUS2JModule(stage, main, listenablePlayer));
+        configuration = injector.getInstance(EDUS2Configuration.class);
+        usageReportingService = injector.getInstance(UsageReportingService.class);
+        ScanPlaybackHandler scanPlaybackHandler = injector.getInstance(ScanPlaybackHandler.class);
 
         main.setStyle(BACKGROUND_COLOR_CSS_STYLE);
-        BorderPane bottomControlsPane = EDUS2View.injector.getInstance(MainControlsPane.class);
+        BorderPane bottomControlsPane = injector.getInstance(MainControlsPane.class);
         StackPane controlOverlayPane = new StackPane();
         controlOverlayPane.getChildren().addAll(main, bottomControlsPane);
 
@@ -100,37 +82,13 @@ public class EDUS2View extends Application {
         stage.setTitle("EDUS2J");
         stage.show();
         stage.setFullScreen(true);
+
         // Ensure control buttons aren't highlighted
         main.requestFocus();
 
-        scene.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                processScanRequest();
-            } else if (event.getCode() == KeyCode.SPACE) {
-                toggleVideoPlayStatus();
-            } else {
-                currentScanLocation += event.getText();
-            }
-        });
-
+        scene.setOnKeyPressed(scanPlaybackHandler::handle);
         ensurePhoneHomeWarningAccepted(stage);
         reportStartupToServer();
-        registerPlaybackListeners();
-
-    }
-
-    private void toggleVideoPlayStatus() {
-        if (listenablePlayer.getMediaPlayer().isPresent()) {
-            MediaPlayer mediaPlayer = listenablePlayer.getMediaPlayer().get();
-            switch (mediaPlayer.getStatus()) {
-                case PLAYING:
-                    mediaPlayer.pause();
-                    break;
-                case PAUSED:
-                    mediaPlayer.play();
-                    break;
-            }
-        }
     }
 
     private void reportStartupToServer() {
@@ -165,66 +123,6 @@ public class EDUS2View extends Application {
             } else {
                 stage.close();
             }
-        }
-    }
-
-    private void processScanRequest() {
-        Optional<ManikinScanEnum> scanTagLocationOptional = manikinFacade.getScanTagLocation(currentScanLocation);
-        if (!scanTagLocationOptional.isPresent()) {
-            currentScanLocation = "";
-            return;
-        }
-
-        Optional<Scan> scanOptional = scanFacade.getScan(scanTagLocationOptional.get());
-        if (scanOptional.isPresent() && !isScanPlaying(scanOptional.get())) {
-            playScan(scanOptional.get());
-        }
-        currentScanLocation = "";
-    }
-
-    private void stopPlayer() {
-        listenablePlayer.getMediaPlayer().ifPresent(MediaPlayer::stop);
-    }
-
-    private boolean isScanPlaying(Scan scan) {
-        return listenablePlayer.getMediaPlayer()
-                .map(mp -> mp.getStatus().equals(PLAYING))
-                .orElse(false)
-                && scan.getScanEnum().equals(currentLocationPlaying);
-    }
-
-    private void playScan(Scan scan) {
-        stopPlayer();
-        String scanPath = scan.getPath();
-        currentLocationPlaying = scan.getScanEnum();
-        Media video = new Media(scanPath);
-        MediaPlayer mediaPlayer = new MediaPlayer(video);
-        MediaView videoView = new MediaView(mediaPlayer);
-        listenablePlayer.setMedia(videoView);
-        main.setCenter(videoView);
-    }
-
-    private void registerPlaybackListeners() {
-        listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_READY, ((mediaView) -> {
-            Media video = mediaView.getMediaPlayer().getMedia();
-            mediaView.setPreserveRatio(false);
-            int minVideoWidth = configuration.getMinimumVideoWidth().orElse(DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS);
-            int minVideoHeight = configuration.getMinimumVideoHeight().orElse(DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS);
-            double windowWidth = main.getWidth();
-            double windowHeight = main.getHeight();
-            mediaView.setFitWidth(calculateVideoDimension(minVideoWidth, video.getWidth(), windowWidth));
-            mediaView.setFitHeight(calculateVideoDimension(minVideoHeight, video.getHeight(), windowHeight));
-            listenablePlayer.getMediaPlayer().ifPresent(MediaPlayer::play);
-        }));
-
-        listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, (mp) -> currentLocationPlaying = null);
-    }
-
-    private double calculateVideoDimension(int minimumSize, int videoSize, double screenSize) {
-        if (videoSize > MAX_VIDEO_TO_SCREEN_SIZE_RATIO * screenSize) {
-            return Math.max(minimumSize, MAX_VIDEO_TO_SCREEN_SIZE_RATIO * screenSize);
-        } else {
-            return Math.max(minimumSize, videoSize);
         }
     }
 }
