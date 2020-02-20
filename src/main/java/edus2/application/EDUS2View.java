@@ -54,6 +54,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static java.lang.String.format;
+import static javafx.scene.media.MediaPlayer.Status.PLAYING;
 
 /**
  * Purpose: The main class used to run the EDUS2J program.
@@ -139,6 +140,8 @@ public class EDUS2View extends Application {
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 processScanRequest();
+            } else if (event.getCode() == KeyCode.SPACE) {
+                toggleVideoPlayStatus();
             } else {
                 currentScanLocation += event.getText();
             }
@@ -146,6 +149,20 @@ public class EDUS2View extends Application {
 
         ensurePhoneHomeWarningAccepted(stage);
         reportStartupToServer();
+    }
+
+    private void toggleVideoPlayStatus() {
+        if (listenablePlayer.getMediaPlayer().isPresent()) {
+            MediaPlayer mediaPlayer = listenablePlayer.getMediaPlayer().get();
+            switch (mediaPlayer.getStatus()) {
+                case PLAYING:
+                    mediaPlayer.pause();
+                    break;
+                case PAUSED:
+                    mediaPlayer.play();
+                    break;
+            }
+        }
     }
 
     private void reportStartupToServer() {
@@ -282,8 +299,8 @@ public class EDUS2View extends Application {
             }
         });
 
-        listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, () -> playbackElements.getChildren().add(btnClearScreen));
-        listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_PLAYING, () -> playbackElements.getChildren().remove(btnClearScreen));
+        listenablePlayer.setListener(ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, (mp) -> playbackElements.getChildren().add(btnClearScreen));
+        listenablePlayer.setListener(ListenableMediaPlayerEventEnum.ON_PLAYING, (mp) -> playbackElements.getChildren().remove(btnClearScreen));
         playbackElements.setAlignment(Pos.BOTTOM_CENTER);
         return playbackElements;
     }
@@ -323,21 +340,19 @@ public class EDUS2View extends Application {
 
         Optional<Scan> scanOptional = scanFacade.getScan(scanTagLocationOptional.get());
         if (scanOptional.isPresent() && !isScanPlaying(scanOptional.get())) {
-            stopPlayer();
             playScan(scanOptional.get());
         }
         currentScanLocation = "";
     }
 
     private void stopPlayer() {
-        if (listenablePlayer.getMediaPlayer() != null) {
-            listenablePlayer.getMediaPlayer().stop();
-        }
+        listenablePlayer.getMediaPlayer().ifPresent(MediaPlayer::stop);
     }
 
     private boolean isScanPlaying(Scan scan) {
-        return listenablePlayer.getMediaPlayer() != null
-                && listenablePlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PLAYING)
+        return listenablePlayer.getMediaPlayer()
+                .map(mp -> mp.getStatus().equals(PLAYING))
+                .orElse(false)
                 && scan.getScanEnum().equals(currentLocationPlaying);
     }
 
@@ -346,11 +361,12 @@ public class EDUS2View extends Application {
         String scanPath = scan.getPath();
         currentLocationPlaying = scan.getScanEnum();
         Media video = new Media(scanPath);
-        listenablePlayer.setMediaPlayer(new MediaPlayer(video));
-        MediaView videoView = new MediaView(listenablePlayer.getMediaPlayer());
+        MediaPlayer mediaPlayer = new MediaPlayer(video);
+        listenablePlayer.setMediaPlayer(mediaPlayer);
+        MediaView videoView = new MediaView(mediaPlayer);
         main.setCenter(videoView);
 
-        listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_READY, (() -> {
+        listenablePlayer.setListener(ListenableMediaPlayerEventEnum.ON_READY, ((player) -> {
             videoView.setPreserveRatio(false);
             int minVideoWidth = configuration.getMinimumVideoWidth().orElse(DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS);
             int minVideoHeight = configuration.getMinimumVideoHeight().orElse(DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS);
@@ -358,14 +374,15 @@ public class EDUS2View extends Application {
             double windowHeight = main.getHeight();
             videoView.setFitWidth(calculateVideoDimension(minVideoWidth, video.getWidth(), windowWidth));
             videoView.setFitHeight(calculateVideoDimension(minVideoHeight, video.getHeight(), windowHeight));
-            ScanProgressUpdater scanProgressUpdater = new ScanProgressUpdater(listenablePlayer.getMediaPlayer(), playbackProgress);
-            listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, () -> currentLocationPlaying = null);
+            ScanProgressUpdater scanProgressUpdater = new ScanProgressUpdater(player, playbackProgress);
 
-            listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_STOPPED, scanProgressUpdater::finish);
-            listenablePlayer.getMediaPlayer().play();
+            listenablePlayer.setListener(ListenableMediaPlayerEventEnum.ON_STOPPED, mp -> scanProgressUpdater.finish());
+            listenablePlayer.getMediaPlayer().ifPresent(MediaPlayer::play);
 
             scanProgressUpdater.start();
         }));
+
+        listenablePlayer.setListener(ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, (mp) -> currentLocationPlaying = null);
     }
 
     private double calculateVideoDimension(int minimumSize, int videoSize, double screenSize) {

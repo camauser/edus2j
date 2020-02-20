@@ -3,13 +3,12 @@ package edus2.adapter.ui;
 import javafx.scene.media.MediaPlayer;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
 
 public class ListenableMediaPlayer {
     private MediaPlayer mediaPlayer;
-    private Map<ListenableMediaPlayerEventEnum, Set<MediaPlayerEventHandler>> watcherMap;
+    private Map<ListenableMediaPlayerEventEnum, MediaPlayerEventHandler> watcherMap;
 
     public ListenableMediaPlayer() {
         watcherMap = new HashMap<>();
@@ -20,8 +19,8 @@ public class ListenableMediaPlayer {
         registerInternalListeners();
     }
 
-    public MediaPlayer getMediaPlayer() {
-        return mediaPlayer;
+    public Optional<MediaPlayer> getMediaPlayer() {
+        return Optional.ofNullable(mediaPlayer);
     }
 
     private void registerInternalListeners() {
@@ -48,16 +47,13 @@ public class ListenableMediaPlayer {
     }
 
     private void callListeners(ListenableMediaPlayerEventEnum status) {
-        Set<MediaPlayerEventHandler> listeners = watcherMap.getOrDefault(status, new HashSet<>());
-        for (MediaPlayerEventHandler handler : listeners) {
-            handler.handleEvent();
+        if (watcherMap.containsKey(status)) {
+            watcherMap.get(status).handleEvent(mediaPlayer);
         }
     }
 
-    public void registerListener(ListenableMediaPlayerEventEnum eventType, MediaPlayerEventHandler handler) {
-        Set<MediaPlayerEventHandler> watchers = watcherMap.getOrDefault(eventType, new HashSet<>());
-        watchers.add(handler);
-        watcherMap.put(eventType, watchers);
+    public void setListener(ListenableMediaPlayerEventEnum eventType, MediaPlayerEventHandler handler) {
+        watcherMap.put(eventType, handler);
     }
 
     public enum ListenableMediaPlayerEventEnum {
