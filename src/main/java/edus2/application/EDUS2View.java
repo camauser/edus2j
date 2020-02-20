@@ -70,7 +70,6 @@ public class EDUS2View extends Application {
     private static final String BACKGROUND_COLOR_CSS_STYLE = String.format("-fx-background-color: %s", DEFAULT_BACKGROUND_COLOR_HEX);
     private String currentScanLocation = "";
     private ManikinScanEnum currentLocationPlaying = null;
-    private static ProgressBar playbackProgress;
     private ListenableMediaPlayer listenablePlayer = new ListenableMediaPlayer();
     private BorderPane main;
     private edus2.application.ScanFacade scanFacade;
@@ -149,6 +148,7 @@ public class EDUS2View extends Application {
 
         ensurePhoneHomeWarningAccepted(stage);
         reportStartupToServer();
+        registerPlaybackListeners();
     }
 
     private void toggleVideoPlayStatus() {
@@ -283,7 +283,7 @@ public class EDUS2View extends Application {
         VBox playbackElements = new VBox();
         Text txtPlaybackPosition = new Text("Playback Position");
         txtPlaybackPosition.setFont(Font.font("Calibri", FontWeight.BOLD, FontPosture.ITALIC, 20.0));
-        playbackProgress = new ProgressBar(0.0);
+        ProgressBar playbackProgress = new ProgressBar(0.0);
         playbackProgress.setMinHeight(18.0);
         playbackProgress.setMinWidth(150.0);
         playbackElements.getChildren().addAll(txtPlaybackPosition, playbackProgress);
@@ -299,8 +299,10 @@ public class EDUS2View extends Application {
             }
         });
 
-        listenablePlayer.setListener(ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, (mp) -> playbackElements.getChildren().add(btnClearScreen));
-        listenablePlayer.setListener(ListenableMediaPlayerEventEnum.ON_PLAYING, (mp) -> playbackElements.getChildren().remove(btnClearScreen));
+        listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, (mp) -> playbackElements.getChildren().add(btnClearScreen));
+        listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_PLAYING, (mp) -> playbackElements.getChildren().remove(btnClearScreen));
+        ScanProgressUpdater scanProgressUpdater = new ScanProgressUpdater(listenablePlayer, playbackProgress);
+        scanProgressUpdater.start();
         playbackElements.setAlignment(Pos.BOTTOM_CENTER);
         return playbackElements;
     }
@@ -362,27 +364,25 @@ public class EDUS2View extends Application {
         currentLocationPlaying = scan.getScanEnum();
         Media video = new Media(scanPath);
         MediaPlayer mediaPlayer = new MediaPlayer(video);
-        listenablePlayer.setMediaPlayer(mediaPlayer);
         MediaView videoView = new MediaView(mediaPlayer);
+        listenablePlayer.setMedia(videoView);
         main.setCenter(videoView);
+    }
 
-        listenablePlayer.setListener(ListenableMediaPlayerEventEnum.ON_READY, ((player) -> {
-            videoView.setPreserveRatio(false);
+    private void registerPlaybackListeners() {
+        listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_READY, ((mediaView) -> {
+            Media video = mediaView.getMediaPlayer().getMedia();
+            mediaView.setPreserveRatio(false);
             int minVideoWidth = configuration.getMinimumVideoWidth().orElse(DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS);
             int minVideoHeight = configuration.getMinimumVideoHeight().orElse(DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS);
             double windowWidth = main.getWidth();
             double windowHeight = main.getHeight();
-            videoView.setFitWidth(calculateVideoDimension(minVideoWidth, video.getWidth(), windowWidth));
-            videoView.setFitHeight(calculateVideoDimension(minVideoHeight, video.getHeight(), windowHeight));
-            ScanProgressUpdater scanProgressUpdater = new ScanProgressUpdater(player, playbackProgress);
-
-            listenablePlayer.setListener(ListenableMediaPlayerEventEnum.ON_STOPPED, mp -> scanProgressUpdater.finish());
+            mediaView.setFitWidth(calculateVideoDimension(minVideoWidth, video.getWidth(), windowWidth));
+            mediaView.setFitHeight(calculateVideoDimension(minVideoHeight, video.getHeight(), windowHeight));
             listenablePlayer.getMediaPlayer().ifPresent(MediaPlayer::play);
-
-            scanProgressUpdater.start();
         }));
 
-        listenablePlayer.setListener(ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, (mp) -> currentLocationPlaying = null);
+        listenablePlayer.registerListener(ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, (mp) -> currentLocationPlaying = null);
     }
 
     private double calculateVideoDimension(int minimumSize, int videoSize, double screenSize) {

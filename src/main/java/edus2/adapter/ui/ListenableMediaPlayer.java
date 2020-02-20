@@ -1,33 +1,41 @@
 package edus2.adapter.ui;
 
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class ListenableMediaPlayer {
-    private MediaPlayer mediaPlayer;
-    private Map<ListenableMediaPlayerEventEnum, MediaPlayerEventHandler> watcherMap;
+    private Map<ListenableMediaPlayerEventEnum, Set<MediaPlayerEventHandler>> watcherMap;
+    private MediaView mediaView;
 
     public ListenableMediaPlayer() {
         watcherMap = new HashMap<>();
     }
 
-    public void setMediaPlayer(MediaPlayer mediaPlayer) {
-        this.mediaPlayer = mediaPlayer;
+    public void setMedia(MediaView mediaView) {
+        this.mediaView = mediaView;
         registerInternalListeners();
     }
 
     public Optional<MediaPlayer> getMediaPlayer() {
-        return Optional.ofNullable(mediaPlayer);
+        if (mediaView == null) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(mediaView.getMediaPlayer());
     }
 
     private void registerInternalListeners() {
-        mediaPlayer.setOnPlaying(this::mediaPlaying);
-        mediaPlayer.setOnEndOfMedia(this::endOfMedia);
-        mediaPlayer.setOnReady(this::playerReady);
-        mediaPlayer.setOnStopped(this::playerStopped);
+        mediaView.getMediaPlayer().setOnPlaying(this::mediaPlaying);
+        mediaView.getMediaPlayer().setOnEndOfMedia(this::endOfMedia);
+        mediaView.getMediaPlayer().setOnReady(this::playerReady);
+        mediaView.getMediaPlayer().setOnStopped(this::playerStopped);
+        mediaView.getMediaPlayer().setOnPaused(this::playerPaused);
+    }
+
+    private void playerPaused() {
+        callListeners(ListenableMediaPlayerEventEnum.ON_PAUSED);
     }
 
     private void mediaPlaying() {
@@ -47,19 +55,23 @@ public class ListenableMediaPlayer {
     }
 
     private void callListeners(ListenableMediaPlayerEventEnum status) {
-        if (watcherMap.containsKey(status)) {
-            watcherMap.get(status).handleEvent(mediaPlayer);
+        Set<MediaPlayerEventHandler> listeners = watcherMap.getOrDefault(status, new HashSet<>());
+        for (MediaPlayerEventHandler handler : listeners) {
+            handler.handleEvent(mediaView);
         }
     }
 
-    public void setListener(ListenableMediaPlayerEventEnum eventType, MediaPlayerEventHandler handler) {
-        watcherMap.put(eventType, handler);
+    public void registerListener(ListenableMediaPlayerEventEnum eventType, MediaPlayerEventHandler handler) {
+        Set<MediaPlayerEventHandler> watchers = watcherMap.getOrDefault(eventType, new HashSet<>());
+        watchers.add(handler);
+        watcherMap.put(eventType, watchers);
     }
 
     public enum ListenableMediaPlayerEventEnum {
         ON_PLAYING,
         ON_END_OF_MEDIA,
         ON_READY,
-        ON_STOPPED
+        ON_STOPPED,
+        ON_PAUSED
     }
 }
