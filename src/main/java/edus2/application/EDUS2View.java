@@ -392,8 +392,4 @@ public class EDUS2View extends Application {
             return Math.max(minimumSize, videoSize);
         }
     }
-
-    public static String convertFilePath(String originalPath) {
-        return "file:///" + originalPath.replaceAll("\\\\", "/").replaceAll(" ", "%20");
-    }
 }

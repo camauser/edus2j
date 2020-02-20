@@ -1,6 +1,5 @@
 package edus2.adapter.ui.handler;
 
-import edus2.application.EDUS2View;
 import edus2.application.ScanFacade;
 import edus2.domain.Scan;
 import javafx.stage.FileChooser;
@@ -33,7 +32,7 @@ public class EditScanFileHandler extends ScanHandler {
         FileChooser browser = new FileChooser();
         File selected = browser.showOpenDialog(stage);
         if (selected != null) {
-            String convertedFilePath = EDUS2View.convertFilePath(selected.getPath());
+            String convertedFilePath = convertFilePath(selected.getPath());
             scanFacade.removeScan(selectedScan);
             addScan(selectedScan.getScanEnum(), convertedFilePath);
         }
