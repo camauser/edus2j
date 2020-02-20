@@ -1,4 +1,4 @@
-package edus2.adapter.ui.handler;
+package edus2.adapter.ui.handler.settings;
 
 import edus2.domain.Scan;
 import javafx.scene.control.Alert;
@@ -6,7 +6,7 @@ import javafx.stage.Stage;
 
 import java.util.List;
 
-public abstract class BaseHandler {
+public abstract class SettingsHandler {
     protected abstract void validateInputs(List<Scan> selectedScans);
 
     protected abstract void process(List<Scan> selectedScans, Stage stage);
