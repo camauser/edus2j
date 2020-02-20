@@ -1,6 +1,5 @@
 package edus2.adapter.ui.handler;
 
-import edus2.application.EDUS2View;
 import edus2.application.ScanFacade;
 import edus2.domain.ManikinScanEnum;
 import edus2.domain.Scan;
@@ -37,7 +36,7 @@ public class AddScanHandler extends ScanHandler {
     protected void promptForScanIdAndSaveScan(File file) {
         boolean added = false;
         while (!added) {
-            String convertedFilePath = EDUS2View.convertFilePath(file.getPath());
+            String convertedFilePath = convertFilePath(file.getPath());
             Optional<ManikinScanEnum> scanLocationOptional = promptForScanLocation("Filename: " + file.getName() + "\nWhat location would you like to link the video to?");
             if (!scanLocationOptional.isPresent()) {
                 break;

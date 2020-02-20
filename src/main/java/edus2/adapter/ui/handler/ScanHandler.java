@@ -39,4 +39,8 @@ public abstract class ScanHandler extends BaseHandler {
         scanLocationDialog.setContentText(prompt);
         return scanLocationDialog.showAndWait().map(ManikinScanEnum::findByName);
     }
+
+    protected static String convertFilePath(String originalPath) {
+        return "file:///" + originalPath.replaceAll("\\\\", "/").replaceAll(" ", "%20");
+    }
 }
