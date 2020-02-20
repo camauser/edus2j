@@ -88,47 +88,26 @@ public class ScanSettingsWindow extends VBox {
         LoadScenarioHandler loadScenarioHandler = new LoadScenarioHandler(scanFacade, configuration, importExportRepository);
         SaveScenarioHandler saveScenarioHandler = new SaveScenarioHandler(scanFacade, configuration, importExportRepository);
 
-        btnAdd.setOnAction(event -> {
-            addScanHandler.handle(scanList.getSelectedItems(), stage);
-            scanList.refreshTableItems();
-        });
-
-        btnBulkAdd.setOnAction(event -> {
-            bulkAddScanHandler.handle(scanList.getSelectedItems(), stage);
-            scanList.refreshTableItems();
-        });
-
-        btnEditManikinLocation.setOnAction(event -> {
-            editManikinLocationHandler.handle(scanList.getSelectedItems(), stage);
-            scanList.refreshTableItems();
-        });
-
-        btnEditFile.setOnAction(event -> {
-            editScanFileHandler.handle(scanList.getSelectedItems(), stage);
-            scanList.refreshTableItems();
-        });
-
-        btnDelete.setOnAction(event -> {
-            deleteScanHandler.handle(scanList.getSelectedItems(), stage);
-            scanList.refreshTableItems();
-        });
-
-        btnDeleteAll.setOnAction(event -> {
-            deleteAllScanHandler.handle(scanList.getSelectedItems(), stage);
-            scanList.refreshTableItems();
-        });
-
-        btnLoadScenario.setOnAction(event -> {
-            loadScenarioHandler.handle(scanList.getSelectedItems(), stage);
-            scanList.refreshTableItems();
-        });
-
-        btnSaveScenario.setOnAction(event -> saveScenarioHandler.handle(scanList.getSelectedItems(), stage));
+        registerHandler(btnAdd, addScanHandler);
+        registerHandler(btnBulkAdd, bulkAddScanHandler);
+        registerHandler(btnEditManikinLocation, editManikinLocationHandler);
+        registerHandler(btnEditFile, editScanFileHandler);
+        registerHandler(btnDelete, deleteScanHandler);
+        registerHandler(btnDeleteAll, deleteAllScanHandler);
+        registerHandler(btnLoadScenario, loadScenarioHandler);
+        registerHandler(btnSaveScenario, saveScenarioHandler);
 
         scanSettingButtonsBox.setAlignment(Pos.CENTER);
         scanSettingButtonsBox.getChildren().addAll(btnAdd, btnBulkAdd, btnEditManikinLocation, btnEditFile, btnDelete, btnDeleteAll, btnLoadScenario, btnSaveScenario);
 
         return scanSettingButtonsBox;
+    }
+
+    private void registerHandler(Button button, BaseHandler handler) {
+        button.setOnAction(event -> {
+            handler.handle(scanList.getSelectedItems(), stage);
+            scanList.refreshTableItems();
+        });
     }
 
 }
