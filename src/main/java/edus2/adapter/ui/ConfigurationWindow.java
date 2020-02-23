@@ -50,15 +50,17 @@ public class ConfigurationWindow extends HBox {
         Button btnSaveFileLocation = new Button("Set Save File Location");
         Button btnSetDefaultScenarioDirectory = new Button("Set Default Scenario Directory");
         Button btnSetDefaultVideoDirectory = new Button("Set Default Video Directory");
-        Button btnSaveChanges = new Button("Save Changes");
         btnSetPassword.setOnAction(a -> setPassword());
         btnClearPassword.setOnAction(a -> clearPassword());
         btnSaveFileLocation.setOnAction(a -> setSaveFileLocation());
         btnSetDefaultScenarioDirectory.setOnAction(a -> setDefaultScenarioDirectory());
         btnSetDefaultVideoDirectory.setOnAction(a -> setDefaultVideoDirectory());
-        btnSaveChanges.setOnAction(a -> saveChanges());
+
+        minVideoWidth.setOnKeyReleased(e -> saveMinimumVideoDimensions());
+        minVideoHeight.setOnKeyReleased(e -> saveMinimumVideoDimensions());
 
         GridPane formControls = new FormBuilder()
+                .addLabel("edus2j Configuration Settings")
                 .addControl("Minimum Video Width", minVideoWidth)
                 .addControl("Minimum Video Height", minVideoHeight)
                 .addControl("Set Password", btnSetPassword)
@@ -66,7 +68,6 @@ public class ConfigurationWindow extends HBox {
                 .addControl("Default Scenario Directory", btnSetDefaultScenarioDirectory)
                 .addControl("Default Video Directory", btnSetDefaultVideoDirectory)
                 .addControl("Save File Location", btnSaveFileLocation)
-                .addUnlabeledControl(btnSaveChanges)
                 .build();
 
         this.getChildren().add(formControls);
@@ -130,7 +131,7 @@ public class ConfigurationWindow extends HBox {
         alert.showAndWait();
     }
 
-    private void saveChanges() {
+    private void saveMinimumVideoDimensions() {
         if (!validateMinVideoWidth()) {
             return;
         }
@@ -139,8 +140,8 @@ public class ConfigurationWindow extends HBox {
             return;
         }
 
-        processMinVideoWidth();
-        processMinVideoHeight();
+        saveMinVideoWidth();
+        saveMinVideoHeight();
     }
 
     private boolean validateMinVideoWidth() {
@@ -166,18 +167,20 @@ public class ConfigurationWindow extends HBox {
         }
     }
 
-    private void processMinVideoWidth() {
+    private void saveMinVideoWidth() {
         String rawText = minVideoWidth.getText();
         if (StringUtils.isEmpty(rawText)) {
+            configuration.setMinimumVideoWidth(0);
             return;
         }
 
         configuration.setMinimumVideoWidth(Integer.parseInt(rawText));
     }
 
-    private void processMinVideoHeight() {
+    private void saveMinVideoHeight() {
         String rawText = minVideoHeight.getText();
         if (StringUtils.isEmpty(rawText)) {
+            configuration.setMinimumVideoHeight(0);
             return;
         }
 

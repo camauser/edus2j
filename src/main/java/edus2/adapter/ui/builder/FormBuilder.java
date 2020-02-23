@@ -5,6 +5,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 public class FormBuilder {
@@ -13,11 +16,18 @@ public class FormBuilder {
     private static final int LABEL_COLUMN_INDEX = 0;
     private static final int CONTROL_COLUMN_INDEX = 1;
     private static final int UNLABELED_CONTROL_COLUMN_INDEX = 0;
+    private static final Font LABEL_FONT = Font.font("Calibri", FontWeight.BOLD, FontPosture.ITALIC, 20);
 
     public FormBuilder() {
         form = new GridPane();
         form.setVgap(8.0);
         form.setHgap(20.0);
+    }
+
+    public FormBuilder addLabel(String labelText) {
+        Text label = new Text(labelText);
+        label.setFont(LABEL_FONT);
+        return addUnlabeledControl(label);
     }
 
     public FormBuilder addControl(String labelText, Node control) {
