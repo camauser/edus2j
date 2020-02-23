@@ -142,6 +142,42 @@ public abstract class EDUS2ConfigurationTest {
     }
 
     @Test
+    public void getDefaultVideoDirectory_shouldReturnEmpty_whenLocationNotSet() {
+        // Act
+        Optional<File> actual = configuration.getDefaultVideoDirectory();
+
+        // Assert
+        assertFalse(actual.isPresent());
+    }
+
+    @Test
+    public void getDefaultVideoDirectory_shouldReturnVideoDirectory_whenDirectorySet() {
+        // Arrange
+        File expected = new File("C:\\video\\directory");
+        configuration.setDefaultVideoDirectory(expected);
+
+        // Act
+        Optional<File> actual = configuration.getDefaultVideoDirectory();
+
+        // Assert
+        assertEquals(Optional.of(expected), actual);
+    }
+
+    @Test
+    public void setDefaultVideoDirectory_shouldOverwriteDirectory_whenDirectoryAlreadySet() {
+        // Arrange
+        File expected = new File("C:\\expected\\directory");
+        configuration.setDefaultScenarioDirectory(new File("C:\\first\\directory"));
+
+        // Act
+        configuration.setDefaultVideoDirectory(expected);
+
+        // Assert
+        Optional<File> actual = configuration.getDefaultVideoDirectory();
+        assertEquals(Optional.of(expected), actual);
+    }
+
+    @Test
     public void acceptedPhoneHomeWarning_shouldInitiallyReturnFalse() {
         // Act
         boolean actual = configuration.acceptedPhoneHomeWarning();

@@ -68,6 +68,11 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
     }
 
     @Override
+    public Optional<File> getDefaultVideoDirectory() {
+        return Optional.ofNullable(getDto().defaultVideoDirectory).map(File::new);
+    }
+
+    @Override
     public SystemIdentifier getSystemIdentifier() {
         return SystemIdentifier.of(getDto().systemIdentifier);
     }
@@ -113,6 +118,13 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
     }
 
     @Override
+    public void setDefaultVideoDirectory(File defaultVideoDirectory) {
+        EDUS2ConfigurationDto dto = getDto();
+        dto.defaultVideoDirectory = defaultVideoDirectory.getAbsolutePath();
+        saveToFile(gson.toJson(dto), filePath);
+    }
+
+    @Override
     public void acceptPhoneHomeWarning() {
         EDUS2ConfigurationDto dto = getDto();
         dto.acceptedPhoneHomeWarning = true;
@@ -132,6 +144,7 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         String hashedPassword;
         String saveFileLocation;
         String defaultScenarioDirectory;
+        String defaultVideoDirectory;
         String systemIdentifier;
         boolean acceptedPhoneHomeWarning;
     }
