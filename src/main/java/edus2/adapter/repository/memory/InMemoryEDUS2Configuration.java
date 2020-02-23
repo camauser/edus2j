@@ -12,6 +12,7 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     private String hashedPassword;
     private String saveFileLocation;
     private String defaultScenarioDirectory;
+    private String defaultVideoDirectory;
     private SystemIdentifier systemIdentifier;
     private boolean acceptedPhoneHomeWarning;
 
@@ -49,6 +50,14 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     }
 
     @Override
+    public Optional<File> getDefaultVideoDirectory() {
+        if (defaultVideoDirectory == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new File(defaultVideoDirectory));
+    }
+
+    @Override
     public SystemIdentifier getSystemIdentifier() {
         return systemIdentifier;
     }
@@ -81,6 +90,11 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     @Override
     public void setDefaultScenarioDirectory(File defaultScenarioDirectory) {
         this.defaultScenarioDirectory = defaultScenarioDirectory.getAbsolutePath();
+    }
+
+    @Override
+    public void setDefaultVideoDirectory(File defaultVideoDirectory) {
+        this.defaultVideoDirectory = defaultVideoDirectory.getAbsolutePath();
     }
 
     @Override

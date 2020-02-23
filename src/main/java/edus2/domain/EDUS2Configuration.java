@@ -14,6 +14,8 @@ public interface EDUS2Configuration {
 
      Optional<File> getDefaultScenarioDirectory();
 
+     Optional<File> getDefaultVideoDirectory();
+
      SystemIdentifier getSystemIdentifier();
 
      boolean acceptedPhoneHomeWarning();
@@ -27,6 +29,8 @@ public interface EDUS2Configuration {
      void setSaveFileLocation(String saveFileLocation);
 
      void setDefaultScenarioDirectory(File defaultScenarioDirectory);
+
+     void setDefaultVideoDirectory(File defaultVideoDirectory);
 
      void acceptPhoneHomeWarning();
 }
