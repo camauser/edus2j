@@ -1,15 +1,14 @@
 package edus2.adapter.ui;
 
+import edus2.adapter.ui.builder.FormBuilder;
 import edus2.application.AuthenticationFacade;
 import edus2.domain.EDUS2Configuration;
-import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +17,7 @@ import java.io.File;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 
-public class ConfigurationWindow extends VBox {
+public class ConfigurationWindow extends HBox {
     private final TextField minVideoWidth;
     private final TextField minVideoHeight;
     private EDUS2IconStage stage;
@@ -46,23 +45,42 @@ public class ConfigurationWindow extends VBox {
         minVideoWidth.setText(configuration.getMinimumVideoWidth().map(Object::toString).orElse(""));
         minVideoHeight.setText(configuration.getMinimumVideoHeight().map(Object::toString).orElse(""));
 
-        this.getChildren().addAll(new HBox(new Text("Minimum Video Width"), minVideoWidth));
-        this.getChildren().addAll(new HBox(new Text("Minimum Video Height"), minVideoHeight));
-        Button btnSaveChanges = new Button("Save Changes");
         Button btnSetPassword = new Button("Set Password");
         Button btnClearPassword = new Button("Clear Password");
         Button btnSaveFileLocation = new Button("Set Save File Location");
         Button btnSetDefaultScenarioDirectory = new Button("Set Default Scenario Directory");
+        Button btnSetDefaultVideoDirectory = new Button("Set Default Video Directory");
+        Button btnSaveChanges = new Button("Save Changes");
         btnSetPassword.setOnAction(a -> setPassword());
         btnClearPassword.setOnAction(a -> clearPassword());
         btnSaveFileLocation.setOnAction(a -> setSaveFileLocation());
         btnSetDefaultScenarioDirectory.setOnAction(a -> setDefaultScenarioDirectory());
+        btnSetDefaultVideoDirectory.setOnAction(a -> setDefaultVideoDirectory());
         btnSaveChanges.setOnAction(a -> saveChanges());
-        HBox saveBox = new HBox(btnSaveChanges);
-        saveBox.setAlignment(Pos.CENTER);
-        HBox auxiliaryControls = new HBox(10, btnSetPassword, btnClearPassword, btnSaveFileLocation, btnSetDefaultScenarioDirectory);
-        auxiliaryControls.setAlignment(Pos.CENTER);
-        this.getChildren().addAll(saveBox, auxiliaryControls);
+
+        GridPane formControls = new FormBuilder()
+                .addControl("Minimum Video Width", minVideoWidth)
+                .addControl("Minimum Video Height", minVideoHeight)
+                .addControl("Set Password", btnSetPassword)
+                .addControl("Clear Password", btnClearPassword)
+                .addControl("Default Scenario Directory", btnSetDefaultScenarioDirectory)
+                .addControl("Default Video Directory", btnSetDefaultVideoDirectory)
+                .addControl("Save File Location", btnSaveFileLocation)
+                .addUnlabeledControl(btnSaveChanges)
+                .build();
+
+        this.getChildren().add(formControls);
+    }
+
+    private void setDefaultVideoDirectory() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File defaultVideoDirectory = directoryChooser.showDialog(this.stage);
+        if (defaultVideoDirectory != null) {
+            configuration.setDefaultVideoDirectory(defaultVideoDirectory);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Default video directory updated.");
+            alert.setHeaderText("Default Video Directory Successfully Updated");
+            alert.showAndWait();
+        }
     }
 
     private void setDefaultScenarioDirectory() {
