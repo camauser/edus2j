@@ -1,6 +1,7 @@
 package edus2.adapter.ui.handler.settings;
 
 import edus2.application.ScanFacade;
+import edus2.domain.EDUS2Configuration;
 import edus2.domain.ManikinScanEnum;
 import edus2.domain.Scan;
 import javafx.stage.FileChooser;
@@ -8,13 +9,14 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class BulkAddScanHandler extends AddScanHandler {
 
-    public BulkAddScanHandler(ScanFacade scanFacade) {
-        super(scanFacade);
+    public BulkAddScanHandler(ScanFacade scanFacade, EDUS2Configuration configuration) {
+        super(scanFacade, configuration);
     }
 
 
@@ -28,6 +30,8 @@ public class BulkAddScanHandler extends AddScanHandler {
     @Override
     public void process(List<Scan> selectedScans, Stage stage) {
         FileChooser browser = new FileChooser();
+        Optional<File> defaultVideoDirectory = configuration.getDefaultVideoDirectory();
+        defaultVideoDirectory.filter(File::exists).ifPresent(browser::setInitialDirectory);
         List<File> selected = browser.showOpenMultipleDialog(stage);
         if (selected == null) {
             return;

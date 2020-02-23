@@ -79,8 +79,8 @@ public class ScanSettingsWindow extends VBox {
         Button btnLoadScenario = new Button("Load Scenario");
         Button btnSaveScenario = new Button("Save Scenario");
 
-        AddScanHandler addScanHandler = new AddScanHandler(scanFacade);
-        BulkAddScanHandler bulkAddScanHandler = new BulkAddScanHandler(scanFacade);
+        AddScanHandler addScanHandler = new AddScanHandler(scanFacade, configuration);
+        BulkAddScanHandler bulkAddScanHandler = new BulkAddScanHandler(scanFacade, configuration);
         EditManikinLocationHandler editManikinLocationHandler = new EditManikinLocationHandler(scanFacade);
         EditScanFileHandler editScanFileHandler = new EditScanFileHandler(scanFacade);
         DeleteScanHandler deleteScanHandler = new DeleteScanHandler(scanFacade);
