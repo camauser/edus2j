@@ -37,4 +37,10 @@ public interface EDUS2Configuration {
      void acceptPhoneHomeWarning();
 
      void setDarkModeEnabled(boolean enabled);
+
+     void registerDarkModeListener(ConfigurationValueListener<Boolean> listener);
+
+     public interface ConfigurationValueListener<T> {
+          void onValueChanged(T newValue);
+     }
 }
