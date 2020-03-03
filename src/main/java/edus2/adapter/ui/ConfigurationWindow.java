@@ -3,10 +3,7 @@ package edus2.adapter.ui;
 import edus2.adapter.ui.builder.FormBuilder;
 import edus2.application.AuthenticationFacade;
 import edus2.domain.EDUS2Configuration;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
@@ -50,11 +47,16 @@ public class ConfigurationWindow extends HBox {
         Button btnSaveFileLocation = new Button("Set Save File Location");
         Button btnSetDefaultScenarioDirectory = new Button("Set Default Scenario Directory");
         Button btnSetDefaultVideoDirectory = new Button("Set Default Video Directory");
+        CheckBox chkEnableDarkMode = new CheckBox("Enable");
         btnSetPassword.setOnAction(a -> setPassword());
         btnClearPassword.setOnAction(a -> clearPassword());
+
         btnSaveFileLocation.setOnAction(a -> setSaveFileLocation());
         btnSetDefaultScenarioDirectory.setOnAction(a -> setDefaultScenarioDirectory());
         btnSetDefaultVideoDirectory.setOnAction(a -> setDefaultVideoDirectory());
+
+        chkEnableDarkMode.setOnAction(a -> setDarkMode(chkEnableDarkMode));
+        chkEnableDarkMode.setSelected(configuration.darkModeEnabled());
 
         minVideoWidth.setOnKeyReleased(e -> saveMinimumVideoDimensions());
         minVideoHeight.setOnKeyReleased(e -> saveMinimumVideoDimensions());
@@ -65,12 +67,17 @@ public class ConfigurationWindow extends HBox {
                 .addControl("Minimum Video Height", minVideoHeight)
                 .addControl("Set Password", btnSetPassword)
                 .addControl("Clear Password", btnClearPassword)
+                .addControl("Dark Mode", chkEnableDarkMode)
                 .addControl("Default Scenario Directory", btnSetDefaultScenarioDirectory)
                 .addControl("Default Video Directory", btnSetDefaultVideoDirectory)
                 .addControl("Save File Location", btnSaveFileLocation)
                 .build();
 
         this.getChildren().add(formControls);
+    }
+
+    private void setDarkMode(CheckBox darkModeCheckbox) {
+        configuration.setDarkModeEnabled(darkModeCheckbox.isSelected());
     }
 
     private void setDefaultVideoDirectory() {
