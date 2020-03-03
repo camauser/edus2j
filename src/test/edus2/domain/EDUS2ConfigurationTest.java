@@ -208,4 +208,23 @@ public abstract class EDUS2ConfigurationTest {
         boolean actual = configuration.acceptedPhoneHomeWarning();
         assertTrue(actual);
     }
+
+    @Test
+    public void darkModeEnabled_shouldInitiallyReturnTrue() {
+        // Act
+        boolean actual = configuration.darkModeEnabled();
+
+        // Assert
+        assertTrue(actual);
+    }
+
+    @Test
+    public void setDarkModeEnabled_shouldSetDarkModeEnabledSwitch() {
+        // Act
+        configuration.setDarkModeEnabled(false);
+
+        // Assert
+        boolean actual = configuration.darkModeEnabled();
+        assertFalse(actual);
+    }
 }
