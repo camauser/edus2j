@@ -20,6 +20,7 @@ import com.google.inject.Injector;
 import edus2.adapter.guice.EDUS2JModule;
 import edus2.adapter.ui.ListenableMediaPlayer;
 import edus2.adapter.ui.MainControlsPane;
+import edus2.adapter.ui.builder.SceneBuilder;
 import edus2.adapter.ui.handler.frontpage.ScanPlaybackHandler;
 import edus2.adapter.ui.usagereporting.ReportStartupTask;
 import edus2.application.usagereporting.UsageReportingService;
@@ -45,8 +46,6 @@ import java.util.concurrent.Executors;
  * @version 1.0
  */
 public class EDUS2View extends Application {
-    private static final String DEFAULT_BACKGROUND_COLOR_HEX = "#575957";
-    private static final String BACKGROUND_COLOR_CSS_STYLE = String.format("-fx-background-color: %s", DEFAULT_BACKGROUND_COLOR_HEX);
     private ListenableMediaPlayer listenablePlayer = new ListenableMediaPlayer();
     private EDUS2Configuration configuration;
     private UsageReportingService usageReportingService;
@@ -68,13 +67,13 @@ public class EDUS2View extends Application {
         configuration = injector.getInstance(EDUS2Configuration.class);
         usageReportingService = injector.getInstance(UsageReportingService.class);
         ScanPlaybackHandler scanPlaybackHandler = injector.getInstance(ScanPlaybackHandler.class);
+        SceneBuilder sceneBuilder = injector.getInstance(SceneBuilder.class);
 
-        main.setStyle(BACKGROUND_COLOR_CSS_STYLE);
         BorderPane bottomControlsPane = injector.getInstance(MainControlsPane.class);
         StackPane controlOverlayPane = new StackPane();
         controlOverlayPane.getChildren().addAll(main, bottomControlsPane);
 
-        Scene scene = new Scene(controlOverlayPane);
+        Scene scene = sceneBuilder.build(controlOverlayPane);
         stage.setHeight(720);
         stage.setWidth(1280);
         stage.setScene(scene);

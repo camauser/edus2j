@@ -3,6 +3,7 @@ package edus2.adapter.ui.handler.frontpage;
 import edus2.adapter.ui.EDUS2IconStage;
 import edus2.adapter.ui.PasswordInputDialog;
 import edus2.adapter.ui.ScanSettingsWindow;
+import edus2.adapter.ui.builder.SceneBuilder;
 import edus2.application.AuthenticationFacade;
 import edus2.application.ScanFacade;
 import edus2.domain.EDUS2Configuration;
@@ -15,12 +16,15 @@ import java.util.Optional;
 public class ScanSettingsWindowHandler extends FrontpageHandler {
     private final AuthenticationFacade authenticationFacade;
     private final ScanFacade scanFacade;
+    private final SceneBuilder sceneBuilder;
     private final EDUS2Configuration configuration;
 
-    public ScanSettingsWindowHandler(BorderPane mainDisplayPane, AuthenticationFacade authenticationFacade, ScanFacade scanFacade, EDUS2Configuration configuration) {
+    public ScanSettingsWindowHandler(BorderPane mainDisplayPane, AuthenticationFacade authenticationFacade,
+                                     ScanFacade scanFacade, SceneBuilder sceneBuilder, EDUS2Configuration configuration) {
         super(mainDisplayPane);
         this.authenticationFacade = authenticationFacade;
         this.scanFacade = scanFacade;
+        this.sceneBuilder = sceneBuilder;
         this.configuration = configuration;
     }
 
@@ -29,8 +33,8 @@ public class ScanSettingsWindowHandler extends FrontpageHandler {
         try {
             if (isAuthenticated()) {
                 EDUS2IconStage scanWindowStage = new EDUS2IconStage();
-                ScanSettingsWindow scanSettingsWindow = new ScanSettingsWindow(scanFacade, authenticationFacade, configuration, scanWindowStage);
-                Scene scanWindowScene = new Scene(scanSettingsWindow);
+                ScanSettingsWindow scanSettingsWindow = new ScanSettingsWindow(scanFacade, authenticationFacade, configuration, sceneBuilder, scanWindowStage);
+                Scene scanWindowScene = sceneBuilder.build(scanSettingsWindow);
                 scanWindowStage.setScene(scanWindowScene);
                 scanWindowStage.show();
             } else {
