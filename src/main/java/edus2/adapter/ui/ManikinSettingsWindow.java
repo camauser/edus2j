@@ -1,6 +1,7 @@
 package edus2.adapter.ui;
 
 import edus2.adapter.repository.file.FileManikinImportExportRepository;
+import edus2.adapter.ui.builder.SceneBuilder;
 import edus2.application.ManikinFacade;
 import edus2.domain.InvalidManikinNameException;
 import edus2.domain.Manikin;
@@ -22,7 +23,7 @@ public class ManikinSettingsWindow extends VBox {
     private FileManikinImportExportRepository importExportRepository;
     private EDUS2IconStage stage;
 
-    public ManikinSettingsWindow(ManikinFacade manikinFacade, EDUS2IconStage stage) {
+    public ManikinSettingsWindow(ManikinFacade manikinFacade, SceneBuilder sceneBuilder, EDUS2IconStage stage) {
         super(10);
         manikinDisplay = new ManikinsWindow(manikinFacade);
         importExportRepository = new FileManikinImportExportRepository(manikinFacade);
@@ -40,7 +41,7 @@ public class ManikinSettingsWindow extends VBox {
             ManikinCreateWindow manikinCreateWindow = new ManikinCreateWindow(manikinFacade);
             EDUS2IconStage addStage = new EDUS2IconStage();
             addStage.widthProperty().addListener((ob, oldVal, newVal) -> manikinCreateWindow.handleWindowResize(newVal.intValue()));
-            Scene scene = new Scene(manikinCreateWindow);
+            Scene scene = sceneBuilder.build(manikinCreateWindow);
             addStage.setScene(scene);
             addStage.showAndWait();
             manikinDisplay.refreshTableItems();
@@ -56,7 +57,7 @@ public class ManikinSettingsWindow extends VBox {
             ManikinUpdateWindow manikinUpdateWindow = new ManikinUpdateWindow(manikinFacade);
             manikinUpdateWindow.bindManikin(manikinFacade.getManikin(selected.getName()).orElseThrow(() -> new InvalidManikinNameException(String.format("Manikin %s does not exist!", selected.getName()))));
             updateStage.widthProperty().addListener((ob, oldVal, newVal) -> manikinUpdateWindow.handleWindowResize(newVal.intValue()));
-            Scene scene = new Scene(manikinUpdateWindow);
+            Scene scene = sceneBuilder.build(manikinUpdateWindow);
             updateStage.setScene(scene);
             updateStage.showAndWait();
             manikinDisplay.refreshTableItems();

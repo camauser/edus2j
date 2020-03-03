@@ -16,6 +16,7 @@ package edus2.adapter.ui;/*
  */
 
 import edus2.adapter.repository.file.FileScanImportExportRepository;
+import edus2.adapter.ui.builder.SceneBuilder;
 import edus2.adapter.ui.handler.settings.*;
 import edus2.application.AuthenticationFacade;
 import edus2.application.ScanFacade;
@@ -39,7 +40,7 @@ public class ScanSettingsWindow extends VBox {
     private FileScanImportExportRepository importExportRepository;
     private EDUS2Configuration configuration;
 
-    public ScanSettingsWindow(ScanFacade scanFacade, AuthenticationFacade authenticationFacade, EDUS2Configuration configuration, EDUS2IconStage stage) {
+    public ScanSettingsWindow(ScanFacade scanFacade, AuthenticationFacade authenticationFacade, EDUS2Configuration configuration, SceneBuilder sceneBuilder, EDUS2IconStage stage) {
         // Just set up a settings window, which is then shown on-screen
         super(10);
         this.scanFacade = scanFacade;
@@ -54,7 +55,7 @@ public class ScanSettingsWindow extends VBox {
         btnConfigSettings.setOnAction(e -> {
             EDUS2IconStage configurationStage = new EDUS2IconStage();
             ConfigurationWindow configurationWindow = new ConfigurationWindow(configuration, authenticationFacade, configurationStage);
-            Scene configurationScene = new Scene(configurationWindow);
+            Scene configurationScene = sceneBuilder.build(configurationWindow);
             configurationStage.setScene(configurationScene);
             configurationStage.showAndWait();
             // needed to keep scan list up-to-date if scan file is changed

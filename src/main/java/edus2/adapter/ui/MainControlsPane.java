@@ -1,6 +1,7 @@
 package edus2.adapter.ui;
 
 import com.google.inject.Inject;
+import edus2.adapter.ui.builder.SceneBuilder;
 import edus2.adapter.ui.handler.frontpage.FullscreenHandler;
 import edus2.adapter.ui.handler.frontpage.ManikinSettingsWindowHandler;
 import edus2.adapter.ui.handler.frontpage.ScanSettingsWindowHandler;
@@ -35,18 +36,20 @@ public class MainControlsPane extends BorderPane {
     private ManikinSettingsWindowHandler manikinSettingsWindowHandler;
     private final ShutdownHandler shutdownHandler;
     private final ScanProgressUpdater scanProgressUpdater;
+    private SceneBuilder sceneBuilder;
 
     @Inject
     public MainControlsPane(Stage stage, BorderPane mainDisplayPane, AuthenticationFacade authenticationFacade, ScanFacade scanFacade, EDUS2Configuration configuration,
-                            ManikinFacade manikinFacade, ListenableMediaPlayer listenablePlayer) {
+                            ManikinFacade manikinFacade, SceneBuilder sceneBuilder, ListenableMediaPlayer listenablePlayer) {
+        this.sceneBuilder = sceneBuilder;
         ProgressBar playbackProgress = new ProgressBar(0.0);
         playbackProgress.setMinHeight(18.0);
         playbackProgress.setMinWidth(150.0);
 
         this.mainDisplayPane = mainDisplayPane;
         fullscreenHandler = new FullscreenHandler(mainDisplayPane, stage);
-        scanSettingsWindowHandler = new ScanSettingsWindowHandler(mainDisplayPane, authenticationFacade, scanFacade, configuration);
-        manikinSettingsWindowHandler = new ManikinSettingsWindowHandler(mainDisplayPane, manikinFacade);
+        scanSettingsWindowHandler = new ScanSettingsWindowHandler(mainDisplayPane, authenticationFacade, scanFacade, sceneBuilder, configuration);
+        manikinSettingsWindowHandler = new ManikinSettingsWindowHandler(mainDisplayPane, sceneBuilder, manikinFacade);
         scanProgressUpdater = new ScanProgressUpdater(listenablePlayer, playbackProgress);
         shutdownHandler = new ShutdownHandler(mainDisplayPane, stage, scanProgressUpdater);
 
@@ -142,7 +145,7 @@ public class MainControlsPane extends BorderPane {
         credits.setCenter(details);
         BorderPane.setAlignment(credits, Pos.CENTER);
 
-        Scene creditScene = new Scene(credits);
+        Scene creditScene = sceneBuilder.build(credits);
 
         EDUS2IconStage creditStage = new EDUS2IconStage();
         creditStage.setScene(creditScene);
