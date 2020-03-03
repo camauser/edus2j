@@ -4,6 +4,8 @@ import edus2.domain.EDUS2Configuration;
 import edus2.domain.SystemIdentifier;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 public class InMemoryEDUS2Configuration implements EDUS2Configuration {
@@ -17,10 +19,13 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     private boolean acceptedPhoneHomeWarning;
     private boolean darkModeEnabled;
 
+    private List<ConfigurationValueListener<Boolean>> darkModeListeners;
+
     public InMemoryEDUS2Configuration() {
         this.systemIdentifier = SystemIdentifier.ofRandom();
         this.acceptedPhoneHomeWarning = false;
         this.darkModeEnabled = true;
+        darkModeListeners = new LinkedList<>();
     }
 
     @Override
@@ -112,5 +117,13 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     @Override
     public void setDarkModeEnabled(boolean enabled) {
         darkModeEnabled = enabled;
+        for (ConfigurationValueListener<Boolean> listener : darkModeListeners) {
+            listener.onValueChanged(enabled);
+        }
+    }
+
+    @Override
+    public void registerDarkModeListener(ConfigurationValueListener<Boolean> listener) {
+        darkModeListeners.add(listener);
     }
 }
