@@ -20,6 +20,8 @@ public interface EDUS2Configuration {
 
      boolean acceptedPhoneHomeWarning();
 
+     boolean darkModeEnabled();
+
      void setMinimumVideoHeight(int minimumVideoHeight);
 
      void setMinimumVideoWidth(int minimumVideoWidth);
@@ -33,4 +35,6 @@ public interface EDUS2Configuration {
      void setDefaultVideoDirectory(File defaultVideoDirectory);
 
      void acceptPhoneHomeWarning();
+
+     void setDarkModeEnabled(boolean enabled);
 }

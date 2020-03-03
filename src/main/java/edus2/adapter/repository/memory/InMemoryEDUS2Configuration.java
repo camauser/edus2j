@@ -15,10 +15,12 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     private String defaultVideoDirectory;
     private SystemIdentifier systemIdentifier;
     private boolean acceptedPhoneHomeWarning;
+    private boolean darkModeEnabled;
 
     public InMemoryEDUS2Configuration() {
         this.systemIdentifier = SystemIdentifier.ofRandom();
         this.acceptedPhoneHomeWarning = false;
+        this.darkModeEnabled = true;
     }
 
     @Override
@@ -68,6 +70,11 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     }
 
     @Override
+    public boolean darkModeEnabled() {
+        return darkModeEnabled;
+    }
+
+    @Override
     public void setMinimumVideoHeight(int minimumVideoHeight) {
         this.minimumVideoHeight = minimumVideoHeight;
     }
@@ -100,5 +107,10 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     @Override
     public void acceptPhoneHomeWarning() {
         this.acceptedPhoneHomeWarning = true;
+    }
+
+    @Override
+    public void setDarkModeEnabled(boolean enabled) {
+        darkModeEnabled = enabled;
     }
 }

@@ -83,6 +83,11 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
     }
 
     @Override
+    public boolean darkModeEnabled() {
+        return Optional.ofNullable(getDto().darkModeEnabled).orElse(true);
+    }
+
+    @Override
     public void setMinimumVideoHeight(int minimumVideoHeight) {
         EDUS2ConfigurationDto dto = getDto();
         dto.minimumVideoHeight = minimumVideoHeight;
@@ -131,6 +136,13 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         saveToFile(gson.toJson(dto), filePath);
     }
 
+    @Override
+    public void setDarkModeEnabled(boolean enabled) {
+        EDUS2ConfigurationDto dto = getDto();
+        dto.darkModeEnabled = enabled;
+        saveToFile(gson.toJson(dto), filePath);
+    }
+
     private EDUS2ConfigurationDto getDto() {
         Optional<String> fileContents = readFileContents(filePath);
         return fileContents
@@ -147,5 +159,6 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         String defaultVideoDirectory;
         String systemIdentifier;
         boolean acceptedPhoneHomeWarning;
+        Boolean darkModeEnabled;
     }
 }
