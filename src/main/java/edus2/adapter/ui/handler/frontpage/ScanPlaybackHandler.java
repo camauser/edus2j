@@ -2,17 +2,20 @@ package edus2.adapter.ui.handler.frontpage;
 
 import com.google.inject.Inject;
 import edus2.adapter.ui.ListenableMediaPlayer;
+import edus2.adapter.ui.Toast;
 import edus2.application.ManikinFacade;
 import edus2.application.ScanFacade;
 import edus2.domain.EDUS2Configuration;
 import edus2.domain.ManikinScanEnum;
 import edus2.domain.Scan;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.stage.Stage;
 
 import java.util.Optional;
 
@@ -23,24 +26,29 @@ public class ScanPlaybackHandler {
     private static final int DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS = 1280;
     private static final int DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS = 720;
     private static final double MAX_VIDEO_TO_SCREEN_SIZE_RATIO = 0.8;
+    private final Image PLAY_IMAGE = new Image(ScanPlaybackHandler.class.getResourceAsStream("/img/playback/play-icon.png"));
+    private final Image PAUSE_IMAGE = new Image(ScanPlaybackHandler.class.getResourceAsStream("/img/playback/pause-icon.png"));
 
     private final BorderPane mainDisplayPane;
     private final ListenableMediaPlayer listenableMediaPlayer;
     private ManikinFacade manikinFacade;
     private final ScanFacade scanFacade;
     private EDUS2Configuration configuration;
+    private Stage stage;
     private String currentScan;
     private ManikinScanEnum currentLocationPlaying = null;
 
     @Inject
     public ScanPlaybackHandler(BorderPane mainDisplayPane, ListenableMediaPlayer listenableMediaPlayer, ManikinFacade manikinFacade, ScanFacade scanFacade,
-                               EDUS2Configuration configuration) {
+                               EDUS2Configuration configuration, Stage stage) {
         this.mainDisplayPane = mainDisplayPane;
         this.listenableMediaPlayer = listenableMediaPlayer;
         this.manikinFacade = manikinFacade;
         this.scanFacade = scanFacade;
         this.configuration = configuration;
+        this.stage = stage;
         registerPlaybackListeners();
+        currentScan = "";
     }
 
     public void handle(KeyEvent event) {
@@ -59,9 +67,11 @@ public class ScanPlaybackHandler {
             switch (mediaPlayer.getStatus()) {
                 case PLAYING:
                     mediaPlayer.pause();
+                    Toast.display(stage, PAUSE_IMAGE, 250, 250);
                     break;
                 case PAUSED:
                     mediaPlayer.play();
+                    Toast.display(stage, PLAY_IMAGE, 250, 250);
                     break;
             }
         }
