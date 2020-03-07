@@ -37,11 +37,13 @@ public class MainControlsPane extends BorderPane {
     private final ShutdownHandler shutdownHandler;
     private final ScanProgressUpdater scanProgressUpdater;
     private SceneBuilder sceneBuilder;
+    private ListenableMediaPlayer listenablePlayer;
 
     @Inject
     public MainControlsPane(Stage stage, BorderPane mainDisplayPane, AuthenticationFacade authenticationFacade, ScanFacade scanFacade, EDUS2Configuration configuration,
                             ManikinFacade manikinFacade, SceneBuilder sceneBuilder, ListenableMediaPlayer listenablePlayer) {
         this.sceneBuilder = sceneBuilder;
+        this.listenablePlayer = listenablePlayer;
         ProgressBar playbackProgress = new ProgressBar(0.0);
         playbackProgress.setMinHeight(18.0);
         playbackProgress.setMinWidth(150.0);
@@ -83,7 +85,6 @@ public class MainControlsPane extends BorderPane {
         Text txtPlaybackPosition = new Text("Playback Position");
         txtPlaybackPosition.setFont(Font.font("Calibri", FontWeight.BOLD, FontPosture.ITALIC, 20.0));
         MainControlButton btnClearScreen = new MainControlButton("Clear Screen");
-        ListenableMediaPlayer listenablePlayer = new ListenableMediaPlayer();
         playbackElements.getChildren().addAll(txtPlaybackPosition, playbackProgress);
         VBox.setMargin(txtPlaybackPosition, new Insets(5.0));
         VBox.setMargin(playbackProgress, new Insets(5.0));
