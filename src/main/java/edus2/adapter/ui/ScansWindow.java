@@ -19,18 +19,19 @@ import edus2.application.ScanFacade;
 import edus2.domain.Scan;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.geometry.Pos;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class ScansWindow extends Pane {
+public class ScansWindow extends VBox {
     private TableView<Scan> records;
     private ScanFacade scanFacade;
 
@@ -42,7 +43,7 @@ public class ScansWindow extends Pane {
         scanEnum.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getScanEnum().getName()));
         scanEnum.setMinWidth(130);
 
-        TableColumn<Scan, String> path = new TableColumn<>("File Path");
+        TableColumn<Scan, String> path = new TableColumn<>("File Name");
         path.setCellValueFactory(new PropertyValueFactory<>("path"));
         path.setCellValueFactory(cell -> {
             try {
@@ -57,7 +58,8 @@ public class ScansWindow extends Pane {
         refreshTableItems();
         //noinspection unchecked
         records.getColumns().addAll(scanEnum, path);
-
+        records.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        this.setAlignment(Pos.CENTER);
         this.getChildren().add(records);
     }
 

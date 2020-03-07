@@ -63,8 +63,8 @@ public class ConfigurationWindow extends HBox {
 
         GridPane formControls = new FormBuilder()
                 .addLabel("edus2j Configuration Settings")
-                .addControl("Minimum Video Width", minVideoWidth)
-                .addControl("Minimum Video Height", minVideoHeight)
+                .addControl("Minimum Video Width (px)", minVideoWidth)
+                .addControl("Minimum Video Height (px)", minVideoHeight)
                 .addControl("Set Password", btnSetPassword)
                 .addControl("Clear Password", btnClearPassword)
                 .addControl("Dark Mode", chkEnableDarkMode)
