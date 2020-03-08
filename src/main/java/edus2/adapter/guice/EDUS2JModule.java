@@ -6,6 +6,7 @@ import edus2.adapter.guice.provider.FileEDUS2ConfigurationProvider;
 import edus2.adapter.repository.file.FileManikinRepository;
 import edus2.adapter.repository.file.FileScanRepository;
 import edus2.adapter.ui.ListenableMediaPlayer;
+import edus2.adapter.ui.Toast;
 import edus2.adapter.ui.builder.SceneBuilder;
 import edus2.application.ScanFacade;
 import edus2.domain.EDUS2Configuration;
@@ -46,5 +47,7 @@ public class EDUS2JModule extends AbstractModule {
         bind(ScanFacade.class).in(Singleton.class);
 
         bind(SceneBuilder.class).in(Singleton.class);
+
+        bind(Toast.class).in(Singleton.class);
     }
 }
