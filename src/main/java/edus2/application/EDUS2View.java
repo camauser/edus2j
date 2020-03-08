@@ -37,7 +37,7 @@ import javafx.stage.Stage;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Purpose: The main class used to run the EDUS2J program.
@@ -86,11 +86,11 @@ public class EDUS2View extends Application {
         main.requestFocus();
 
         scene.setOnKeyPressed(scanPlaybackHandler::handle);
-        ensurePhoneHomeWarningAccepted(stage);
-        reportStartupToServer();
+        ensurePhoneHomeWarningAccepted(stage, injector.getInstance(ScheduledExecutorService.class));
+        reportStartupToServer(injector.getInstance(ScheduledExecutorService.class));
     }
 
-    private void reportStartupToServer() {
+    private void reportStartupToServer(ExecutorService threadPool) {
         ReportStartupTask task = new ReportStartupTask(usageReportingService);
         task.setOnSucceeded(wse -> {
             Optional<String> serverResponseMessage = task.getValue();
@@ -102,12 +102,12 @@ public class EDUS2View extends Application {
             }
         });
 
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(task);
-        executorService.shutdown();
+        if (!threadPool.isShutdown()) {
+            threadPool.execute(task);
+        }
     }
 
-    private void ensurePhoneHomeWarningAccepted(Stage stage) {
+    private void ensurePhoneHomeWarningAccepted(Stage stage, ExecutorService threadPool) {
         if (!configuration.acceptedPhoneHomeWarning()) {
             Alert phoneHomeAlert = new Alert(Alert.AlertType.INFORMATION, "Please note, as a means of tracking" +
                     " uptake/dissemination/impact, we are collecting metrics on downloads and usage of the software." +
@@ -120,6 +120,7 @@ public class EDUS2View extends Application {
             if (warningAccepted) {
                 configuration.acceptPhoneHomeWarning();
             } else {
+                threadPool.shutdown();
                 stage.close();
             }
         }
