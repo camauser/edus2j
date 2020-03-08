@@ -210,9 +210,9 @@ public abstract class EDUS2ConfigurationTest {
     }
 
     @Test
-    public void darkModeEnabled_shouldInitiallyReturnTrue() {
+    public void darkModeEnabledProperty_shouldInitiallyReturnTrue() {
         // Act
-        boolean actual = configuration.darkModeEnabled();
+        boolean actual = configuration.darkModeEnabledProperty().get();
 
         // Assert
         assertTrue(actual);
@@ -224,7 +224,7 @@ public abstract class EDUS2ConfigurationTest {
         configuration.setDarkModeEnabled(false);
 
         // Assert
-        boolean actual = configuration.darkModeEnabled();
+        boolean actual = configuration.darkModeEnabledProperty().get();
         assertFalse(actual);
     }
 }

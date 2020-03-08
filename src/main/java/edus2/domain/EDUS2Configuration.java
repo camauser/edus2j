@@ -1,46 +1,42 @@
 package edus2.domain;
 
+import edus2.domain.property.ReadableObserableProperty;
+
 import java.io.File;
 import java.util.Optional;
 
 public interface EDUS2Configuration {
-     Optional<Integer> getMinimumVideoHeight();
+    Optional<Integer> getMinimumVideoHeight();
 
-     Optional<Integer> getMinimumVideoWidth();
+    Optional<Integer> getMinimumVideoWidth();
 
-     Optional<String> getHashedPassword();
+    Optional<String> getHashedPassword();
 
-     Optional<String> getSaveFileLocation();
+    Optional<String> getSaveFileLocation();
 
-     Optional<File> getDefaultScenarioDirectory();
+    Optional<File> getDefaultScenarioDirectory();
 
-     Optional<File> getDefaultVideoDirectory();
+    Optional<File> getDefaultVideoDirectory();
 
-     SystemIdentifier getSystemIdentifier();
+    SystemIdentifier getSystemIdentifier();
 
-     boolean acceptedPhoneHomeWarning();
+    boolean acceptedPhoneHomeWarning();
 
-     boolean darkModeEnabled();
+    ReadableObserableProperty<Boolean> darkModeEnabledProperty();
 
-     void setMinimumVideoHeight(int minimumVideoHeight);
+    void setMinimumVideoHeight(int minimumVideoHeight);
 
-     void setMinimumVideoWidth(int minimumVideoWidth);
+    void setMinimumVideoWidth(int minimumVideoWidth);
 
-     void setHashedPassword(String hashedPassword);
+    void setHashedPassword(String hashedPassword);
 
-     void setSaveFileLocation(String saveFileLocation);
+    void setSaveFileLocation(String saveFileLocation);
 
-     void setDefaultScenarioDirectory(File defaultScenarioDirectory);
+    void setDefaultScenarioDirectory(File defaultScenarioDirectory);
 
-     void setDefaultVideoDirectory(File defaultVideoDirectory);
+    void setDefaultVideoDirectory(File defaultVideoDirectory);
 
-     void acceptPhoneHomeWarning();
+    void acceptPhoneHomeWarning();
 
-     void setDarkModeEnabled(boolean enabled);
-
-     void registerDarkModeListener(ConfigurationValueListener<Boolean> listener);
-
-     public interface ConfigurationValueListener<T> {
-          void onValueChanged(T newValue);
-     }
+    void setDarkModeEnabled(boolean enabled);
 }

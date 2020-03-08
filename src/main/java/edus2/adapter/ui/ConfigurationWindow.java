@@ -56,7 +56,7 @@ public class ConfigurationWindow extends HBox {
         btnSetDefaultVideoDirectory.setOnAction(a -> setDefaultVideoDirectory());
 
         chkEnableDarkMode.setOnAction(a -> setDarkMode(chkEnableDarkMode));
-        chkEnableDarkMode.setSelected(configuration.darkModeEnabled());
+        chkEnableDarkMode.setSelected(configuration.darkModeEnabledProperty().get());
 
         minVideoWidth.setOnKeyReleased(e -> saveMinimumVideoDimensions());
         minVideoHeight.setOnKeyReleased(e -> saveMinimumVideoDimensions());

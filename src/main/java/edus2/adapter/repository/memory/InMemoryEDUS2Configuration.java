@@ -2,10 +2,10 @@ package edus2.adapter.repository.memory;
 
 import edus2.domain.EDUS2Configuration;
 import edus2.domain.SystemIdentifier;
+import edus2.domain.property.ObservableProperty;
+import edus2.domain.property.ReadableObserableProperty;
 
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 
 public class InMemoryEDUS2Configuration implements EDUS2Configuration {
@@ -17,15 +17,12 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     private String defaultVideoDirectory;
     private SystemIdentifier systemIdentifier;
     private boolean acceptedPhoneHomeWarning;
-    private boolean darkModeEnabled;
-
-    private List<ConfigurationValueListener<Boolean>> darkModeListeners;
+    private ObservableProperty<Boolean> darkModeEnabledProperty;
 
     public InMemoryEDUS2Configuration() {
         this.systemIdentifier = SystemIdentifier.ofRandom();
         this.acceptedPhoneHomeWarning = false;
-        this.darkModeEnabled = true;
-        darkModeListeners = new LinkedList<>();
+        darkModeEnabledProperty = new ObservableProperty<>(true);
     }
 
     @Override
@@ -75,8 +72,8 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     }
 
     @Override
-    public boolean darkModeEnabled() {
-        return darkModeEnabled;
+    public ReadableObserableProperty<Boolean> darkModeEnabledProperty() {
+        return darkModeEnabledProperty;
     }
 
     @Override
@@ -116,14 +113,6 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
 
     @Override
     public void setDarkModeEnabled(boolean enabled) {
-        darkModeEnabled = enabled;
-        for (ConfigurationValueListener<Boolean> listener : darkModeListeners) {
-            listener.onValueChanged(enabled);
-        }
-    }
-
-    @Override
-    public void registerDarkModeListener(ConfigurationValueListener<Boolean> listener) {
-        darkModeListeners.add(listener);
+        darkModeEnabledProperty.set(enabled);
     }
 }

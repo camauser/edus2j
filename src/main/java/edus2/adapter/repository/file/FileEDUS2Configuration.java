@@ -4,11 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import edus2.domain.EDUS2Configuration;
 import edus2.domain.SystemIdentifier;
+import edus2.domain.property.ObservableProperty;
+import edus2.domain.property.ReadableObserableProperty;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -17,19 +17,20 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
 
     private Gson gson;
     private String filePath;
-    private List<ConfigurationValueListener<Boolean>> darkModeListeners;
+    private ObservableProperty<Boolean> darkModeProperty;
 
     public FileEDUS2Configuration(String saveFilePath) {
         this.filePath = Paths.get(saveFilePath).toString();
         this.gson = new GsonBuilder().create();
-        darkModeListeners = new LinkedList<>();
         ensureConfigurationFileExists();
+        darkModeProperty = new ObservableProperty<>(getDto().darkModeEnabled);
     }
 
     FileEDUS2Configuration(String fileDirectory, String fileName) {
         this.filePath = fileDirectory + "\\" + fileName;
         this.gson = new GsonBuilder().create();
         ensureConfigurationFileExists();
+        darkModeProperty = new ObservableProperty<>(getDto().darkModeEnabled);
     }
 
     private void ensureConfigurationFileExists() {
@@ -87,8 +88,8 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
     }
 
     @Override
-    public boolean darkModeEnabled() {
-        return Optional.ofNullable(getDto().darkModeEnabled).orElse(true);
+    public ReadableObserableProperty<Boolean> darkModeEnabledProperty() {
+        return darkModeProperty;
     }
 
     @Override
@@ -145,14 +146,7 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         EDUS2ConfigurationDto dto = getDto();
         dto.darkModeEnabled = enabled;
         saveToFile(gson.toJson(dto), filePath);
-        for (ConfigurationValueListener<Boolean> listener : darkModeListeners) {
-            listener.onValueChanged(enabled);
-        }
-    }
-
-    @Override
-    public void registerDarkModeListener(ConfigurationValueListener<Boolean> listener) {
-        darkModeListeners.add(listener);
+        darkModeProperty.set(enabled);
     }
 
     private EDUS2ConfigurationDto getDto() {
@@ -171,6 +165,6 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         String defaultVideoDirectory;
         String systemIdentifier;
         boolean acceptedPhoneHomeWarning;
-        Boolean darkModeEnabled;
+        boolean darkModeEnabled = true;
     }
 }
