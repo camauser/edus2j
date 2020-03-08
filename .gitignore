@@ -13,7 +13,6 @@ hs_err_pid*
 .idea
 EDUS2Data.json
 edus2j.log
-/target/classes/META-INF/edus2j.kotlin_module
-/target/test-classes/META-INF/edus2j.kotlin_module
 /src/target/
 edus2j.iml
+/target/*
