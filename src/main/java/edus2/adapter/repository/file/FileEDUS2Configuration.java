@@ -11,8 +11,6 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import static java.lang.String.format;
-
 public class FileEDUS2Configuration extends FileRepository implements EDUS2Configuration {
 
     private Gson gson;
@@ -22,29 +20,15 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
     public FileEDUS2Configuration(String saveFilePath) {
         this.filePath = Paths.get(saveFilePath).toString();
         this.gson = new GsonBuilder().create();
-        ensureConfigurationFileExists();
+        saveToFile(gson.toJson(getDto()), filePath);
         darkModeProperty = new ObservableProperty<>(getDto().darkModeEnabled);
     }
 
     FileEDUS2Configuration(String fileDirectory, String fileName) {
         this.filePath = fileDirectory + "\\" + fileName;
         this.gson = new GsonBuilder().create();
-        ensureConfigurationFileExists();
+        saveToFile(gson.toJson(getDto()), filePath);
         darkModeProperty = new ObservableProperty<>(getDto().darkModeEnabled);
-    }
-
-    private void ensureConfigurationFileExists() {
-        try {
-            EDUS2ConfigurationDto dto = getDto();
-            if (dto.systemIdentifier == null) {
-                dto.systemIdentifier = SystemIdentifier.ofRandom().getSystemIdentifier();
-                saveToFile(gson.toJson(dto), filePath);
-            }
-        } catch (MissingConfigurationFileException e) {
-            EDUS2ConfigurationDto dto = new EDUS2ConfigurationDto();
-            dto.systemIdentifier = SystemIdentifier.ofRandom().getSystemIdentifier();
-            saveToFile(gson.toJson(dto), filePath);
-        }
     }
 
     @Override
@@ -153,7 +137,7 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         Optional<String> fileContents = readFileContents(filePath);
         return fileContents
                 .map(s -> gson.fromJson(s, EDUS2ConfigurationDto.class))
-                .orElseThrow(() -> new MissingConfigurationFileException(format("Could not read configuration file from %s", filePath)));
+                .orElse(new EDUS2ConfigurationDto());
     }
 
     private static class EDUS2ConfigurationDto {
@@ -163,7 +147,7 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         String saveFileLocation;
         String defaultScenarioDirectory;
         String defaultVideoDirectory;
-        String systemIdentifier;
+        String systemIdentifier = SystemIdentifier.ofRandom().getSystemIdentifier();
         boolean acceptedPhoneHomeWarning;
         boolean darkModeEnabled = true;
     }
