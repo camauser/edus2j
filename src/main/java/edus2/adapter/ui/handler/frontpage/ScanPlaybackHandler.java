@@ -15,7 +15,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
-import javafx.stage.Stage;
 
 import java.util.Optional;
 
@@ -34,19 +33,19 @@ public class ScanPlaybackHandler {
     private ManikinFacade manikinFacade;
     private final ScanFacade scanFacade;
     private EDUS2Configuration configuration;
-    private Stage stage;
+    private Toast toast;
     private String currentScan;
     private ManikinScanEnum currentLocationPlaying = null;
 
     @Inject
     public ScanPlaybackHandler(BorderPane mainDisplayPane, ListenableMediaPlayer listenableMediaPlayer, ManikinFacade manikinFacade, ScanFacade scanFacade,
-                               EDUS2Configuration configuration, Stage stage) {
+                               EDUS2Configuration configuration, Toast toast) {
         this.mainDisplayPane = mainDisplayPane;
         this.listenableMediaPlayer = listenableMediaPlayer;
         this.manikinFacade = manikinFacade;
         this.scanFacade = scanFacade;
         this.configuration = configuration;
-        this.stage = stage;
+        this.toast = toast;
         registerPlaybackListeners();
         currentScan = "";
     }
@@ -67,11 +66,11 @@ public class ScanPlaybackHandler {
             switch (mediaPlayer.getStatus()) {
                 case PLAYING:
                     mediaPlayer.pause();
-                    Toast.display(stage, PAUSE_IMAGE, 250, 250);
+                    toast.display(PAUSE_IMAGE);
                     break;
                 case PAUSED:
                     mediaPlayer.play();
-                    Toast.display(stage, PLAY_IMAGE, 250, 250);
+                    toast.display(PLAY_IMAGE);
                     break;
             }
         }

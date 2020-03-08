@@ -1,5 +1,6 @@
 package edus2.adapter.ui;
 
+import com.google.inject.Inject;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -13,9 +14,19 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 public final class Toast {
-    public static void display(Stage ownerStage, Image image, int fadeInDelayMillis, int fadeOutDelayMillis) {
+
+    private Stage parentStage;
+    private static final int FADE_IN_DELAY_MILLIS = 250;
+    private static final int FADE_OUT_DELAY_MILLIS = 250;
+
+    @Inject
+    public Toast(Stage parentStage) {
+        this.parentStage = parentStage;
+    }
+
+    public void display(Image image) {
         Stage toastStage = new Stage();
-        toastStage.initOwner(ownerStage);
+        toastStage.initOwner(parentStage);
         toastStage.setResizable(false);
         toastStage.initStyle(StageStyle.TRANSPARENT);
 
@@ -32,18 +43,16 @@ public final class Toast {
         toastStage.show();
 
         Timeline fadeInTimeline = new Timeline();
-        KeyFrame fadeInKey1 = new KeyFrame(Duration.millis(fadeInDelayMillis), new KeyValue(toastStage.getScene().getRoot().opacityProperty(), 1));
+        KeyFrame fadeInKey1 = new KeyFrame(Duration.millis(FADE_IN_DELAY_MILLIS), new KeyValue(toastStage.getScene().getRoot().opacityProperty(), 1));
         fadeInTimeline.getKeyFrames().add(fadeInKey1);
         fadeInTimeline.setOnFinished((ae) ->
-        {
-            new Thread(() -> {
-                Timeline fadeOutTimeline = new Timeline();
-                KeyFrame fadeOutKey1 = new KeyFrame(Duration.millis(fadeOutDelayMillis), new KeyValue(toastStage.getScene().getRoot().opacityProperty(), 0));
-                fadeOutTimeline.getKeyFrames().add(fadeOutKey1);
-                fadeOutTimeline.setOnFinished((aeb) -> toastStage.close());
-                fadeOutTimeline.play();
-            }).start();
-        });
+                new Thread(() -> {
+                    Timeline fadeOutTimeline = new Timeline();
+                    KeyFrame fadeOutKey1 = new KeyFrame(Duration.millis(FADE_OUT_DELAY_MILLIS), new KeyValue(toastStage.getScene().getRoot().opacityProperty(), 0));
+                    fadeOutTimeline.getKeyFrames().add(fadeOutKey1);
+                    fadeOutTimeline.setOnFinished((aeb) -> toastStage.close());
+                    fadeOutTimeline.play();
+                }).start());
         fadeInTimeline.play();
     }
 }
