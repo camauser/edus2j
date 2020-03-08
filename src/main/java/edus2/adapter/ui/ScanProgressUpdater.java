@@ -27,10 +27,7 @@ public class ScanProgressUpdater extends Thread {
     private ListenableMediaPlayer listenableMediaPlayer;
     private ProgressBar progressBar;
     private AtomicBoolean videoPlaying = new AtomicBoolean(false);
-    private AtomicBoolean shutdownRequested = new AtomicBoolean(false);
-    private static final int FRAMES_PER_SECOND = 60;
-    private static final int MILLIS_PER_SECOND = 1000;
-    private static final int MILLIS_BETWEEN_FRAMES = MILLIS_PER_SECOND / FRAMES_PER_SECOND;
+
 
     public ScanProgressUpdater(ListenableMediaPlayer listenableMediaPlayer, ProgressBar progressBar) {
         this.listenableMediaPlayer = listenableMediaPlayer;
@@ -42,23 +39,11 @@ public class ScanProgressUpdater extends Thread {
     }
 
     public void run() {
-        while (!shutdownRequested.get()) {
-            while (videoPlaying.get() && !shutdownRequested.get()) {
-                try {
-                    if (listenableMediaPlayer.getMediaPlayer().isPresent()) {
-                        MediaPlayer mediaPlayer = listenableMediaPlayer.getMediaPlayer().get();
-                        double currentProgress = mediaPlayer.getCurrentTime().toSeconds() / mediaPlayer.getTotalDuration().toSeconds();
-                        Platform.runLater(() -> progressBar.setProgress(currentProgress));
-                    }
-                    Thread.sleep(MILLIS_BETWEEN_FRAMES);
-                } catch (Exception e) {
-                    shutdown();
-                }
-            }
+        if (listenableMediaPlayer.getMediaPlayer().isPresent()) {
+            MediaPlayer mediaPlayer = listenableMediaPlayer.getMediaPlayer().get();
+            double currentProgress = mediaPlayer.getCurrentTime().toSeconds() / mediaPlayer.getTotalDuration().toSeconds();
+            Platform.runLater(() -> progressBar.setProgress(currentProgress));
         }
     }
 
-    public void shutdown() {
-        shutdownRequested.set(true);
-    }
 }

@@ -25,6 +25,9 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import static java.lang.String.format;
 
 public class MainControlsPane extends BorderPane {
@@ -38,12 +41,17 @@ public class MainControlsPane extends BorderPane {
     private final ScanProgressUpdater scanProgressUpdater;
     private SceneBuilder sceneBuilder;
     private ListenableMediaPlayer listenablePlayer;
+    private ScheduledExecutorService threadPool;
+    private static final int FRAMES_PER_SECOND = 60;
+    private static final int MILLIS_PER_SECOND = 1000;
+    private static final int MILLIS_BETWEEN_FRAMES = MILLIS_PER_SECOND / FRAMES_PER_SECOND;
 
     @Inject
     public MainControlsPane(Stage stage, BorderPane mainDisplayPane, AuthenticationFacade authenticationFacade, ScanFacade scanFacade, EDUS2Configuration configuration,
-                            ManikinFacade manikinFacade, SceneBuilder sceneBuilder, ListenableMediaPlayer listenablePlayer) {
+                            ManikinFacade manikinFacade, SceneBuilder sceneBuilder, ListenableMediaPlayer listenablePlayer, ScheduledExecutorService threadPool) {
         this.sceneBuilder = sceneBuilder;
         this.listenablePlayer = listenablePlayer;
+        this.threadPool = threadPool;
         ProgressBar playbackProgress = new ProgressBar(0.0);
         playbackProgress.setMinHeight(18.0);
         playbackProgress.setMinWidth(150.0);
@@ -53,7 +61,7 @@ public class MainControlsPane extends BorderPane {
         scanSettingsWindowHandler = new ScanSettingsWindowHandler(mainDisplayPane, authenticationFacade, scanFacade, sceneBuilder, configuration);
         manikinSettingsWindowHandler = new ManikinSettingsWindowHandler(mainDisplayPane, sceneBuilder, manikinFacade);
         scanProgressUpdater = new ScanProgressUpdater(listenablePlayer, playbackProgress);
-        shutdownHandler = new ShutdownHandler(mainDisplayPane, stage, scanProgressUpdater);
+        shutdownHandler = new ShutdownHandler(mainDisplayPane, stage, threadPool);
 
         titleBox = generateTitleBox();
         VBox playbackPositionBox = generatePlaybackPositionControl(playbackProgress);
@@ -100,7 +108,7 @@ public class MainControlsPane extends BorderPane {
 
         listenablePlayer.registerListener(ListenableMediaPlayer.ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, (mp) -> playbackElements.getChildren().add(btnClearScreen));
         listenablePlayer.registerListener(ListenableMediaPlayer.ListenableMediaPlayerEventEnum.ON_PLAYING, (mp) -> playbackElements.getChildren().remove(btnClearScreen));
-        scanProgressUpdater.start();
+        threadPool.scheduleAtFixedRate(scanProgressUpdater, 0, MILLIS_BETWEEN_FRAMES, TimeUnit.MILLISECONDS);
         playbackElements.setAlignment(Pos.BOTTOM_CENTER);
         return playbackElements;
     }

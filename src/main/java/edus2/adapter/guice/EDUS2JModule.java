@@ -15,6 +15,9 @@ import edus2.domain.ScanRepository;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
 public class EDUS2JModule extends AbstractModule {
 
     private final Stage stage;
@@ -35,6 +38,8 @@ public class EDUS2JModule extends AbstractModule {
         bind(BorderPane.class).toInstance(mainDisplayPane);
 
         bind(ListenableMediaPlayer.class).toInstance(listenableMediaPlayer);
+
+        bind(ScheduledExecutorService.class).toInstance(Executors.newScheduledThreadPool(5));
 
         bind(ScanRepository.class).to(FileScanRepository.class).in(Singleton.class);
 
