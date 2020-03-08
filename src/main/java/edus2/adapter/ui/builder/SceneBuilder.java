@@ -18,7 +18,7 @@ public class SceneBuilder {
     public SceneBuilder(EDUS2Configuration configuration) {
         this.configuration = configuration;
         createdScenes = new LinkedList<>();
-        configuration.registerDarkModeListener(this::onDarkModeConfigToggled);
+        configuration.darkModeEnabledProperty().registerListener(this::onDarkModeConfigToggled);
     }
 
     private void onDarkModeConfigToggled(boolean darkModeEnabled) {
@@ -43,7 +43,7 @@ public class SceneBuilder {
 
     public Scene build(Parent root) {
         Scene scene = new Scene(root);
-        if (configuration.darkModeEnabled()) {
+        if (configuration.darkModeEnabledProperty().get()) {
             scene.getStylesheets().add(SceneBuilder.class.getClassLoader().getResource(DARK_STYLE_FILE).toExternalForm());
         }
 
