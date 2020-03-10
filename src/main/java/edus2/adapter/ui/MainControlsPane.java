@@ -1,7 +1,7 @@
 package edus2.adapter.ui;
 
 import com.google.inject.Inject;
-import edus2.adapter.Credits;
+import edus2.adapter.scenecontents.Credits;
 import edus2.adapter.ui.builder.SceneBuilder;
 import edus2.adapter.ui.handler.frontpage.FullscreenHandler;
 import edus2.adapter.ui.handler.frontpage.ManikinSettingsWindowHandler;
