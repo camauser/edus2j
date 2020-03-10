@@ -1,6 +1,7 @@
 package edus2.adapter.ui;
 
 import com.google.inject.Inject;
+import edus2.adapter.Credits;
 import edus2.adapter.ui.builder.SceneBuilder;
 import edus2.adapter.ui.handler.frontpage.FullscreenHandler;
 import edus2.adapter.ui.handler.frontpage.ManikinSettingsWindowHandler;
@@ -9,11 +10,9 @@ import edus2.adapter.ui.handler.frontpage.ShutdownHandler;
 import edus2.application.AuthenticationFacade;
 import edus2.application.ManikinFacade;
 import edus2.application.ScanFacade;
-import edus2.application.version.ApplicationInfo;
 import edus2.domain.EDUS2Configuration;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -28,8 +27,6 @@ import javafx.stage.Stage;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.String.format;
-
 public class MainControlsPane extends BorderPane {
     private final BorderPane mainDisplayPane;
     private final HBox titleBox;
@@ -39,19 +36,20 @@ public class MainControlsPane extends BorderPane {
     private ManikinSettingsWindowHandler manikinSettingsWindowHandler;
     private final ShutdownHandler shutdownHandler;
     private final ScanProgressUpdater scanProgressUpdater;
-    private SceneBuilder sceneBuilder;
     private ListenableMediaPlayer listenablePlayer;
     private ScheduledExecutorService threadPool;
+    private Credits credits;
     private static final int FRAMES_PER_SECOND = 60;
     private static final int MILLIS_PER_SECOND = 1000;
     private static final int MILLIS_BETWEEN_FRAMES = MILLIS_PER_SECOND / FRAMES_PER_SECOND;
 
     @Inject
     public MainControlsPane(Stage stage, BorderPane mainDisplayPane, AuthenticationFacade authenticationFacade, ScanFacade scanFacade, EDUS2Configuration configuration,
-                            ManikinFacade manikinFacade, SceneBuilder sceneBuilder, ListenableMediaPlayer listenablePlayer, ScheduledExecutorService threadPool) {
-        this.sceneBuilder = sceneBuilder;
+                            ManikinFacade manikinFacade, SceneBuilder sceneBuilder, ListenableMediaPlayer listenablePlayer, ScheduledExecutorService threadPool,
+                            Credits credits) {
         this.listenablePlayer = listenablePlayer;
         this.threadPool = threadPool;
+        this.credits = credits;
         ProgressBar playbackProgress = new ProgressBar(0.0);
         playbackProgress.setMinHeight(18.0);
         playbackProgress.setMinWidth(150.0);
@@ -137,27 +135,8 @@ public class MainControlsPane extends BorderPane {
     }
 
     private void showCredits() {
-        BorderPane credits = new BorderPane();
-        Text header = new Text("EDUS2J Credits");
-        header.setFont(new Font(32.0));
-        credits.setTop(header);
-        header.setFont(Font.font("Calibri", FontWeight.BOLD,
-                FontPosture.ITALIC, 36.0));
-        BorderPane.setAlignment(header, Pos.TOP_CENTER);
-        Text details = new Text(format(
-                "Credits for this project go to: \n"
-                        + "Java Porting: Cameron Auser\n"
-                        + "Original Design: Paul Kulyk, Paul Olsynski\n"
-                        + "EDUS2 is an emergency department ultrasound simulator, "
-                        + "and EDUS2J is a port of this original software to Java.\nEDUS2J version: %s", ApplicationInfo.getVersion()));
-        details.setFont(new Font("Calibri", 18.0));
-        credits.setCenter(details);
-        BorderPane.setAlignment(credits, Pos.CENTER);
-
-        Scene creditScene = sceneBuilder.build(credits);
-
         EDUS2IconStage creditStage = new EDUS2IconStage();
-        creditStage.setScene(creditScene);
+        creditStage.setScene(credits.getScene());
         creditStage.setTitle("EDUS2J Credits");
         creditStage.show();
     }

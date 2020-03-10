@@ -51,6 +51,12 @@
             <artifactId>httpclient</artifactId>
             <version>4.5.10</version>
         </dependency>
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-junit</artifactId>
+            <version>4.0.15-alpha</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
