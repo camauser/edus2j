@@ -1,31 +1,28 @@
 package edus2.adapter.ui.handler.frontpage;
 
+import com.google.inject.Inject;
+import edus2.adapter.scenecontents.ManikinSettingsWindowContents;
 import edus2.adapter.ui.EDUS2IconStage;
-import edus2.adapter.ui.ManikinSettingsWindow;
-import edus2.adapter.ui.builder.SceneBuilder;
-import edus2.application.ManikinFacade;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.BorderPane;
 
 public class ManikinSettingsWindowHandler extends FrontpageHandler {
-    private final SceneBuilder sceneBuilder;
-    private final ManikinFacade manikinFacade;
+    private final ManikinSettingsWindowContents manikinSettingsWindowContents;
 
-    public ManikinSettingsWindowHandler(BorderPane mainDisplayPane, SceneBuilder sceneBuilder, ManikinFacade manikinFacade) {
+    @Inject
+    public ManikinSettingsWindowHandler(BorderPane mainDisplayPane, ManikinSettingsWindowContents manikinSettingsWindowContents) {
         super(mainDisplayPane);
-        this.sceneBuilder = sceneBuilder;
-        this.manikinFacade = manikinFacade;
+        this.manikinSettingsWindowContents = manikinSettingsWindowContents;
     }
 
     @Override
     protected void handleRequest() {
         try {
             mainDisplayPane.requestFocus();
+            Scene scene = manikinSettingsWindowContents.getScene();
             EDUS2IconStage manikinSettingStage = new EDUS2IconStage();
-            ManikinSettingsWindow manikinSettingsWindow = new ManikinSettingsWindow(manikinFacade, sceneBuilder, manikinSettingStage);
-            Scene manikinWindowScene = sceneBuilder.build(manikinSettingsWindow);
-            manikinSettingStage.setScene(manikinWindowScene);
+            manikinSettingStage.setScene(scene);
             manikinSettingStage.show();
         } catch (Exception e) {
             e.printStackTrace();

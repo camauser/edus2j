@@ -24,22 +24,13 @@ import static org.junit.Assert.assertEquals;
 public class ManikinCreateWindowContentsTest extends ApplicationTest {
 
     private ManikinFacade manikinFacade;
-    private ManikinCreateWindowContents createWindowContents;
     private Scene scene;
-
-//    @Before
-//    public void setup() {
-//        manikinFacade = new ManikinFacade(new InMemoryManikinRepository());
-//        SceneBuilder sceneBuilder = new SceneBuilder(new InMemoryEDUS2Configuration());
-//        createWindowContents = new ManikinCreateWindowContents(sceneBuilder, manikinFacade);
-//        scene = createWindowContents.getScene();
-//    }
 
     @Override
     public void start(Stage stage) {
         manikinFacade = new ManikinFacade(new InMemoryManikinRepository());
         SceneBuilder sceneBuilder = new SceneBuilder(new InMemoryEDUS2Configuration());
-        createWindowContents = new ManikinCreateWindowContents(sceneBuilder, manikinFacade);
+        ManikinCreateWindowContents createWindowContents = new ManikinCreateWindowContents(sceneBuilder, manikinFacade);
         scene = createWindowContents.getScene();
         stage.setScene(scene);
         stage.show();
@@ -64,7 +55,7 @@ public class ManikinCreateWindowContentsTest extends ApplicationTest {
     public void saveManikin_shouldDisplayError_whenManikinNameExists() {
         // Arrange
         manikinFacade.create(new Manikin(generateTagMap(), "Manny"));
-        populateScanPoints("Manny", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
+        populateScanPoints("Manny", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100");
         Button submitButton = from(scene.getRoot()).lookup(".button").query();
 
         // Act
