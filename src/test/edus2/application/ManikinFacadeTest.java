@@ -14,11 +14,10 @@ import static org.junit.Assert.*;
 public class ManikinFacadeTest extends ManikinTestBase {
 
     private ManikinFacade facade;
-    private InMemoryManikinRepository manikinRepository;
 
     @Before
     public void setup() {
-        manikinRepository = new InMemoryManikinRepository();
+        InMemoryManikinRepository manikinRepository = new InMemoryManikinRepository();
         this.facade = new ManikinFacade(manikinRepository);
     }
 
