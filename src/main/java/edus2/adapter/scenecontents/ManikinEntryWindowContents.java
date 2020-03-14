@@ -1,8 +1,10 @@
-package edus2.adapter.ui;
+package edus2.adapter.scenecontents;
 
+import edus2.adapter.ui.builder.SceneBuilder;
 import edus2.domain.Manikin;
 import edus2.domain.ManikinScanEnum;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -15,7 +17,8 @@ import javafx.scene.text.Text;
 import java.util.HashMap;
 import java.util.Objects;
 
-public abstract class ManikinEntryWindow extends HBox {
+public abstract class ManikinEntryWindowContents extends SceneContents {
+
     private GridPane manikinFieldEntry;
     private TextField manikinName;
     private TextField cardiacSc;
@@ -29,10 +32,15 @@ public abstract class ManikinEntryWindow extends HBox {
     private TextField cardiacPslPss;
     private TextField cardiacA4c;
     private int fieldsAdded = 0;
-    private final ImageView imageView;
+    private ImageView imageView;
 
-    public ManikinEntryWindow() {
-        super(20.0);
+    public ManikinEntryWindowContents(SceneBuilder sceneBuilder) {
+        super(sceneBuilder);
+    }
+
+    @Override
+    protected Parent buildSceneContents() {
+        HBox entryWindow = new HBox(20);
         this.manikinFieldEntry = new GridPane();
         manikinFieldEntry.setHgap(10.0);
         manikinFieldEntry.setVgap(5.0);
@@ -44,8 +52,9 @@ public abstract class ManikinEntryWindow extends HBox {
         HBox imageHbox = new HBox(imageView);
         imageHbox.setAlignment(Pos.CENTER);
         manikinFieldEntry.setAlignment(Pos.CENTER);
-        this.getChildren().addAll(manikinFieldEntry, imageHbox);
-        this.setAlignment(Pos.CENTER);
+        entryWindow.getChildren().addAll(manikinFieldEntry, imageHbox);
+        entryWindow.setAlignment(Pos.CENTER);
+        return entryWindow;
     }
 
     public void bindManikin(Manikin manikin) {
