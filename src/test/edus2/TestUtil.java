@@ -23,7 +23,7 @@ public class TestUtil {
     }
 
     public static String randomAlphanumericString() {
-        int stringLength = randomInt(1, 101);
+        int stringLength = randomInt(8, 101);
         StringBuilder result = new StringBuilder();
         for(int i = 1; i <= stringLength; i++) {
             int characterIndex = RANDOM.nextInt(0, ALPHANUMERIC_CHARACTERS.length());

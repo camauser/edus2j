@@ -1,5 +1,6 @@
 package edus2.adapter.ui;
 
+import com.google.inject.Inject;
 import edus2.application.ManikinFacade;
 import edus2.domain.Manikin;
 import javafx.collections.FXCollections;
@@ -12,6 +13,7 @@ public class ManikinsWindow extends HBox {
     private TableView<Manikin> records;
     private ManikinFacade manikinFacade;
 
+    @Inject
     public ManikinsWindow(ManikinFacade manikinFacade) {
         this.manikinFacade = manikinFacade;
         // Set up a TableView to display all the records in, and then
