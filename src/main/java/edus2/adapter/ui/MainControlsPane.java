@@ -8,7 +8,6 @@ import edus2.adapter.ui.handler.frontpage.ManikinSettingsWindowHandler;
 import edus2.adapter.ui.handler.frontpage.ScanSettingsWindowHandler;
 import edus2.adapter.ui.handler.frontpage.ShutdownHandler;
 import edus2.application.AuthenticationFacade;
-import edus2.application.ManikinFacade;
 import edus2.application.ScanFacade;
 import edus2.domain.EDUS2Configuration;
 import javafx.geometry.Insets;
@@ -45,11 +44,12 @@ public class MainControlsPane extends BorderPane {
 
     @Inject
     public MainControlsPane(Stage stage, BorderPane mainDisplayPane, AuthenticationFacade authenticationFacade, ScanFacade scanFacade, EDUS2Configuration configuration,
-                            ManikinFacade manikinFacade, SceneBuilder sceneBuilder, ListenableMediaPlayer listenablePlayer, ScheduledExecutorService threadPool,
-                            Credits credits) {
+                            SceneBuilder sceneBuilder, ListenableMediaPlayer listenablePlayer, ScheduledExecutorService threadPool,
+                            Credits credits, ManikinSettingsWindowHandler manikinSettingsWindowHandler) {
         this.listenablePlayer = listenablePlayer;
         this.threadPool = threadPool;
         this.credits = credits;
+        this.manikinSettingsWindowHandler = manikinSettingsWindowHandler;
         ProgressBar playbackProgress = new ProgressBar(0.0);
         playbackProgress.setMinHeight(18.0);
         playbackProgress.setMinWidth(150.0);
@@ -57,7 +57,6 @@ public class MainControlsPane extends BorderPane {
         this.mainDisplayPane = mainDisplayPane;
         fullscreenHandler = new FullscreenHandler(mainDisplayPane, stage);
         scanSettingsWindowHandler = new ScanSettingsWindowHandler(mainDisplayPane, authenticationFacade, scanFacade, sceneBuilder, configuration);
-        manikinSettingsWindowHandler = new ManikinSettingsWindowHandler(mainDisplayPane, sceneBuilder, manikinFacade);
         scanProgressUpdater = new ScanProgressUpdater(listenablePlayer, playbackProgress);
         shutdownHandler = new ShutdownHandler(mainDisplayPane, stage, threadPool);
 
