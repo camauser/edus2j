@@ -15,6 +15,7 @@ package edus2.adapter.ui;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.google.inject.Inject;
 import edus2.application.ScanFacade;
 import edus2.domain.Scan;
 import javafx.beans.property.SimpleStringProperty;
@@ -35,6 +36,7 @@ public class ScansWindow extends VBox {
     private TableView<Scan> records;
     private ScanFacade scanFacade;
 
+    @Inject
     public ScansWindow(ScanFacade scanFacade) {
         this.scanFacade = scanFacade;
         records = new TableView<>();

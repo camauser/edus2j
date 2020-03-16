@@ -1,61 +1,51 @@
-package edus2.adapter.ui;/*
- * Copyright 2016 Paul Kulyk, Paul Olszynski, Cameron Auser
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+package edus2.adapter.scenecontents;
 
+import com.google.inject.Inject;
 import edus2.adapter.repository.file.FileScanImportExportRepository;
+import edus2.adapter.ui.EDUS2IconStage;
+import edus2.adapter.ui.ScansWindow;
 import edus2.adapter.ui.builder.SceneBuilder;
 import edus2.adapter.ui.handler.settings.*;
-import edus2.application.AuthenticationFacade;
 import edus2.application.ScanFacade;
 import edus2.domain.EDUS2Configuration;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-/**
- * Purpose: Display a settings window for EDUS2.
- *
- * @author Cameron Auser
- * @version 1.0
- */
-public class ScanSettingsWindow extends VBox {
-    private EDUS2IconStage stage;
-    private ScansWindow scanList;
-    private ScanFacade scanFacade;
-    private FileScanImportExportRepository importExportRepository;
-    private EDUS2Configuration configuration;
+public class ScanSettingsWindowContents extends SceneContents {
+    private final ScanFacade scanFacade;
+    private final EDUS2Configuration configuration;
+    private final FileScanImportExportRepository importExportRepository;
+    private final EDUS2IconStage stage;
+    private final ScansWindow scanList;
+    private final ConfigurationWindowContents configurationWindowContents;
 
-    public ScanSettingsWindow(ScanFacade scanFacade, AuthenticationFacade authenticationFacade, EDUS2Configuration configuration, SceneBuilder sceneBuilder, EDUS2IconStage stage) {
-        // Just set up a settings window, which is then shown on-screen
-        super(10);
+    @Inject
+    public ScanSettingsWindowContents(SceneBuilder sceneBuilder, ScanFacade scanFacade, EDUS2Configuration configuration,
+                                      FileScanImportExportRepository importExportRepository,
+                                      EDUS2IconStage stage, ScansWindow scansWindow,
+                                      ConfigurationWindowContents configurationWindowContents) {
+        super(sceneBuilder);
         this.scanFacade = scanFacade;
-        this.importExportRepository = new FileScanImportExportRepository(scanFacade);
-        this.stage = stage;
         this.configuration = configuration;
-        scanList = new ScansWindow(scanFacade);
+        this.importExportRepository = importExportRepository;
+        this.stage = stage;
+        this.scanList = scansWindow;
+        this.configurationWindowContents = configurationWindowContents;
+    }
 
+    @Override
+    protected Parent buildSceneContents() {
+        VBox settingsWindow = new VBox(10);
         HBox scanSettingButtonsBox = setupControlButtons();
 
         Button btnConfigSettings = new Button("Configuration Settings");
         btnConfigSettings.setOnAction(e -> {
             EDUS2IconStage configurationStage = new EDUS2IconStage();
-            ConfigurationWindow configurationWindow = new ConfigurationWindow(configuration, authenticationFacade, configurationStage);
-            Scene configurationScene = sceneBuilder.build(configurationWindow);
+            Scene configurationScene = configurationWindowContents.getScene();
             configurationStage.setScene(configurationScene);
             configurationStage.showAndWait();
             // needed to keep scan list up-to-date if scan file is changed
@@ -65,8 +55,8 @@ public class ScanSettingsWindow extends VBox {
         HBox configurationButtonBox = new HBox();
         configurationButtonBox.setAlignment(Pos.CENTER);
         configurationButtonBox.getChildren().add(btnConfigSettings);
-        this.getChildren().addAll(scanList, scanSettingButtonsBox, configurationButtonBox);
-
+        settingsWindow.getChildren().addAll(scanList, scanSettingButtonsBox, configurationButtonBox);
+        return settingsWindow;
     }
 
     private HBox setupControlButtons() {
@@ -110,5 +100,4 @@ public class ScanSettingsWindow extends VBox {
             scanList.refreshTableItems();
         });
     }
-
 }
