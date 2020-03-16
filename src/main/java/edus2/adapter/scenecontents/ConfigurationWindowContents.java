@@ -1,8 +1,13 @@
-package edus2.adapter.ui;
+package edus2.adapter.scenecontents;
 
+import com.google.inject.Inject;
+import edus2.adapter.ui.EDUS2IconStage;
+import edus2.adapter.ui.PasswordInputDialog;
 import edus2.adapter.ui.builder.FormBuilder;
+import edus2.adapter.ui.builder.SceneBuilder;
 import edus2.application.AuthenticationFacade;
 import edus2.domain.EDUS2Configuration;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -14,17 +19,26 @@ import java.io.File;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 
-public class ConfigurationWindow extends HBox {
+public class ConfigurationWindowContents extends SceneContents {
+    private final EDUS2Configuration configuration;
+    private final AuthenticationFacade authenticationFacade;
+    private final EDUS2IconStage stage;
     private final TextField minVideoWidth;
     private final TextField minVideoHeight;
-    private EDUS2IconStage stage;
-    private EDUS2Configuration configuration;
-    private AuthenticationFacade authenticationFacade;
 
-    public ConfigurationWindow(EDUS2Configuration configuration, AuthenticationFacade authenticationFacade, EDUS2IconStage stage) {
-        super(10);
+    @Inject
+    public ConfigurationWindowContents(SceneBuilder sceneBuilder, EDUS2Configuration configuration, AuthenticationFacade authenticationFacade, EDUS2IconStage stage) {
+        super(sceneBuilder);
+        this.configuration = configuration;
         this.authenticationFacade = authenticationFacade;
         this.stage = stage;
+        minVideoWidth = new TextField();
+        minVideoHeight = new TextField();
+    }
+
+    @Override
+    protected Parent buildSceneContents() {
+        HBox configurationBox = new HBox(10);
         UnaryOperator<TextFormatter.Change> integerFilter = entry -> {
             String text = entry.getText();
             if (text.matches("^\\d*$")) {
@@ -33,10 +47,8 @@ public class ConfigurationWindow extends HBox {
 
             return null;
         };
-        this.configuration = configuration;
-        minVideoWidth = new TextField();
+
         minVideoWidth.setTextFormatter(new TextFormatter<>(integerFilter));
-        minVideoHeight = new TextField();
         minVideoHeight.setTextFormatter(new TextFormatter<>(integerFilter));
 
         minVideoWidth.setText(configuration.getMinimumVideoWidth().map(Object::toString).orElse(""));
@@ -73,7 +85,8 @@ public class ConfigurationWindow extends HBox {
                 .addControl("Save File Location", btnSaveFileLocation)
                 .build();
 
-        this.getChildren().add(formControls);
+        configurationBox.getChildren().add(formControls);
+        return configurationBox;
     }
 
     private void setDarkMode(CheckBox darkModeCheckbox) {
@@ -193,5 +206,4 @@ public class ConfigurationWindow extends HBox {
 
         configuration.setMinimumVideoHeight(Integer.parseInt(rawText));
     }
-
 }

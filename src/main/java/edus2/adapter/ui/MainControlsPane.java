@@ -2,14 +2,10 @@ package edus2.adapter.ui;
 
 import com.google.inject.Inject;
 import edus2.adapter.scenecontents.Credits;
-import edus2.adapter.ui.builder.SceneBuilder;
 import edus2.adapter.ui.handler.frontpage.FullscreenHandler;
 import edus2.adapter.ui.handler.frontpage.ManikinSettingsWindowHandler;
 import edus2.adapter.ui.handler.frontpage.ScanSettingsWindowHandler;
 import edus2.adapter.ui.handler.frontpage.ShutdownHandler;
-import edus2.application.AuthenticationFacade;
-import edus2.application.ScanFacade;
-import edus2.domain.EDUS2Configuration;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ProgressBar;
@@ -43,20 +39,21 @@ public class MainControlsPane extends BorderPane {
     private static final int MILLIS_BETWEEN_FRAMES = MILLIS_PER_SECOND / FRAMES_PER_SECOND;
 
     @Inject
-    public MainControlsPane(Stage stage, BorderPane mainDisplayPane, AuthenticationFacade authenticationFacade, ScanFacade scanFacade, EDUS2Configuration configuration,
-                            SceneBuilder sceneBuilder, ListenableMediaPlayer listenablePlayer, ScheduledExecutorService threadPool,
-                            Credits credits, ManikinSettingsWindowHandler manikinSettingsWindowHandler) {
+    public MainControlsPane(Stage stage, BorderPane mainDisplayPane,
+                            ListenableMediaPlayer listenablePlayer, ScheduledExecutorService threadPool,
+                            Credits credits, ManikinSettingsWindowHandler manikinSettingsWindowHandler,
+                            ScanSettingsWindowHandler scanSettingsWindowHandler) {
         this.listenablePlayer = listenablePlayer;
         this.threadPool = threadPool;
         this.credits = credits;
         this.manikinSettingsWindowHandler = manikinSettingsWindowHandler;
+        this.scanSettingsWindowHandler = scanSettingsWindowHandler;
         ProgressBar playbackProgress = new ProgressBar(0.0);
         playbackProgress.setMinHeight(18.0);
         playbackProgress.setMinWidth(150.0);
 
         this.mainDisplayPane = mainDisplayPane;
         fullscreenHandler = new FullscreenHandler(mainDisplayPane, stage);
-        scanSettingsWindowHandler = new ScanSettingsWindowHandler(mainDisplayPane, authenticationFacade, scanFacade, sceneBuilder, configuration);
         scanProgressUpdater = new ScanProgressUpdater(listenablePlayer, playbackProgress);
         shutdownHandler = new ShutdownHandler(mainDisplayPane, stage, threadPool);
 
