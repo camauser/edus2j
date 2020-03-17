@@ -8,20 +8,18 @@ import edus2.domain.Manikin;
 import edus2.domain.ManikinScanEnum;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextField;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import org.junit.Test;
-import org.testfx.framework.junit.ApplicationTest;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static edus2.TestUtil.randomAlphanumericString;
 import static org.junit.Assert.assertEquals;
 
-public class ManikinCreateWindowContentsTest extends ApplicationTest {
+public class ManikinCreateWindowContentsTest extends SceneContentsTest {
 
     private ManikinFacade manikinFacade;
     private Scene scene;
@@ -83,25 +81,31 @@ public class ManikinCreateWindowContentsTest extends ApplicationTest {
         assertPopupContents("Error saving manikin: Scan tag 'IVC' already exists on manikin 'Manny'");
     }
 
-    // courtesy of https://stackoverflow.com/questions/48565782/testfx-how-to-test-validation-dialogs-with-no-ids
-    private void assertPopupContents(String expectedMessage) {
-        DialogPane popupStage = (DialogPane)getTopModalStage().getScene().getRoot();
+    @Test
+    public void saveManikin_shouldDisplayError_whenDuplicateTagGiven() {
+        // Arrange
+        String duplicateTag = "duplicate";
+        populateScanPoints("Manny", duplicateTag, duplicateTag, "3", "4", "5", "6", "7", "8", "9", "10");
+        Button submitButton = from(scene.getRoot()).lookup(".button").query();
 
-        assertEquals(expectedMessage, popupStage.getContentText());
+        // Act
+        clickOn(submitButton);
+
+        // Assert
+        assertPopupContents("Error saving manikin: Scan tag duplicate was listed more than once");
     }
 
-    private javafx.stage.Stage getTopModalStage() {
-        // Get a list of windows but ordered from top[0] to bottom[n] ones.
-        // It is needed to get the first found modal window.
-        final List<Window> allWindows = new ArrayList<>(robotContext().getWindowFinder().listWindows());
-        Collections.reverse(allWindows);
+    @Test
+    public void saveManikin_shouldDisplayError_whenScanPointEmpty() {
+        // Arrange
+        populateScanPoints("Manny", null, "2", "3", "4", "5", "6", "7", "8", "9", "10");
+        Button submitButton = from(scene.getRoot()).lookup(".button").query();
 
-        return (javafx.stage.Stage) allWindows
-                .stream()
-                .filter(window -> window instanceof javafx.stage.Stage)
-                .filter(window -> ((javafx.stage.Stage) window).getModality() == Modality.APPLICATION_MODAL)
-                .findFirst()
-                .orElse(null);
+        // Act
+        clickOn(submitButton);
+
+        // Assert+
+        assertPopupContents("Error saving manikin: One or more locations are missing a scan tag.");
     }
 
     private void populateScanPoints(String name, String leftLung, String rightLung, String pslPss, String a4c, String sc, String ivc,

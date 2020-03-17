@@ -70,8 +70,8 @@ public class ConfigurationWindowContents extends SceneContents {
         chkEnableDarkMode.setOnAction(a -> setDarkMode(chkEnableDarkMode));
         chkEnableDarkMode.setSelected(configuration.darkModeEnabledProperty().get());
 
-        minVideoWidth.setOnKeyReleased(e -> saveMinimumVideoDimensions());
-        minVideoHeight.setOnKeyReleased(e -> saveMinimumVideoDimensions());
+        minVideoWidth.setOnKeyReleased(e -> saveMinVideoWidth());
+        minVideoHeight.setOnKeyReleased(e -> saveMinVideoHeight());
 
         GridPane formControls = new FormBuilder()
                 .addLabel("edus2j Configuration Settings")
@@ -94,8 +94,7 @@ public class ConfigurationWindowContents extends SceneContents {
     }
 
     private void setDefaultVideoDirectory() {
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        File defaultVideoDirectory = directoryChooser.showDialog(this.stage);
+        File defaultVideoDirectory = promptForDirectory();
         if (defaultVideoDirectory != null) {
             configuration.setDefaultVideoDirectory(defaultVideoDirectory);
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Default video directory updated.");
@@ -105,8 +104,7 @@ public class ConfigurationWindowContents extends SceneContents {
     }
 
     private void setDefaultScenarioDirectory() {
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        File defaultScenarioDirectory = directoryChooser.showDialog(this.stage);
+        File defaultScenarioDirectory = promptForDirectory();
         if (defaultScenarioDirectory != null) {
             configuration.setDefaultScenarioDirectory(defaultScenarioDirectory);
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Default scenario directory updated.");
@@ -116,14 +114,23 @@ public class ConfigurationWindowContents extends SceneContents {
     }
 
     private void setSaveFileLocation() {
-        FileChooser fileChooser = new FileChooser();
-        File saveFile = fileChooser.showSaveDialog(this.stage);
+        File saveFile = promptForFile();
         if (saveFile != null) {
             configuration.setSaveFileLocation(saveFile.getAbsolutePath());
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Save file location updated.");
             alert.setHeaderText("Save File Location Successfully Updated");
             alert.showAndWait();
         }
+    }
+
+    protected File promptForDirectory() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        return directoryChooser.showDialog(this.stage);
+    }
+
+    protected File promptForFile() {
+        FileChooser fileChooser = new FileChooser();
+        return fileChooser.showSaveDialog(this.stage);
     }
 
     private void setPassword() {
@@ -151,37 +158,16 @@ public class ConfigurationWindowContents extends SceneContents {
         alert.showAndWait();
     }
 
-    private void saveMinimumVideoDimensions() {
-        if (!validateMinVideoWidth()) {
-            return;
-        }
-
-        if (!validateMinVideoHeight()) {
-            return;
-        }
-
-        saveMinVideoWidth();
-        saveMinVideoHeight();
-    }
-
-    private boolean validateMinVideoWidth() {
-        return validateMinimumVideoDimensions(minVideoWidth.getText());
-    }
-
-    private boolean validateMinVideoHeight() {
-        return validateMinimumVideoDimensions(minVideoHeight.getText());
-    }
-
-    private boolean validateMinimumVideoDimensions(String value) {
-        if (StringUtils.isEmpty(value)) {
-            return true;
+    private boolean validVideoDimension(String attempt) {
+        if (StringUtils.isEmpty(attempt)) {
+            return false;
         }
 
         try {
-            Integer.parseInt(value);
+            Integer.parseInt(attempt);
             return true;
         } catch (NumberFormatException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, String.format("Minimum video width/height can be %s at most: %s is too large", Integer.MAX_VALUE, value));
+            Alert alert = new Alert(Alert.AlertType.ERROR, String.format("Minimum video width/height can be %s at most: %s is too large", Integer.MAX_VALUE, attempt));
             alert.showAndWait();
             return false;
         }
@@ -189,21 +175,17 @@ public class ConfigurationWindowContents extends SceneContents {
 
     private void saveMinVideoWidth() {
         String rawText = minVideoWidth.getText();
-        if (StringUtils.isEmpty(rawText)) {
-            configuration.setMinimumVideoWidth(0);
-            return;
+        if (validVideoDimension(rawText)) {
+            configuration.setMinimumVideoWidth(Integer.parseInt(rawText));
         }
 
-        configuration.setMinimumVideoWidth(Integer.parseInt(rawText));
     }
 
     private void saveMinVideoHeight() {
         String rawText = minVideoHeight.getText();
-        if (StringUtils.isEmpty(rawText)) {
-            configuration.setMinimumVideoHeight(0);
-            return;
+        if (validVideoDimension(rawText)) {
+            configuration.setMinimumVideoHeight(Integer.parseInt(rawText));
         }
 
-        configuration.setMinimumVideoHeight(Integer.parseInt(rawText));
     }
 }
