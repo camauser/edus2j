@@ -134,9 +134,7 @@ public class ManikinSettingsWindowContents extends SceneContents {
     }
 
     private void importManikins() {
-        FileChooser browser = new FileChooser();
-        browser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Manikin file format (*.kin)", "*.kin"));
-        File scanFile = browser.showOpenDialog(stage);
+        File scanFile = promptForKinFileOpen();
         if (scanFile != null) {
             try {
                 importExportRepository.importManikinsFromFile(scanFile);
@@ -149,9 +147,7 @@ public class ManikinSettingsWindowContents extends SceneContents {
     }
 
     private void exportManikins() {
-        FileChooser browser = new FileChooser();
-        browser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Manikin file format (*.kin)", "*.kin"));
-        File selected = browser.showSaveDialog(stage);
+        File selected = promptForKinFileSave();
         if (selected != null) {
             try {
                 importExportRepository.exportManikinsToFile(selected);
@@ -162,5 +158,17 @@ public class ManikinSettingsWindowContents extends SceneContents {
                 alert.showAndWait();
             }
         }
+    }
+
+    protected File promptForKinFileSave() {
+        FileChooser browser = new FileChooser();
+        browser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Manikin file format (*.kin)", "*.kin"));
+        return browser.showSaveDialog(stage);
+    }
+
+    protected File promptForKinFileOpen() {
+        FileChooser browser = new FileChooser();
+        browser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Manikin file format (*.kin)", "*.kin"));
+        return browser.showOpenDialog(stage);
     }
 }
