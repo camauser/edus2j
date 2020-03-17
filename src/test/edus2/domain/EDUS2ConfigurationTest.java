@@ -227,4 +227,18 @@ public abstract class EDUS2ConfigurationTest {
         boolean actual = configuration.darkModeEnabledProperty().get();
         assertFalse(actual);
     }
+
+    @Test
+    public void getSystemIdentifier_shouldInitiallyGenerateIdentifier() {
+        // Arrange
+        EDUS2Configuration firstConfiguration = getConfiguration();
+        EDUS2Configuration secondConfiguration = getConfiguration();
+
+        // Act
+        SystemIdentifier firstIdentifier = firstConfiguration.getSystemIdentifier();
+        SystemIdentifier secondIdentifier = secondConfiguration.getSystemIdentifier();
+
+        // Assert
+        assertNotEquals(firstIdentifier, secondIdentifier);
+    }
 }
