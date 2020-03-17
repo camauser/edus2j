@@ -20,34 +20,33 @@ import java.util.Objects;
 public abstract class ManikinEntryWindowContents extends SceneContents {
 
     private GridPane manikinFieldEntry;
-    private TextField manikinName;
-    private TextField cardiacSc;
-    private TextField ivc;
-    private TextField ruq;
-    private TextField luq;
-    private TextField abdominalAorta;
-    private TextField pelvis;
-    private TextField rightLungScan;
-    private TextField leftLungScan;
-    private TextField cardiacPslPss;
-    private TextField cardiacA4c;
+    protected TextField manikinName;
+    protected TextField cardiacSc;
+    protected TextField ivc;
+    protected TextField ruq;
+    protected TextField luq;
+    protected TextField abdominalAorta;
+    protected TextField pelvis;
+    protected TextField rightLungScan;
+    protected TextField leftLungScan;
+    protected TextField cardiacPslPss;
+    protected TextField cardiacA4c;
     private int fieldsAdded = 0;
     private ImageView imageView;
 
     public ManikinEntryWindowContents(SceneBuilder sceneBuilder) {
         super(sceneBuilder);
+        this.manikinFieldEntry = new GridPane();
+        Image scanPointImage = new Image(Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream("manikin-scanpoints.png")));
+        imageView = new ImageView(scanPointImage);
+        generateInputFields();
     }
 
     @Override
     protected Parent buildSceneContents() {
         HBox entryWindow = new HBox(20);
-        this.manikinFieldEntry = new GridPane();
         manikinFieldEntry.setHgap(10.0);
         manikinFieldEntry.setVgap(5.0);
-
-        generateInputFields();
-        Image scanPointImage = new Image(Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream("manikin-scanpoints.png")));
-        imageView = new ImageView(scanPointImage);
 
         HBox imageHbox = new HBox(imageView);
         imageHbox.setAlignment(Pos.CENTER);
@@ -55,22 +54,6 @@ public abstract class ManikinEntryWindowContents extends SceneContents {
         entryWindow.getChildren().addAll(manikinFieldEntry, imageHbox);
         entryWindow.setAlignment(Pos.CENTER);
         return entryWindow;
-    }
-
-    public void bindManikin(Manikin manikin) {
-        clearFields();
-        manikinName.setText(manikin.getName());
-        manikinName.setEditable(false);
-        rightLungScan.setText(manikin.getTagMap().get(ManikinScanEnum.RIGHT_LUNG));
-        leftLungScan.setText(manikin.getTagMap().get(ManikinScanEnum.LEFT_LUNG));
-        cardiacPslPss.setText(manikin.getTagMap().get(ManikinScanEnum.CARDIAC_PSL_PSS));
-        cardiacA4c.setText(manikin.getTagMap().get(ManikinScanEnum.CARDIAC_A4C));
-        cardiacSc.setText(manikin.getTagMap().get(ManikinScanEnum.CARDIAC_SC));
-        ivc.setText(manikin.getTagMap().get(ManikinScanEnum.IVC));
-        ruq.setText(manikin.getTagMap().get(ManikinScanEnum.RUQ));
-        luq.setText(manikin.getTagMap().get(ManikinScanEnum.LUQ));
-        abdominalAorta.setText(manikin.getTagMap().get(ManikinScanEnum.ABDOMINAL_AORTA));
-        pelvis.setText(manikin.getTagMap().get(ManikinScanEnum.PELVIS));
     }
 
     private void generateInputFields() {
@@ -129,7 +112,7 @@ public abstract class ManikinEntryWindowContents extends SceneContents {
         return new Manikin(tagMap, manikinName.getText());
     }
 
-    private void clearFields() {
+    protected void clearFields() {
         fieldsAdded = 0;
         manikinFieldEntry.getChildren().clear();
         generateInputFields();
