@@ -1,13 +1,10 @@
 package edus2.adapter.scenecontents;
 
 import com.google.inject.Inject;
-import edus2.adapter.repository.file.FileScanImportExportRepository;
 import edus2.adapter.ui.EDUS2IconStage;
 import edus2.adapter.ui.ScansWindow;
 import edus2.adapter.ui.builder.SceneBuilder;
 import edus2.adapter.ui.handler.settings.*;
-import edus2.application.ScanFacade;
-import edus2.domain.EDUS2Configuration;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -16,25 +13,39 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class ScanSettingsWindowContents extends SceneContents {
-    private final ScanFacade scanFacade;
-    private final EDUS2Configuration configuration;
-    private final FileScanImportExportRepository importExportRepository;
     private final EDUS2IconStage stage;
     private final ScansWindow scanList;
     private final ConfigurationWindowContents configurationWindowContents;
+    private final AddScanHandler addScanHandler;
+    private final BulkAddScanHandler bulkAddScanHandler;
+    private final EditManikinLocationHandler editManikinLocationHandler;
+    private final EditScanFileHandler editScanFileHandler;
+    private final DeleteScanHandler deleteScanHandler;
+    private final DeleteAllScanHandler deleteAllScanHandler;
+    private final LoadScenarioHandler loadScenarioHandler;
+    private final SaveScenarioHandler saveScenarioHandler;
 
     @Inject
-    public ScanSettingsWindowContents(SceneBuilder sceneBuilder, ScanFacade scanFacade, EDUS2Configuration configuration,
-                                      FileScanImportExportRepository importExportRepository,
+    public ScanSettingsWindowContents(SceneBuilder sceneBuilder,
                                       EDUS2IconStage stage, ScansWindow scansWindow,
-                                      ConfigurationWindowContents configurationWindowContents) {
+                                      ConfigurationWindowContents configurationWindowContents,
+                                      AddScanHandler addScanHandler, BulkAddScanHandler bulkAddScanHandler,
+                                      EditManikinLocationHandler editManikinLocationHandler,
+                                      EditScanFileHandler editScanFileHandler, DeleteScanHandler deleteScanHandler,
+                                      DeleteAllScanHandler deleteAllScanHandler, LoadScenarioHandler loadScenarioHandler,
+                                      SaveScenarioHandler saveScenarioHandler) {
         super(sceneBuilder);
-        this.scanFacade = scanFacade;
-        this.configuration = configuration;
-        this.importExportRepository = importExportRepository;
         this.stage = stage;
         this.scanList = scansWindow;
         this.configurationWindowContents = configurationWindowContents;
+        this.addScanHandler = addScanHandler;
+        this.bulkAddScanHandler = bulkAddScanHandler;
+        this.editManikinLocationHandler = editManikinLocationHandler;
+        this.editScanFileHandler = editScanFileHandler;
+        this.deleteScanHandler = deleteScanHandler;
+        this.deleteAllScanHandler = deleteAllScanHandler;
+        this.loadScenarioHandler = loadScenarioHandler;
+        this.saveScenarioHandler = saveScenarioHandler;
     }
 
     @Override
@@ -69,15 +80,6 @@ public class ScanSettingsWindowContents extends SceneContents {
         Button btnDeleteAll = new Button("Delete All Videos");
         Button btnLoadScenario = new Button("Load Scenario");
         Button btnSaveScenario = new Button("Save Scenario");
-
-        AddScanHandler addScanHandler = new AddScanHandler(scanFacade, configuration);
-        BulkAddScanHandler bulkAddScanHandler = new BulkAddScanHandler(scanFacade, configuration);
-        EditManikinLocationHandler editManikinLocationHandler = new EditManikinLocationHandler(scanFacade);
-        EditScanFileHandler editScanFileHandler = new EditScanFileHandler(scanFacade);
-        DeleteScanHandler deleteScanHandler = new DeleteScanHandler(scanFacade);
-        DeleteAllScanHandler deleteAllScanHandler = new DeleteAllScanHandler(scanFacade);
-        LoadScenarioHandler loadScenarioHandler = new LoadScenarioHandler(scanFacade, configuration, importExportRepository);
-        SaveScenarioHandler saveScenarioHandler = new SaveScenarioHandler(scanFacade, configuration, importExportRepository);
 
         registerHandler(btnAdd, addScanHandler);
         registerHandler(btnBulkAdd, bulkAddScanHandler);
