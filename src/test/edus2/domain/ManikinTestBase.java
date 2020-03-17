@@ -6,7 +6,7 @@ import java.util.Map;
 import static edus2.TestUtil.randomAlphanumericString;
 
 public abstract class ManikinTestBase {
-    protected Map<ManikinScanEnum, String> generateTagMap() {
+    public static Map<ManikinScanEnum, String> generateTagMap() {
         Map<ManikinScanEnum, String> tagMap = new HashMap<>();
         tagMap.put(ManikinScanEnum.RIGHT_LUNG, randomAlphanumericString());
         tagMap.put(ManikinScanEnum.LEFT_LUNG, randomAlphanumericString());
