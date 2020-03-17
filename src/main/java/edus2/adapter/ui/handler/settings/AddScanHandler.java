@@ -22,6 +22,7 @@ public class AddScanHandler extends ScanHandler {
         this.configuration = configuration;
     }
 
+    @Override
     public void validateInputs(List<Scan> selectedScans) {
         if (scanFacade.getUnusedScanEnums().isEmpty()) {
             throw new RuntimeException("All manikin scan locations have been linked to scans already!");
@@ -30,13 +31,17 @@ public class AddScanHandler extends ScanHandler {
 
     @Override
     public void process(List<Scan> selectedScans, Stage stage) {
-        FileChooser browser = new FileChooser();
-        Optional<File> defaultVideoDirectory = configuration.getDefaultVideoDirectory();
-        defaultVideoDirectory.filter(File::exists).ifPresent(browser::setInitialDirectory);
-        File selected = browser.showOpenDialog(stage);
+        File selected = promptForScanFile(stage);
         if (selected != null) {
             promptForScanIdAndSaveScan(selected);
         }
+    }
+
+    public File promptForScanFile(Stage stage) {
+        FileChooser browser = new FileChooser();
+        Optional<File> defaultVideoDirectory = configuration.getDefaultVideoDirectory();
+        defaultVideoDirectory.filter(File::exists).ifPresent(browser::setInitialDirectory);
+        return browser.showOpenDialog(stage);
     }
 
     protected void promptForScanIdAndSaveScan(File file) {

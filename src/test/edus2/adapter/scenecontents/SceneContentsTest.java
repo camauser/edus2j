@@ -14,11 +14,14 @@ import static org.junit.Assert.assertEquals;
 public abstract class SceneContentsTest extends ApplicationTest {
     // courtesy of https://stackoverflow.com/questions/48565782/testfx-how-to-test-validation-dialogs-with-no-ids
     protected void assertPopupContents(String expectedMessage) {
-        DialogPane popupStage = (DialogPane)getTopModalStage().getScene().getRoot();
+        DialogPane popupStage = getPopupDialogPane();
 
         assertEquals(expectedMessage, popupStage.getContentText());
     }
 
+    protected DialogPane getPopupDialogPane() {
+        return (DialogPane)getTopModalStage().getScene().getRoot();
+    }
 
     private javafx.stage.Stage getTopModalStage() {
         // Get a list of windows but ordered from top[0] to bottom[n] ones.
