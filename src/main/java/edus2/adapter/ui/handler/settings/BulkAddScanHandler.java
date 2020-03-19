@@ -29,10 +29,7 @@ public class BulkAddScanHandler extends AddScanHandler {
 
     @Override
     public void process(List<Scan> selectedScans, Stage stage) {
-        FileChooser browser = new FileChooser();
-        Optional<File> defaultVideoDirectory = configuration.getDefaultVideoDirectory();
-        defaultVideoDirectory.filter(File::exists).ifPresent(browser::setInitialDirectory);
-        List<File> selected = browser.showOpenMultipleDialog(stage);
+        List<File> selected = promptForScanFiles(stage);
         if (selected == null) {
             return;
         }
@@ -49,5 +46,12 @@ public class BulkAddScanHandler extends AddScanHandler {
         for (File current : selected) {
             promptForScanIdAndSaveScan(current);
         }
+    }
+
+    protected List<File> promptForScanFiles(Stage stage) {
+        FileChooser browser = new FileChooser();
+        Optional<File> defaultVideoDirectory = configuration.getDefaultVideoDirectory();
+        defaultVideoDirectory.filter(File::exists).ifPresent(browser::setInitialDirectory);
+        return browser.showOpenMultipleDialog(stage);
     }
 }
