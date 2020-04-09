@@ -1,5 +1,6 @@
 package edus2.adapter.ui.handler.settings;
 
+import com.google.inject.Inject;
 import edus2.application.ScanFacade;
 import edus2.domain.Scan;
 import javafx.scene.control.Alert;
@@ -8,6 +9,8 @@ import javafx.stage.Stage;
 import java.util.List;
 
 public class DeleteAllScanHandler extends ScanHandler {
+
+    @Inject
     public DeleteAllScanHandler(ScanFacade scanFacade) {
         super(scanFacade);
     }
