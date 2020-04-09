@@ -1,5 +1,6 @@
 package edus2.adapter.ui.handler.settings;
 
+import com.google.inject.Inject;
 import edus2.adapter.repository.file.FileScanImportExportRepository;
 import edus2.application.ScanFacade;
 import edus2.domain.EDUS2Configuration;
@@ -16,6 +17,7 @@ public class SaveScenarioHandler extends ScanHandler {
     private final EDUS2Configuration configuration;
     private final FileScanImportExportRepository importExportRepository;
 
+    @Inject
     public SaveScenarioHandler(ScanFacade scanFacade, EDUS2Configuration configuration, FileScanImportExportRepository importExportRepository) {
         super(scanFacade);
         this.configuration = configuration;

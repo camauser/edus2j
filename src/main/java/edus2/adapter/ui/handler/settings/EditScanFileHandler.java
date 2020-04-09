@@ -1,5 +1,6 @@
 package edus2.adapter.ui.handler.settings;
 
+import com.google.inject.Inject;
 import edus2.application.ScanFacade;
 import edus2.domain.Scan;
 import javafx.stage.FileChooser;
@@ -10,6 +11,7 @@ import java.util.List;
 
 public class EditScanFileHandler extends ScanHandler {
 
+    @Inject
     public EditScanFileHandler(ScanFacade scanFacade) {
         super(scanFacade);
     }

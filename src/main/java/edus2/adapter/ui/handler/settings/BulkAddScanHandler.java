@@ -1,5 +1,6 @@
 package edus2.adapter.ui.handler.settings;
 
+import com.google.inject.Inject;
 import edus2.application.ScanFacade;
 import edus2.domain.EDUS2Configuration;
 import edus2.domain.ManikinScanEnum;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 public class BulkAddScanHandler extends AddScanHandler {
 
+    @Inject
     public BulkAddScanHandler(ScanFacade scanFacade, EDUS2Configuration configuration) {
         super(scanFacade, configuration);
     }

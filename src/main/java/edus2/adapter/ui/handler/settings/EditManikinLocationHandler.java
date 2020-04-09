@@ -1,5 +1,6 @@
 package edus2.adapter.ui.handler.settings;
 
+import com.google.inject.Inject;
 import edus2.application.ScanFacade;
 import edus2.domain.ManikinScanEnum;
 import edus2.domain.Scan;
@@ -10,6 +11,7 @@ import java.util.Optional;
 
 public class EditManikinLocationHandler extends ScanHandler {
 
+    @Inject
     public EditManikinLocationHandler(ScanFacade scanFacade) {
         super(scanFacade);
     }
