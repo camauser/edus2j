@@ -1,11 +1,10 @@
 package edus2.adapter.ui.handler.frontpage;
 
 import com.google.inject.Inject;
-import edus2.adapter.scenecontents.ScanSettingsWindowContents;
+import edus2.adapter.stagebuilder.ScanSettingsWindowContents;
 import edus2.adapter.ui.EDUS2IconStage;
 import edus2.adapter.ui.PasswordInputDialog;
 import edus2.application.AuthenticationFacade;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.BorderPane;
 
@@ -27,10 +26,7 @@ public class ScanSettingsWindowHandler extends FrontpageHandler {
     protected void handleRequest() {
         try {
             if (isAuthenticated()) {
-                EDUS2IconStage scanWindowStage = new EDUS2IconStage();
-                Scene settingsScene = scanSettingsWindowContents.getScene();
-                scanWindowStage.setScene(settingsScene);
-                scanWindowStage.setTitle(scanSettingsWindowContents.getTitle());
+                EDUS2IconStage scanWindowStage = scanSettingsWindowContents.build();
                 scanWindowStage.show();
             } else {
                 Alert invalidPasswordAlert = new Alert(Alert.AlertType.ERROR);

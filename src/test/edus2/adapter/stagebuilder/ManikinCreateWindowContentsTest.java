@@ -1,4 +1,4 @@
-package edus2.adapter.scenecontents;
+package edus2.adapter.stagebuilder;
 
 import edus2.adapter.repository.memory.InMemoryEDUS2Configuration;
 import edus2.adapter.repository.memory.InMemoryManikinRepository;
@@ -19,7 +19,7 @@ import java.util.Map;
 import static edus2.TestUtil.randomAlphanumericString;
 import static org.junit.Assert.assertEquals;
 
-public class ManikinCreateWindowContentsTest extends SceneContentsTest {
+public class ManikinCreateWindowContentsTest extends StageBuilderTest {
 
     private ManikinFacade manikinFacade;
     private Scene scene;
@@ -29,7 +29,7 @@ public class ManikinCreateWindowContentsTest extends SceneContentsTest {
         manikinFacade = new ManikinFacade(new InMemoryManikinRepository());
         SceneBuilder sceneBuilder = new SceneBuilder(new InMemoryEDUS2Configuration());
         ManikinCreateWindowContents createWindowContents = new ManikinCreateWindowContents(sceneBuilder, manikinFacade);
-        scene = createWindowContents.getScene();
+        scene = createWindowContents.buildScene();
         stage.setScene(scene);
         stage.show();
         stage.toFront();

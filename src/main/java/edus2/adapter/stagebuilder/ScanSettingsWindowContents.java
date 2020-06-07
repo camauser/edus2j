@@ -1,4 +1,4 @@
-package edus2.adapter.scenecontents;
+package edus2.adapter.stagebuilder;
 
 import com.google.inject.Inject;
 import edus2.adapter.ui.EDUS2IconStage;
@@ -7,12 +7,11 @@ import edus2.adapter.ui.builder.SceneBuilder;
 import edus2.adapter.ui.handler.settings.*;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-public class ScanSettingsWindowContents extends SceneContents {
+public class ScanSettingsWindowContents extends StageBuilder {
     private final EDUS2IconStage stage;
     private final ScansWindow scanList;
     private final ConfigurationWindowContents configurationWindowContents;
@@ -55,10 +54,7 @@ public class ScanSettingsWindowContents extends SceneContents {
 
         Button btnConfigSettings = new Button("Configuration Settings");
         btnConfigSettings.setOnAction(e -> {
-            EDUS2IconStage configurationStage = new EDUS2IconStage();
-            Scene configurationScene = configurationWindowContents.getScene();
-            configurationStage.setScene(configurationScene);
-            configurationStage.setTitle(configurationWindowContents.getTitle());
+            EDUS2IconStage configurationStage = configurationWindowContents.build();
             configurationStage.showAndWait();
             // needed to keep scan list up-to-date if scan file is changed
             scanList.refreshTableItems();

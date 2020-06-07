@@ -1,7 +1,7 @@
 package edus2.adapter.ui;
 
 import com.google.inject.Inject;
-import edus2.adapter.scenecontents.Credits;
+import edus2.adapter.stagebuilder.Credits;
 import edus2.adapter.ui.handler.frontpage.FullscreenHandler;
 import edus2.adapter.ui.handler.frontpage.ManikinSettingsWindowHandler;
 import edus2.adapter.ui.handler.frontpage.ScanSettingsWindowHandler;
@@ -131,9 +131,7 @@ public class MainControlsPane extends BorderPane {
     }
 
     private void showCredits() {
-        EDUS2IconStage creditStage = new EDUS2IconStage();
-        creditStage.setScene(credits.getScene());
-        creditStage.setTitle(credits.getTitle());
+        EDUS2IconStage creditStage = credits.build();
         creditStage.show();
     }
 }

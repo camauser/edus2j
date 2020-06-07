@@ -1,4 +1,4 @@
-package edus2.adapter.scenecontents;
+package edus2.adapter.stagebuilder;
 
 import com.google.inject.Inject;
 import edus2.adapter.ui.EDUS2IconStage;
@@ -19,7 +19,7 @@ import java.io.File;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 
-public class ConfigurationWindowContents extends SceneContents {
+public class ConfigurationWindowContents extends StageBuilder {
     private final EDUS2Configuration configuration;
     private final AuthenticationFacade authenticationFacade;
     private final EDUS2IconStage stage;

@@ -2,7 +2,7 @@ package edus2.adapter.ui.handler.settings;
 
 import edus2.adapter.repository.memory.InMemoryEDUS2Configuration;
 import edus2.adapter.repository.memory.InMemoryScanRepository;
-import edus2.adapter.scenecontents.SceneContentsTest;
+import edus2.adapter.stagebuilder.StageBuilderTest;
 import edus2.application.ScanFacade;
 import edus2.domain.ManikinScanEnum;
 import javafx.application.Platform;
@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
-public class BulkAddScanHandlerTest extends SceneContentsTest {
+public class BulkAddScanHandlerTest extends StageBuilderTest {
     private ScanFacade scanFacade;
     private BulkAddScanHandler handler;
 

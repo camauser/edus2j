@@ -1,4 +1,4 @@
-package edus2.adapter.scenecontents;
+package edus2.adapter.stagebuilder;
 
 import edus2.adapter.ui.builder.SceneBuilder;
 import edus2.domain.Manikin;
@@ -17,7 +17,7 @@ import javafx.scene.text.Text;
 import java.util.HashMap;
 import java.util.Objects;
 
-public abstract class ManikinEntryWindowContents extends SceneContents {
+public abstract class ManikinEntryWindowContents extends StageBuilder {
 
     private GridPane manikinFieldEntry;
     protected TextField manikinName;

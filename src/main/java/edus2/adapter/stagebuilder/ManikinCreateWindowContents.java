@@ -1,4 +1,4 @@
-package edus2.adapter.scenecontents;
+package edus2.adapter.stagebuilder;
 
 import com.google.inject.Inject;
 import edus2.adapter.ui.builder.SceneBuilder;

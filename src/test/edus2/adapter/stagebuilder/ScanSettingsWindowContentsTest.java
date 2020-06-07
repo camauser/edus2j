@@ -1,4 +1,4 @@
-package edus2.adapter.scenecontents;
+package edus2.adapter.stagebuilder;
 
 import edus2.adapter.repository.memory.InMemoryEDUS2Configuration;
 import edus2.adapter.repository.memory.InMemoryScanRepository;
@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import static org.mockito.Mockito.*;
 
-public class ScanSettingsWindowContentsTest extends SceneContentsTest {
+public class ScanSettingsWindowContentsTest extends StageBuilderTest {
     private AddScanHandler addScanHandlerMock;
     private BulkAddScanHandler bulkAddScanHandlerMock;
     private EditManikinLocationHandler editManikinLocationHandlerMock;
@@ -44,7 +44,7 @@ public class ScanSettingsWindowContentsTest extends SceneContentsTest {
                 null, addScanHandlerMock, bulkAddScanHandlerMock,
                 editManikinLocationHandlerMock, editScanFileHandlerMock, deleteScanHandlerMock, deleteAllScanHandler,
                 loadScenarioHandlerMock, saveScenarioHandlerMock);
-        Scene scene = scanSettingsWindowContents.getScene();
+        Scene scene = scanSettingsWindowContents.buildScene();
         stage.setScene(scene);
         stage.show();
         stage.toFront();
