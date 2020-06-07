@@ -30,6 +30,7 @@ public class ScanSettingsWindowHandler extends FrontpageHandler {
                 EDUS2IconStage scanWindowStage = new EDUS2IconStage();
                 Scene settingsScene = scanSettingsWindowContents.getScene();
                 scanWindowStage.setScene(settingsScene);
+                scanWindowStage.setTitle(scanSettingsWindowContents.getTitle());
                 scanWindowStage.show();
             } else {
                 Alert invalidPasswordAlert = new Alert(Alert.AlertType.ERROR);

@@ -62,6 +62,7 @@ public class ManikinSettingsWindowContents extends SceneContents {
             EDUS2IconStage addStage = new EDUS2IconStage();
             addStage.widthProperty().addListener((ob, oldVal, newVal) -> manikinCreateWindowContents.handleWindowResize(newVal.intValue()));
             Scene scene = manikinCreateWindowContents.getScene();
+            addStage.setTitle(manikinCreateWindowContents.getTitle());
             addStage.setScene(scene);
             addStage.showAndWait();
             manikinsWindow.refreshTableItems();
@@ -76,9 +77,9 @@ public class ManikinSettingsWindowContents extends SceneContents {
             EDUS2IconStage updateStage = new EDUS2IconStage();
 
             manikinUpdateWindowContents.bindManikin(manikinFacade.getManikin(selected.getName()).orElseThrow(() -> new InvalidManikinNameException(String.format("Manikin %s does not exist!", selected.getName()))));
-            Scene scene = manikinUpdateWindowContents.getScene();
             updateStage.widthProperty().addListener((ob, oldVal, newVal) -> manikinUpdateWindowContents.handleWindowResize(newVal.intValue()));
-            updateStage.setScene(scene);
+            updateStage.setScene(manikinUpdateWindowContents.getScene());
+            updateStage.setTitle(manikinUpdateWindowContents.getTitle());
             updateStage.showAndWait();
             manikinsWindow.refreshTableItems();
         });
@@ -131,6 +132,11 @@ public class ManikinSettingsWindowContents extends SceneContents {
         manikinsWindow.setAlignment(Pos.CENTER);
         manikinSettingsBox.getChildren().addAll(manikinsWindow, scanSettingButtonsBox);
         return manikinSettingsBox;
+    }
+
+    @Override
+    public String getTitle() {
+        return "Manikin Settings";
     }
 
     private void importManikins() {

@@ -58,6 +58,7 @@ public class ScanSettingsWindowContents extends SceneContents {
             EDUS2IconStage configurationStage = new EDUS2IconStage();
             Scene configurationScene = configurationWindowContents.getScene();
             configurationStage.setScene(configurationScene);
+            configurationStage.setTitle(configurationWindowContents.getTitle());
             configurationStage.showAndWait();
             // needed to keep scan list up-to-date if scan file is changed
             scanList.refreshTableItems();
@@ -68,6 +69,11 @@ public class ScanSettingsWindowContents extends SceneContents {
         configurationButtonBox.getChildren().add(btnConfigSettings);
         settingsWindow.getChildren().addAll(scanList, scanSettingButtonsBox, configurationButtonBox);
         return settingsWindow;
+    }
+
+    @Override
+    public String getTitle() {
+        return "Scan Settings";
     }
 
     private HBox setupControlButtons() {

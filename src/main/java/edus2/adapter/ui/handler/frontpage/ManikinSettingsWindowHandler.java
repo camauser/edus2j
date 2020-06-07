@@ -23,6 +23,7 @@ public class ManikinSettingsWindowHandler extends FrontpageHandler {
             Scene scene = manikinSettingsWindowContents.getScene();
             EDUS2IconStage manikinSettingStage = new EDUS2IconStage();
             manikinSettingStage.setScene(scene);
+            manikinSettingStage.setTitle(manikinSettingsWindowContents.getTitle());
             manikinSettingStage.show();
         } catch (Exception e) {
             e.printStackTrace();

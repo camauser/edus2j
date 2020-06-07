@@ -24,4 +24,9 @@ public class ManikinCreateWindowContents extends ManikinEntryWindowContents {
     protected boolean shouldClearFieldsAfterSave() {
         return true;
     }
+
+    @Override
+    public String getTitle() {
+        return "Create Manikin";
+    }
 }
