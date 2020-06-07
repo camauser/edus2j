@@ -1,4 +1,4 @@
-package edus2.adapter.scenecontents;
+package edus2.adapter.stagebuilder;
 
 import edus2.adapter.repository.memory.InMemoryEDUS2Configuration;
 import edus2.adapter.repository.memory.InMemoryManikinRepository;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class ManikinUpdateWindowContentsTest extends SceneContentsTest {
+public class ManikinUpdateWindowContentsTest extends StageBuilderTest {
 
     private ManikinFacade manikinFacade;
     private Scene scene;
@@ -31,7 +31,7 @@ public class ManikinUpdateWindowContentsTest extends SceneContentsTest {
         manikinFacade.create(manikin);
         manikinUpdateWindowContents.bindManikin(manikin);
 
-        scene = manikinUpdateWindowContents.getScene();
+        scene = manikinUpdateWindowContents.buildScene();
         stage.setScene(scene);
         stage.show();
         stage.toFront();

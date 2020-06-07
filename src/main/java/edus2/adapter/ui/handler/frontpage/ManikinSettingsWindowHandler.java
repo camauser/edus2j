@@ -1,9 +1,8 @@
 package edus2.adapter.ui.handler.frontpage;
 
 import com.google.inject.Inject;
-import edus2.adapter.scenecontents.ManikinSettingsWindowContents;
+import edus2.adapter.stagebuilder.ManikinSettingsWindowContents;
 import edus2.adapter.ui.EDUS2IconStage;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.BorderPane;
 
@@ -20,10 +19,7 @@ public class ManikinSettingsWindowHandler extends FrontpageHandler {
     protected void handleRequest() {
         try {
             mainDisplayPane.requestFocus();
-            Scene scene = manikinSettingsWindowContents.getScene();
-            EDUS2IconStage manikinSettingStage = new EDUS2IconStage();
-            manikinSettingStage.setScene(scene);
-            manikinSettingStage.setTitle(manikinSettingsWindowContents.getTitle());
+            EDUS2IconStage manikinSettingStage = manikinSettingsWindowContents.build();
             manikinSettingStage.show();
         } catch (Exception e) {
             e.printStackTrace();

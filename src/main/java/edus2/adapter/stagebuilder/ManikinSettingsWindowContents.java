@@ -1,4 +1,4 @@
-package edus2.adapter.scenecontents;
+package edus2.adapter.stagebuilder;
 
 import com.google.inject.Inject;
 import edus2.adapter.repository.file.FileManikinImportExportRepository;
@@ -10,7 +10,6 @@ import edus2.domain.InvalidManikinNameException;
 import edus2.domain.Manikin;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -22,7 +21,7 @@ import javafx.stage.FileChooser;
 import java.io.File;
 import java.util.Optional;
 
-public class ManikinSettingsWindowContents extends SceneContents {
+public class ManikinSettingsWindowContents extends StageBuilder {
 
     private final ManikinFacade manikinFacade;
     private final EDUS2IconStage stage;
@@ -59,11 +58,8 @@ public class ManikinSettingsWindowContents extends SceneContents {
         Button btnExport = new Button("Export Manikins");
 
         btnAdd.setOnAction(event -> {
-            EDUS2IconStage addStage = new EDUS2IconStage();
+            EDUS2IconStage addStage = manikinCreateWindowContents.build();
             addStage.widthProperty().addListener((ob, oldVal, newVal) -> manikinCreateWindowContents.handleWindowResize(newVal.intValue()));
-            Scene scene = manikinCreateWindowContents.getScene();
-            addStage.setTitle(manikinCreateWindowContents.getTitle());
-            addStage.setScene(scene);
             addStage.showAndWait();
             manikinsWindow.refreshTableItems();
         });
@@ -74,12 +70,9 @@ public class ManikinSettingsWindowContents extends SceneContents {
                 return;
             }
 
-            EDUS2IconStage updateStage = new EDUS2IconStage();
-
             manikinUpdateWindowContents.bindManikin(manikinFacade.getManikin(selected.getName()).orElseThrow(() -> new InvalidManikinNameException(String.format("Manikin %s does not exist!", selected.getName()))));
+            EDUS2IconStage updateStage = manikinUpdateWindowContents.build();
             updateStage.widthProperty().addListener((ob, oldVal, newVal) -> manikinUpdateWindowContents.handleWindowResize(newVal.intValue()));
-            updateStage.setScene(manikinUpdateWindowContents.getScene());
-            updateStage.setTitle(manikinUpdateWindowContents.getTitle());
             updateStage.showAndWait();
             manikinsWindow.refreshTableItems();
         });

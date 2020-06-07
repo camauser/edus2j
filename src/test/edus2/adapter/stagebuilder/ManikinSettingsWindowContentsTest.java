@@ -1,4 +1,4 @@
-package edus2.adapter.scenecontents;
+package edus2.adapter.stagebuilder;
 
 import edus2.adapter.repository.file.FileManikinImportExportRepository;
 import edus2.adapter.repository.memory.InMemoryEDUS2Configuration;
@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
-public class ManikinSettingsWindowContentsTest extends SceneContentsTest {
+public class ManikinSettingsWindowContentsTest extends StageBuilderTest {
     private static final int LEFT_LUNG_BOX = 1;
     private static final int RIGHT_LUNG_BOX = 2;
     private static final int PSL_PSS_BOX = 3;
@@ -56,7 +56,7 @@ public class ManikinSettingsWindowContentsTest extends SceneContentsTest {
 
         doReturn(new File("C:/openFile")).when(manikinSettingsWindowContents).promptForKinFileOpen();
         doReturn(new File("C:/saveFile")).when(manikinSettingsWindowContents).promptForKinFileSave();
-        Scene scene = manikinSettingsWindowContents.getScene();
+        Scene scene = manikinSettingsWindowContents.buildScene();
         stage.setScene(scene);
         stage.show();
     }

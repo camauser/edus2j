@@ -1,4 +1,4 @@
-package edus2.adapter.scenecontents;
+package edus2.adapter.stagebuilder;
 
 import com.google.inject.Inject;
 import edus2.adapter.ui.builder.SceneBuilder;
@@ -13,7 +13,7 @@ import javafx.scene.text.Text;
 
 import static java.lang.String.format;
 
-public class Credits extends SceneContents {
+public class Credits extends StageBuilder {
 
     @Inject
     public Credits(SceneBuilder sceneBuilder) {

@@ -1,4 +1,4 @@
-package edus2.adapter.scenecontents;
+package edus2.adapter.stagebuilder;
 
 import edus2.adapter.repository.memory.InMemoryEDUS2Configuration;
 import edus2.adapter.ui.EDUS2IconStage;
@@ -20,7 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
-public class ConfigurationWindowContentsTest extends SceneContentsTest {
+public class ConfigurationWindowContentsTest extends StageBuilderTest {
 
     private static final int MIN_VIDEO_WIDTH_INDEX = 0;
     private static final int MIN_VIDEO_HEIGHT_INDEX = 1;
@@ -42,7 +42,7 @@ public class ConfigurationWindowContentsTest extends SceneContentsTest {
         doReturn(expectedDirectory).when(configurationWindowContents).promptForDirectory();
         doReturn(expectedFile).when(configurationWindowContents).promptForFile();
 
-        scene = configurationWindowContents.getScene();
+        scene = configurationWindowContents.buildScene();
         stage.setScene(scene);
         stage.show();
         stage.toFront();

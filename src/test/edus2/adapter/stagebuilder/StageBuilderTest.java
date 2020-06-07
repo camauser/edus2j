@@ -1,4 +1,4 @@
-package edus2.adapter.scenecontents;
+package edus2.adapter.stagebuilder;
 
 import javafx.scene.control.DialogPane;
 import javafx.stage.Modality;
@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public abstract class SceneContentsTest extends ApplicationTest {
+public abstract class StageBuilderTest extends ApplicationTest {
     // courtesy of https://stackoverflow.com/questions/48565782/testfx-how-to-test-validation-dialogs-with-no-ids
     protected void assertPopupContents(String expectedMessage) {
         DialogPane popupStage = getPopupDialogPane();
