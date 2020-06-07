@@ -75,8 +75,8 @@ public class ManikinSettingsWindowContents extends SceneContents {
 
             EDUS2IconStage updateStage = new EDUS2IconStage();
 
-            Scene scene = manikinUpdateWindowContents.getScene();
             manikinUpdateWindowContents.bindManikin(manikinFacade.getManikin(selected.getName()).orElseThrow(() -> new InvalidManikinNameException(String.format("Manikin %s does not exist!", selected.getName()))));
+            Scene scene = manikinUpdateWindowContents.getScene();
             updateStage.widthProperty().addListener((ob, oldVal, newVal) -> manikinUpdateWindowContents.handleWindowResize(newVal.intValue()));
             updateStage.setScene(scene);
             updateStage.showAndWait();
