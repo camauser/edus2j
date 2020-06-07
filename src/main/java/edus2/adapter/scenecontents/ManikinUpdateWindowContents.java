@@ -48,6 +48,11 @@ public class ManikinUpdateWindowContents extends ManikinEntryWindowContents {
     }
 
     @Override
+    public String getTitle() {
+        return "Update Manikin";
+    }
+
+    @Override
     protected void saveManikin(Manikin manikin) {
         manikinFacade.update(manikin);
     }

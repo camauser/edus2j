@@ -133,7 +133,7 @@ public class MainControlsPane extends BorderPane {
     private void showCredits() {
         EDUS2IconStage creditStage = new EDUS2IconStage();
         creditStage.setScene(credits.getScene());
-        creditStage.setTitle("EDUS2J Credits");
+        creditStage.setTitle(credits.getTitle());
         creditStage.show();
     }
 }

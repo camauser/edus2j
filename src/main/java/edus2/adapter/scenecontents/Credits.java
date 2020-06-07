@@ -39,4 +39,9 @@ public class Credits extends SceneContents {
         BorderPane.setAlignment(credits, Pos.CENTER);
         return credits;
     }
+
+    @Override
+    public String getTitle() {
+        return "EDUS2J Credits";
+    }
 }

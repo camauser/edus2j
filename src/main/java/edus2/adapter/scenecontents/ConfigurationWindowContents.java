@@ -89,6 +89,11 @@ public class ConfigurationWindowContents extends SceneContents {
         return configurationBox;
     }
 
+    @Override
+    public String getTitle() {
+        return "Configuration Settings";
+    }
+
     private void setDarkMode(CheckBox darkModeCheckbox) {
         configuration.setDarkModeEnabled(darkModeCheckbox.isSelected());
     }

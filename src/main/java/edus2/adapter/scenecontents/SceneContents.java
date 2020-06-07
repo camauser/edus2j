@@ -16,4 +16,6 @@ public abstract class SceneContents {
     }
 
     protected abstract Parent buildSceneContents();
+
+    public abstract String getTitle();
 }
