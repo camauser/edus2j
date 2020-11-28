@@ -2,6 +2,7 @@ package edus2.adapter.repository.file;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import edus2.domain.EDUS2Configuration;
 import edus2.domain.SystemIdentifier;
 import edus2.domain.property.ObservableProperty;
@@ -135,9 +136,15 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
 
     private EDUS2ConfigurationDto getDto() {
         Optional<String> fileContents = readFileContents(filePath);
-        return fileContents
-                .map(s -> gson.fromJson(s, EDUS2ConfigurationDto.class))
-                .orElse(new EDUS2ConfigurationDto());
+        if (fileContents.isPresent()) {
+            try {
+                return gson.fromJson(fileContents.get(), EDUS2ConfigurationDto.class);
+            } catch (JsonSyntaxException e) {
+                throw new RuntimeException(String.format("Couldn't parse config file. Contents: \"%s\"", fileContents.get()), e);
+            }
+        } else {
+            return new EDUS2ConfigurationDto();
+        }
     }
 
     private static class EDUS2ConfigurationDto {
