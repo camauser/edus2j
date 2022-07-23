@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
+import edus2.adapter.repository.file.dto.ScanDto;
 import edus2.application.ScanFacade;
-import edus2.domain.ManikinScanEnum;
 import edus2.domain.Scan;
 
 import java.io.File;
@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FileScanImportExportRepository {
-    private ScanFacade scanFacade;
-    private Gson gson;
+    private final ScanFacade scanFacade;
+    private final Gson gson;
 
     @Inject
     public FileScanImportExportRepository(ScanFacade scanFacade) {
@@ -34,21 +34,9 @@ public class FileScanImportExportRepository {
         byte[] fileContents = Files.readAllBytes(inputFile.toPath());
         Type type = new TypeToken<List<ScanDto>>(){}.getType();
         List<ScanDto> scanDtos = gson.fromJson(new String(fileContents), type);
-        List<Scan> scans = scanDtos.stream().map(ScanDto::toScan).collect(Collectors.toList());
+        List<Scan> scans = scanDtos.stream().map(ScanDto::toDomain).collect(Collectors.toList());
         scanFacade.removeAllScans();
         scanFacade.addScans(scans);
     }
 
-    private static class ScanDto {
-        private ManikinScanEnum scanEnum;
-        private String path;
-        ScanDto(Scan scan) {
-            this.scanEnum = scan.getScanEnum();
-            this.path = scan.getPath();
-        }
-
-        Scan toScan() {
-            return new Scan(scanEnum, this.path);
-        }
-    }
 }

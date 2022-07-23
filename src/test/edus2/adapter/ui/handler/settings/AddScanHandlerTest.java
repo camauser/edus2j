@@ -15,7 +15,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.junit.Test;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static edus2.TestUtil.Lst;
 import static org.junit.Assert.assertEquals;
@@ -28,12 +29,14 @@ public class AddScanHandlerTest extends StageBuilderTest {
 
     private ScanFacade scanFacade;
     private AddScanHandler handler;
+    private Path scanPath;
 
     @Override
     public void start(Stage stage) {
         scanFacade = new ScanFacade(new InMemoryScanRepository());
         handler = spy(new AddScanHandler(scanFacade, new InMemoryEDUS2Configuration()));
-        doReturn(new File("C:/scan")).when(handler).promptForScanFile(any());
+        scanPath = Paths.get("/scan");
+        doReturn(scanPath.toFile()).when(handler).promptForScanFile(any());
         stage.setScene(new Scene(new VBox()));
         stage.show();
     }
@@ -50,13 +53,13 @@ public class AddScanHandlerTest extends StageBuilderTest {
         clickOn(scanLocationBox).clickOn(point("IVC")).clickOn("OK");
 
         // Assert
-        assertEquals("file:///C:/scan", scanFacade.getScan(ManikinScanEnum.IVC).get().getPath());
+        assertEquals(scanPath, scanFacade.getScan(ManikinScanEnum.IVC).get().getPath());
     }
 
     @Test
     public void handle_shouldNotShowUsedLocations() throws InterruptedException {
         // Arrange
-        scanFacade.addScan(new Scan(ManikinScanEnum.IVC, "C:/path"));
+        scanFacade.addScan(new Scan(ManikinScanEnum.IVC, Paths.get("C:/path")));
         Platform.runLater(() -> handler.handle(Lst(), null));
         Thread.sleep(250);
         DialogPane popupDialogPane = getPopupDialogPane();

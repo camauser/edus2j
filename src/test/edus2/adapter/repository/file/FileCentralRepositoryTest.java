@@ -3,6 +3,7 @@ package edus2.adapter.repository.file;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import edus2.adapter.repository.file.dto.ScanDto;
 import edus2.adapter.repository.memory.InMemoryEDUS2Configuration;
 import edus2.domain.EDUS2Configuration;
 import edus2.domain.Scan;
@@ -11,6 +12,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.lang.reflect.Type;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -79,16 +81,16 @@ public class FileCentralRepositoryTest {
     public void saveSection_shouldPersistJsonCorrectly() {
         // Arrange
         Gson gson = new GsonBuilder().create();
-        Type type = new TypeToken<List<Scan>>(){}.getType();
-        ArrayList<Scan> scans = new ArrayList<>();
-        scans.add(new Scan(randomManikinScanEnum(), "path"));
-        scans.add(new Scan(randomManikinScanEnum(), "path2"));
+        Type type = new TypeToken<List<ScanDto>>(){}.getType();
+        ArrayList<ScanDto> scans = new ArrayList<>();
+        scans.add(new ScanDto(new Scan(randomManikinScanEnum(), Paths.get("path"))));
+        scans.add(new ScanDto(new Scan(randomManikinScanEnum(), Paths.get("path2"))));
 
         // Act
         repository.saveSection(gson.toJson(scans));
 
         // Assert
-        Optional<List<Scan>> actual = repository.retrieveSection().map(j -> gson.fromJson(j, type));
+        Optional<List<ScanDto>> actual = repository.retrieveSection().map(j -> gson.fromJson(j, type));
         assertEquals(Optional.of(scans), actual);
     }
 }

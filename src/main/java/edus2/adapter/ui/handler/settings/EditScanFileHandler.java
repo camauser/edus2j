@@ -34,9 +34,8 @@ public class EditScanFileHandler extends ScanHandler {
         FileChooser browser = new FileChooser();
         File selected = browser.showOpenDialog(stage);
         if (selected != null) {
-            String convertedFilePath = convertFilePath(selected.getPath());
             scanFacade.removeScan(selectedScan);
-            addScan(selectedScan.getScanEnum(), convertedFilePath);
+            addScan(selectedScan.getScanEnum(), selected.toPath());
         }
     }
 }

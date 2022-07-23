@@ -5,14 +5,14 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static edus2.TestUtil.randomAlphanumericString;
+import static edus2.TestUtil.randomPath;
 import static edus2.TestUtil.randomScan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public abstract class ScanRepositoryTest {
 
-    private ScanRepository scanRepository;
+    protected ScanRepository scanRepository;
 
     protected abstract ScanRepository getScanRepository();
 
@@ -66,7 +66,7 @@ public abstract class ScanRepositoryTest {
 
     @Test
     public void remove_shouldNotRemoveDuplicateScan_whenSameVideoUnderMultipleIds() {
-        Scan scan = new Scan(ManikinScanEnum.RIGHT_LUNG, randomAlphanumericString());
+        Scan scan = new Scan(ManikinScanEnum.RIGHT_LUNG, randomPath());
         Scan duplicateScan = new Scan(ManikinScanEnum.LEFT_LUNG, scan.getPath());
         scanRepository.save(scan);
         scanRepository.save(duplicateScan);

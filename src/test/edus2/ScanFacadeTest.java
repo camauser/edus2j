@@ -30,8 +30,8 @@ public class ScanFacadeTest {
         InMemoryEDUS2Configuration configuration = new InMemoryEDUS2Configuration();
         configuration.setSaveFileLocation(randomTempFile());
         scanFacade = new ScanFacade(new FileScanRepository(configuration));
-        scan = new Scan(ManikinScanEnum.RIGHT_LUNG, randomAlphanumericString());
-        scanTwo = new Scan(ManikinScanEnum.LEFT_LUNG, randomAlphanumericString());
+        scan = new Scan(ManikinScanEnum.RIGHT_LUNG, randomPath());
+        scanTwo = new Scan(ManikinScanEnum.LEFT_LUNG, randomPath());
     }
 
     @Test
@@ -73,7 +73,7 @@ public class ScanFacadeTest {
     @Test(expected = EmptyScanIdException.class)
     public void addScan_shouldThrowEmptyScanIdException_whenEmptyScanIdGiven() {
         // Arrange
-        Scan emptyScanIdScan = new Scan(null, randomAlphanumericString());
+        Scan emptyScanIdScan = new Scan(null, randomPath());
 
         // Act
         scanFacade.addScan(emptyScanIdScan);
@@ -163,7 +163,7 @@ public class ScanFacadeTest {
     @Test
     public void getUnusedScanEnums_shouldExcludeScanEnum_whenEnumUsed() {
         // Arrange
-        scanFacade.addScan(new Scan(ManikinScanEnum.RIGHT_LUNG, randomAlphanumericString()));
+        scanFacade.addScan(new Scan(ManikinScanEnum.RIGHT_LUNG, randomPath()));
 
         // Act
         Set<ManikinScanEnum> actual = scanFacade.getUnusedScanEnums();

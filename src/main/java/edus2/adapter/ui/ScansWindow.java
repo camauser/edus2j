@@ -27,9 +27,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.List;
 
 public class ScansWindow extends VBox {
@@ -47,14 +44,7 @@ public class ScansWindow extends VBox {
 
         TableColumn<Scan, String> path = new TableColumn<>("File Name");
         path.setCellValueFactory(new PropertyValueFactory<>("path"));
-        path.setCellValueFactory(cell -> {
-            try {
-                return new SimpleStringProperty(Paths.get(new URI(cell.getValue().getPath())).getFileName().toString());
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-                return new SimpleStringProperty("Unknown");
-            }
-        });
+        path.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getPath().getFileName().toString()));
         path.setMinWidth(450);
 
         refreshTableItems();

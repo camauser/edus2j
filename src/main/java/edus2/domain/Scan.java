@@ -1,6 +1,6 @@
 package edus2.domain;/*
  * Copyright 2016 Paul Kulyk, Paul Olszynski, Cameron Auser
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,26 +19,23 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
+import java.nio.file.Path;
 
 
-public class Scan implements Serializable
-{
-    private ManikinScanEnum scanEnum;
-    private String path;
+public class Scan implements Serializable {
+    private final ManikinScanEnum scanEnum;
+    private final Path path;
 
-    public Scan(ManikinScanEnum scanEnum, String path)
-    {
+    public Scan(ManikinScanEnum scanEnum, Path path) {
         this.scanEnum = scanEnum;
         this.path = path;
     }
 
-    public ManikinScanEnum getScanEnum()
-    {
+    public ManikinScanEnum getScanEnum() {
         return scanEnum;
     }
 
-    public String getPath()
-    {
+    public Path getPath() {
         return path;
     }
 
@@ -62,5 +59,13 @@ public class Scan implements Serializable
                 .append(scanEnum)
                 .append(path)
                 .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Scan{" +
+                "scanEnum=" + scanEnum +
+                ", path='" + path + '\'' +
+                '}';
     }
 }

@@ -92,9 +92,8 @@ public class ScanPlaybackHandler {
 
     private void playScan(Scan scan) {
         stopPlayer();
-        String scanPath = scan.getPath();
         currentLocationPlaying = scan.getScanEnum();
-        Media video = new Media(scanPath);
+        Media video = new Media(scan.getPath().toString());
         MediaPlayer mediaPlayer = new MediaPlayer(video);
         MediaView videoView = new MediaView(mediaPlayer);
         listenableMediaPlayer.setMedia(videoView);

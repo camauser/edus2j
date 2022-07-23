@@ -4,8 +4,11 @@ import edus2.domain.ManikinScanEnum;
 import edus2.domain.Scan;
 import org.junit.Test;
 
-import static edus2.TestUtil.randomAlphanumericString;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import static edus2.TestUtil.randomManikinScanEnum;
+import static edus2.TestUtil.randomPath;
 import static org.junit.Assert.assertEquals;
 
 public class ScanTest {
@@ -13,7 +16,7 @@ public class ScanTest {
     @Test
     public void getScanEnum_shouldReturnLocationOfScan() {
         // Arrange
-        Scan scan = new Scan(ManikinScanEnum.RIGHT_LUNG, randomAlphanumericString());
+        Scan scan = new Scan(ManikinScanEnum.RIGHT_LUNG, randomPath());
 
         // Act
         ManikinScanEnum actual = scan.getScanEnum();
@@ -25,13 +28,14 @@ public class ScanTest {
     @Test
     public void getPath_shouldReturnPathOfScan() {
         // Arrange
-        Scan scan = new Scan(randomManikinScanEnum(), "sample/path");
+        Path expected = Paths.get("sample/path");
+        Scan scan = new Scan(randomManikinScanEnum(), expected);
 
         // Act
-        String actual = scan.getPath();
+        Path actual = scan.getPath();
 
         // Assert
-        assertEquals("sample/path", actual);
+        assertEquals(expected, actual);
     }
 
 }

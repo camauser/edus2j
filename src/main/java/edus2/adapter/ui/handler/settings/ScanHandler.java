@@ -8,6 +8,7 @@ import edus2.domain.Scan;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceDialog;
 
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,7 +21,7 @@ public abstract class ScanHandler extends SettingsHandler {
         this.scanFacade = scanFacade;
     }
 
-    protected boolean addScan(ManikinScanEnum scanEnum, String path) {
+    protected boolean addScan(ManikinScanEnum scanEnum, Path path) {
         Scan toAdd = new Scan(scanEnum, path);
         try {
             scanFacade.addScan(toAdd);
@@ -40,7 +41,4 @@ public abstract class ScanHandler extends SettingsHandler {
         return scanLocationDialog.showAndWait().map(ManikinScanEnum::findByName);
     }
 
-    protected static String convertFilePath(String originalPath) {
-        return "file:///" + originalPath.replaceAll("\\\\", "/").replaceAll(" ", "%20");
-    }
 }

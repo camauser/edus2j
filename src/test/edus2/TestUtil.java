@@ -4,6 +4,8 @@ import edus2.domain.ManikinScanEnum;
 import edus2.domain.Scan;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +44,7 @@ public class TestUtil {
     }
 
     public static Scan randomScan() {
-        return new Scan(randomManikinScanEnum(), randomAlphanumericString());
+        return new Scan(randomManikinScanEnum(), randomPath());
     }
 
     public static ManikinScanEnum randomManikinScanEnum() {
@@ -55,6 +57,10 @@ public class TestUtil {
         File file = new File(fileName);
         file.deleteOnExit();
         return fileName;
+    }
+
+    public static Path randomPath() {
+        return Paths.get(randomAlphanumericString());
     }
 
 }

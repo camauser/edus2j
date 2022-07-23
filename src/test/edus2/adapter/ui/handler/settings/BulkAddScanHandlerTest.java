@@ -13,7 +13,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.junit.Test;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static edus2.TestUtil.Lst;
 import static org.junit.Assert.assertEquals;
@@ -25,12 +26,16 @@ import static org.mockito.Mockito.spy;
 public class BulkAddScanHandlerTest extends StageBuilderTest {
     private ScanFacade scanFacade;
     private BulkAddScanHandler handler;
+    private Path firstPath;
+    private Path secondPath;
 
     @Override
     public void start(Stage stage) {
         scanFacade = new ScanFacade(new InMemoryScanRepository());
         handler = spy(new BulkAddScanHandler(scanFacade, new InMemoryEDUS2Configuration()));
-        doReturn(Lst(new File("C:/scan"), new File("C:/scan2"))).when(handler).promptForScanFiles(any());
+        firstPath = Paths.get("/scan");
+        secondPath = Paths.get("/scan");
+        doReturn(Lst(firstPath.toFile(), secondPath.toFile())).when(handler).promptForScanFiles(any());
         stage.setScene(new Scene(new VBox()));
         stage.show();
     }
@@ -45,8 +50,8 @@ public class BulkAddScanHandlerTest extends StageBuilderTest {
         chooseScanLocation("Left Lung");
 
         // Assert
-        assertEquals("file:///C:/scan", scanFacade.getScan(ManikinScanEnum.RIGHT_LUNG).get().getPath());
-        assertEquals("file:///C:/scan2", scanFacade.getScan(ManikinScanEnum.LEFT_LUNG).get().getPath());
+        assertEquals(firstPath, scanFacade.getScan(ManikinScanEnum.RIGHT_LUNG).get().getPath());
+        assertEquals(secondPath, scanFacade.getScan(ManikinScanEnum.LEFT_LUNG).get().getPath());
     }
 
     @Test

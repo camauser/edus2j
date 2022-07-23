@@ -1,6 +1,9 @@
 package edus2.adapter.persistence;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import edus2.adapter.repository.file.FileScanImportExportRepository;
+import edus2.adapter.repository.file.dto.ScanDto;
 import edus2.adapter.repository.memory.InMemoryScanRepository;
 import edus2.application.ScanFacade;
 import edus2.domain.ManikinScanEnum;
@@ -41,14 +44,14 @@ public class FileScanImportExportRepositoryTest {
         // Assert
         List<Scan> scans = scanFacade.getAllScans();
         assertEquals(2, scans.size());
-        assertTrue(scans.contains(new Scan(ManikinScanEnum.RIGHT_LUNG, "/path/to/scan")));
-        assertTrue(scans.contains(new Scan(ManikinScanEnum.LEFT_LUNG, "/path/to/second/scan")));
+        assertTrue(scans.contains(new Scan(ManikinScanEnum.RIGHT_LUNG, Paths.get("/path/to/scan"))));
+        assertTrue(scans.contains(new Scan(ManikinScanEnum.LEFT_LUNG, Paths.get("/path/to/second/scan"))));
     }
 
     @Test
     public void importScans_shouldClearExistingScans() throws IOException {
         // Arrange
-        Scan unexpectedScan = new Scan(ManikinScanEnum.IVC, "scan/to/delete");
+        Scan unexpectedScan = new Scan(ManikinScanEnum.IVC, Paths.get("scan/to/delete"));
         scanFacade.addScan(unexpectedScan);
         String fileName = randomTempFile();
         Files.write(Paths.get(fileName), "[{\"scanEnum\": \"RIGHT_LUNG\", \"path\": \"/path/to/scan\"}, {\"scanEnum\": \"LEFT_LUNG\", \"path\": \"/path/to/second/scan\"}]".getBytes());
@@ -65,22 +68,26 @@ public class FileScanImportExportRepositoryTest {
     @Test
     public void exportScans_shouldExportScansToFile() throws IOException {
         // Arrange
+        Gson gson = new Gson();
         String fileName = randomTempFile();
-        scanFacade.addScans(Lst(new Scan(ManikinScanEnum.RIGHT_LUNG, "/scan/path"), new Scan(ManikinScanEnum.LEFT_LUNG, "/second/path")));
+        Scan firstScan = new Scan(ManikinScanEnum.RIGHT_LUNG, Paths.get("/scan/path"));
+        Scan secondScan = new Scan(ManikinScanEnum.LEFT_LUNG, Paths.get("/second/path"));
+        scanFacade.addScans(Lst(firstScan, secondScan));
 
         // Act
         repository.exportScansToFile(new File(fileName));
 
         // Assert
-        String result = new String(Files.readAllBytes(Paths.get(fileName)));
-        assertEquals("[{\"scanEnum\":\"RIGHT_LUNG\",\"path\":\"/scan/path\"},{\"scanEnum\":\"LEFT_LUNG\",\"path\":\"/second/path\"}]", result);
+        List<ScanDto> actual = gson.fromJson(new String(Files.readAllBytes(Paths.get(fileName))), new TypeToken<List<ScanDto>>() {
+        }.getType());
+        assertEquals(Lst(new ScanDto(firstScan), new ScanDto(secondScan)), actual);
     }
 
     @Test
     public void exportImport_endToEnd() throws IOException {
         // Arrange
         String fileName = randomTempFile();
-        List<Scan> scans = Lst(new Scan(ManikinScanEnum.RIGHT_LUNG, "/scan/path"), new Scan(ManikinScanEnum.LEFT_LUNG, "/second/path"));
+        List<Scan> scans = Lst(new Scan(ManikinScanEnum.RIGHT_LUNG, Paths.get("/scan/path")), new Scan(ManikinScanEnum.LEFT_LUNG, Paths.get("/second/path")));
         scanFacade.addScans(scans);
         repository.exportScansToFile(new File(fileName));
         scanFacade.removeAllScans();

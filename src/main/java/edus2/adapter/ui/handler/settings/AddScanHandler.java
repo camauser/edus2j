@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,13 +48,13 @@ public class AddScanHandler extends ScanHandler {
     protected void promptForScanIdAndSaveScan(File file) {
         boolean added = false;
         while (!added) {
-            String convertedFilePath = convertFilePath(file.getPath());
-            Optional<ManikinScanEnum> scanLocationOptional = promptForScanLocation("Filename: " + file.getName() + "\nWhat location would you like to link the video to?");
+            Path path = file.toPath();
+            Optional<ManikinScanEnum> scanLocationOptional = promptForScanLocation("Filename: " + path + "\nWhat location would you like to link the video to?");
             if (!scanLocationOptional.isPresent()) {
                 break;
             }
 
-            added = addScan(scanLocationOptional.get(), convertedFilePath);
+            added = addScan(scanLocationOptional.get(), path);
         }
     }
 
