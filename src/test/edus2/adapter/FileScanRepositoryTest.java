@@ -43,4 +43,16 @@ public class FileScanRepositoryTest extends ScanRepositoryTest {
         // Assert
         assertEquals(Lst(new Scan(ManikinScanEnum.CARDIAC_SC, Paths.get("C:/edus2j/problematic[file].mp4"))), actual);
     }
+
+    @Test
+    public void retrieveAll_legacyFileFormatWithSpaces() throws IOException {
+        // Arrange
+        Files.write(file.toPath(), "{\"scans\": \"[{\\\"scanEnum\\\":\\\"CARDIAC_SC\\\",\\\"path\\\":\\\"file:///C:/edus2j/problematic%20file.mp4\\\"}]\"}".getBytes());
+
+        // Act
+        List<Scan> actual = scanRepository.retrieveAll();
+
+        // Assert
+        assertEquals(Lst(new Scan(ManikinScanEnum.CARDIAC_SC, Paths.get("C:/edus2j/problematic file.mp4"))), actual);
+    }
 }

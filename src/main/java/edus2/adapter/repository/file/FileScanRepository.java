@@ -21,6 +21,7 @@ public class FileScanRepository extends FileCentralRepository implements ScanRep
     private static final Type SCAN_SECTION_TYPE = new TypeToken<List<ScanDto>>() {
     }.getType();
     private static final String LEGACY_PATH_PREFIX = "file:///";
+    private static final String SPACE_ESCAPE_SEQUENCE = "%20";
     private final Gson gson;
 
     @Inject
@@ -91,6 +92,6 @@ public class FileScanRepository extends FileCentralRepository implements ScanRep
             legacyPath = legacyPath.substring(LEGACY_PATH_PREFIX.length());
         }
 
-        return legacyPath;
+        return legacyPath.replace(SPACE_ESCAPE_SEQUENCE, " ");
     }
 }
