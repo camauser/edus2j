@@ -178,38 +178,6 @@ public abstract class EDUS2ConfigurationTest {
     }
 
     @Test
-    public void acceptedPhoneHomeWarning_shouldInitiallyReturnFalse() {
-        // Act
-        boolean actual = configuration.acceptedPhoneHomeWarning();
-
-        // Assert
-        assertFalse(actual);
-    }
-
-    @Test
-    public void acceptPhoneHomeWarning_shouldSetPhoneHomeWarningShownToTrue() {
-        // Act
-        configuration.acceptPhoneHomeWarning();
-
-        // Assert
-        boolean actual = configuration.acceptedPhoneHomeWarning();
-        assertTrue(actual);
-    }
-
-    @Test
-    public void acceptPhoneHomeWarning_shouldDoNothing_whenCalledMultipleTimes() {
-        // Arrange
-        configuration.acceptPhoneHomeWarning();
-
-        // Act
-        configuration.acceptPhoneHomeWarning();
-
-        // Assert
-        boolean actual = configuration.acceptedPhoneHomeWarning();
-        assertTrue(actual);
-    }
-
-    @Test
     public void darkModeEnabledProperty_shouldInitiallyReturnTrue() {
         // Act
         boolean actual = configuration.darkModeEnabledProperty().get();
@@ -226,19 +194,5 @@ public abstract class EDUS2ConfigurationTest {
         // Assert
         boolean actual = configuration.darkModeEnabledProperty().get();
         assertFalse(actual);
-    }
-
-    @Test
-    public void getSystemIdentifier_shouldInitiallyGenerateIdentifier() {
-        // Arrange
-        EDUS2Configuration firstConfiguration = getConfiguration();
-        EDUS2Configuration secondConfiguration = getConfiguration();
-
-        // Act
-        SystemIdentifier firstIdentifier = firstConfiguration.getSystemIdentifier();
-        SystemIdentifier secondIdentifier = secondConfiguration.getSystemIdentifier();
-
-        // Assert
-        assertNotEquals(firstIdentifier, secondIdentifier);
     }
 }

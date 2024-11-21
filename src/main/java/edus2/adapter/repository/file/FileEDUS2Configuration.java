@@ -3,7 +3,6 @@ package edus2.adapter.repository.file;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import edus2.domain.EDUS2Configuration;
-import edus2.domain.SystemIdentifier;
 import edus2.domain.property.ObservableProperty;
 import edus2.domain.property.ReadableObserableProperty;
 
@@ -62,16 +61,6 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
     }
 
     @Override
-    public SystemIdentifier getSystemIdentifier() {
-        return SystemIdentifier.of(getDto().systemIdentifier);
-    }
-
-    @Override
-    public boolean acceptedPhoneHomeWarning() {
-        return getDto().acceptedPhoneHomeWarning;
-    }
-
-    @Override
     public ReadableObserableProperty<Boolean> darkModeEnabledProperty() {
         return darkModeProperty;
     }
@@ -119,13 +108,6 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
     }
 
     @Override
-    public void acceptPhoneHomeWarning() {
-        EDUS2ConfigurationDto dto = getDto();
-        dto.acceptedPhoneHomeWarning = true;
-        saveToFile(gson.toJson(dto), filePath);
-    }
-
-    @Override
     public void setDarkModeEnabled(boolean enabled) {
         EDUS2ConfigurationDto dto = getDto();
         dto.darkModeEnabled = enabled;
@@ -147,8 +129,6 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
         String saveFileLocation;
         String defaultScenarioDirectory;
         String defaultVideoDirectory;
-        String systemIdentifier = SystemIdentifier.ofRandom().getSystemIdentifier();
-        boolean acceptedPhoneHomeWarning;
         boolean darkModeEnabled = true;
     }
 }

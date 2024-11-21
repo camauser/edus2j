@@ -22,22 +22,14 @@ import edus2.adapter.ui.ListenableMediaPlayer;
 import edus2.adapter.ui.MainControlsPane;
 import edus2.adapter.ui.builder.SceneBuilder;
 import edus2.adapter.ui.handler.frontpage.ScanPlaybackHandler;
-import edus2.adapter.ui.usagereporting.ReportStartupTask;
-import edus2.application.usagereporting.UsageReportingService;
-import edus2.domain.EDUS2Configuration;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Purpose: The main class used to run the EDUS2J program.
@@ -47,8 +39,6 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public class EDUS2View extends Application {
     private ListenableMediaPlayer listenablePlayer = new ListenableMediaPlayer();
-    private EDUS2Configuration configuration;
-    private UsageReportingService usageReportingService;
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -64,8 +54,6 @@ public class EDUS2View extends Application {
     public void start(Stage stage) {
         BorderPane main = new BorderPane();
         Injector injector = Guice.createInjector(new EDUS2JModule(stage, main, listenablePlayer));
-        configuration = injector.getInstance(EDUS2Configuration.class);
-        usageReportingService = injector.getInstance(UsageReportingService.class);
         ScanPlaybackHandler scanPlaybackHandler = injector.getInstance(ScanPlaybackHandler.class);
         SceneBuilder sceneBuilder = injector.getInstance(SceneBuilder.class);
 
@@ -86,43 +74,6 @@ public class EDUS2View extends Application {
         main.requestFocus();
 
         scene.setOnKeyPressed(scanPlaybackHandler::handle);
-        ensurePhoneHomeWarningAccepted(stage, injector.getInstance(ScheduledExecutorService.class));
-        reportStartupToServer(injector.getInstance(ScheduledExecutorService.class));
     }
 
-    private void reportStartupToServer(ExecutorService threadPool) {
-        ReportStartupTask task = new ReportStartupTask(usageReportingService);
-        task.setOnSucceeded(wse -> {
-            Optional<String> serverResponseMessage = task.getValue();
-            if (serverResponseMessage.isPresent()) {
-                Alert serverMessage = new Alert(Alert.AlertType.INFORMATION, serverResponseMessage.get());
-                serverMessage.setTitle("EDUS2J Information");
-                serverMessage.setHeaderText("EDUS2J Information");
-                serverMessage.showAndWait();
-            }
-        });
-
-        if (!threadPool.isShutdown()) {
-            threadPool.execute(task);
-        }
-    }
-
-    private void ensurePhoneHomeWarningAccepted(Stage stage, ExecutorService threadPool) {
-        if (!configuration.acceptedPhoneHomeWarning()) {
-            Alert phoneHomeAlert = new Alert(Alert.AlertType.INFORMATION, "Please note, as a means of tracking" +
-                    " uptake/dissemination/impact, we are collecting metrics on downloads and usage of the software." +
-                    " This information/data may be collated and shared in aggregate form with our stakeholders." +
-                    " If you do not agree to these terms, please close the application now and do not click \"OK\".");
-            phoneHomeAlert.setHeaderText("Data Collection Warning");
-            phoneHomeAlert.setTitle("Data Collection Warning");
-            Optional<ButtonType> response = phoneHomeAlert.showAndWait();
-            boolean warningAccepted = response.isPresent();
-            if (warningAccepted) {
-                configuration.acceptPhoneHomeWarning();
-            } else {
-                threadPool.shutdown();
-                stage.close();
-            }
-        }
-    }
 }

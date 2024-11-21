@@ -1,7 +1,6 @@
 package edus2.adapter.repository.memory;
 
 import edus2.domain.EDUS2Configuration;
-import edus2.domain.SystemIdentifier;
 import edus2.domain.property.ObservableProperty;
 import edus2.domain.property.ReadableObserableProperty;
 
@@ -15,13 +14,9 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     private String saveFileLocation;
     private String defaultScenarioDirectory;
     private String defaultVideoDirectory;
-    private SystemIdentifier systemIdentifier;
-    private boolean acceptedPhoneHomeWarning;
     private ObservableProperty<Boolean> darkModeEnabledProperty;
 
     public InMemoryEDUS2Configuration() {
-        this.systemIdentifier = SystemIdentifier.ofRandom();
-        this.acceptedPhoneHomeWarning = false;
         darkModeEnabledProperty = new ObservableProperty<>(true);
     }
 
@@ -62,16 +57,6 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     }
 
     @Override
-    public SystemIdentifier getSystemIdentifier() {
-        return systemIdentifier;
-    }
-
-    @Override
-    public boolean acceptedPhoneHomeWarning() {
-        return acceptedPhoneHomeWarning;
-    }
-
-    @Override
     public ReadableObserableProperty<Boolean> darkModeEnabledProperty() {
         return darkModeEnabledProperty;
     }
@@ -104,11 +89,6 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     @Override
     public void setDefaultVideoDirectory(File defaultVideoDirectory) {
         this.defaultVideoDirectory = defaultVideoDirectory.getAbsolutePath();
-    }
-
-    @Override
-    public void acceptPhoneHomeWarning() {
-        this.acceptedPhoneHomeWarning = true;
     }
 
     @Override

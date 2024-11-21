@@ -18,10 +18,6 @@ public interface EDUS2Configuration {
 
     Optional<File> getDefaultVideoDirectory();
 
-    SystemIdentifier getSystemIdentifier();
-
-    boolean acceptedPhoneHomeWarning();
-
     ReadableObserableProperty<Boolean> darkModeEnabledProperty();
 
     void setMinimumVideoHeight(int minimumVideoHeight);
@@ -35,8 +31,6 @@ public interface EDUS2Configuration {
     void setDefaultScenarioDirectory(File defaultScenarioDirectory);
 
     void setDefaultVideoDirectory(File defaultVideoDirectory);
-
-    void acceptPhoneHomeWarning();
 
     void setDarkModeEnabled(boolean enabled);
 }
