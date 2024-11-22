@@ -10,6 +10,10 @@ public interface EDUS2Configuration {
 
     Optional<Integer> getMinimumVideoWidth();
 
+    Optional<Integer> getMaximumVideoHeight();
+
+    Optional<Integer> getMaximumVideoWidth();
+
     Optional<String> getHashedPassword();
 
     Optional<String> getSaveFileLocation();

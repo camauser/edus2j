@@ -41,6 +41,16 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
     }
 
     @Override
+    public Optional<Integer> getMaximumVideoHeight() {
+        return Optional.ofNullable(getDto().maximumVideoHeight);
+    }
+
+    @Override
+    public Optional<Integer> getMaximumVideoWidth() {
+        return Optional.ofNullable(getDto().maximumVideoWidth);
+    }
+
+    @Override
     public Optional<String> getHashedPassword() {
         return Optional.ofNullable(getDto().hashedPassword);
     }
@@ -125,6 +135,8 @@ public class FileEDUS2Configuration extends FileRepository implements EDUS2Confi
     private static class EDUS2ConfigurationDto {
         Integer minimumVideoHeight;
         Integer minimumVideoWidth;
+        Integer maximumVideoHeight;
+        Integer maximumVideoWidth;
         String hashedPassword;
         String saveFileLocation;
         String defaultScenarioDirectory;

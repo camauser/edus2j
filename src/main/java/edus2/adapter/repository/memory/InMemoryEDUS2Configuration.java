@@ -31,6 +31,16 @@ public class InMemoryEDUS2Configuration implements EDUS2Configuration {
     }
 
     @Override
+    public Optional<Integer> getMaximumVideoHeight() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Integer> getMaximumVideoWidth() {
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<String> getHashedPassword() {
         return Optional.ofNullable(hashedPassword);
     }

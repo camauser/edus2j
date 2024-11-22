@@ -115,23 +115,42 @@ public class ScanPlaybackHandler {
         listenableMediaPlayer.registerListener(ListenableMediaPlayer.ListenableMediaPlayerEventEnum.ON_READY, ((mediaView) -> {
             Media video = mediaView.getMediaPlayer().getMedia();
             mediaView.setPreserveRatio(false);
-            int minVideoWidth = configuration.getMinimumVideoWidth().orElse(DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS);
-            int minVideoHeight = configuration.getMinimumVideoHeight().orElse(DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS);
             double windowWidth = mainDisplayPane.getWidth();
             double windowHeight = mainDisplayPane.getHeight();
-            mediaView.setFitWidth(calculateVideoDimension(minVideoWidth, video.getWidth(), windowWidth));
-            mediaView.setFitHeight(calculateVideoDimension(minVideoHeight, video.getHeight(), windowHeight));
+            mediaView.setFitWidth(calculateWidth(video.getWidth(), windowWidth));
+            mediaView.setFitHeight(calculateHeight(video.getHeight(), windowHeight));
             listenableMediaPlayer.getMediaPlayer().ifPresent(MediaPlayer::play);
         }));
 
         listenableMediaPlayer.registerListener(ListenableMediaPlayer.ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, (mp) -> currentLocationPlaying = null);
     }
 
-    private double calculateVideoDimension(int minimumSize, int videoSize, double screenSize) {
-        if (videoSize > MAX_VIDEO_TO_SCREEN_SIZE_RATIO * screenSize) {
-            return Math.max(minimumSize, MAX_VIDEO_TO_SCREEN_SIZE_RATIO * screenSize);
-        } else {
-            return Math.max(minimumSize, videoSize);
+    private double calculateWidth(int videoWidth, double screenWidth) {
+        double desiredWidth = Math.min(videoWidth, MAX_VIDEO_TO_SCREEN_SIZE_RATIO * screenWidth);
+
+        int minimumWidth = configuration.getMinimumVideoWidth().orElse(DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS);
+        Optional<Integer> maximumWidth = configuration.getMaximumVideoWidth();
+        desiredWidth = Math.max(minimumWidth, desiredWidth);
+
+        if (maximumWidth.isPresent()) {
+            desiredWidth = Math.min(maximumWidth.get(), desiredWidth);
         }
+
+        return desiredWidth;
     }
+
+    private double calculateHeight(int videoHeight, double screenHeight) {
+        double desiredHeight = Math.min(videoHeight, MAX_VIDEO_TO_SCREEN_SIZE_RATIO * screenHeight);
+
+        int minimumHeight = configuration.getMinimumVideoHeight().orElse(DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS);
+        desiredHeight = Math.max(minimumHeight, desiredHeight);
+        Optional<Integer> maximumHeight = configuration.getMaximumVideoHeight();
+
+        if (maximumHeight.isPresent()) {
+            desiredHeight = Math.min(maximumHeight.get(), desiredHeight);
+        }
+
+        return desiredHeight;
+    }
+
 }
