@@ -14,6 +14,7 @@ public class ListenableMediaPlayer {
     }
 
     public void setMedia(MediaView mediaView) {
+        detachInternalListeners();
         this.mediaView = mediaView;
         registerInternalListeners();
     }
@@ -27,11 +28,33 @@ public class ListenableMediaPlayer {
     }
 
     private void registerInternalListeners() {
-        mediaView.getMediaPlayer().setOnPlaying(this::mediaPlaying);
-        mediaView.getMediaPlayer().setOnEndOfMedia(this::endOfMedia);
-        mediaView.getMediaPlayer().setOnReady(this::playerReady);
-        mediaView.getMediaPlayer().setOnStopped(this::playerStopped);
-        mediaView.getMediaPlayer().setOnPaused(this::playerPaused);
+        MediaPlayer player = mediaView.getMediaPlayer();
+        player.setOnPlaying(this::mediaPlaying);
+        player.setOnEndOfMedia(this::endOfMedia);
+        player.setOnReady(this::playerReady);
+        player.setOnStopped(this::playerStopped);
+        player.setOnPaused(this::playerPaused);
+
+        if (player.getStatus() == MediaPlayer.Status.READY) {
+            playerReady();
+        }
+    }
+
+    private void detachInternalListeners() {
+        if (mediaView == null) {
+            return;
+        }
+
+        MediaPlayer player = mediaView.getMediaPlayer();
+        if (player == null) {
+            return;
+        }
+
+        player.setOnPlaying(null);
+        player.setOnEndOfMedia(null);
+        player.setOnReady(null);
+        player.setOnStopped(null);
+        player.setOnPaused(null);
     }
 
     private void playerPaused() {
