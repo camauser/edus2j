@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.image.ImageView;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
-import uk.co.caprica.vlcj.javafx.videosurface.ImageViewVideoSurface;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
@@ -28,7 +27,7 @@ public class ListenableMediaPlayer {
         mediaPlayer = mediaPlayerFactory.mediaPlayers().newEmbeddedMediaPlayer();
         videoView = new ImageView();
         videoView.setPreserveRatio(false);
-        mediaPlayer.videoSurface().set(new ImageViewVideoSurface(videoView));
+        mediaPlayer.videoSurface().set(PixelWriterVideoSurface.create(videoView));
         registerInternalListeners();
     }
 

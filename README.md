@@ -5,7 +5,7 @@ This project is a clone of the original edus2 (Emergency Department Ultrasound S
 For this project to run correctly, your system should meet the following pre-requisities:
 - Be running Windows 7 or newer (this software hasn't been tested on every Windows release, but it *should* work fine under Windows 8, Windows 8.1, Windows 10, and Windows 11). Both 32 and 64 bit installations of Windows should work with this software.
 - Have a Java Runtime Environment installed on your system. Java 11 or newer is required.
-- Have [VLC media player](https://www.videolan.org/vlc/) installed. edus2j uses LibVLC via vlcj for scan video playback. The bitness of VLC must match the bitness of your JRE (e.g. 64-bit Java requires 64-bit VLC).
+- Have [VLC media player](https://www.videolan.org/vlc/) **3.x** installed (64-bit VLC with 64-bit Java, or 32-bit with 32-bit). edus2j uses LibVLC via vlcj for scan video playback. VLC 4.x is not supported.
 
 # Installing edus2j
 To install edus2j, you have two options: Either compile the source code into a .jar file yourself, or [download the pre-compiled .jar file provided on this repository] (https://github.com/cameronauser/edus2j/releases). Downloading the pre-compiled .jar file is the easier route. After you've either downloaded the provided .jar file, or compiled the source code yourself, you simply need to double-click on the .jar file for edus2j to run the software. It should open up and bring you to the main window.
