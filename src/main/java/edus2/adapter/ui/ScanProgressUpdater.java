@@ -19,23 +19,14 @@ import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.media.MediaPlayer;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static edus2.adapter.ui.ListenableMediaPlayer.ListenableMediaPlayerEventEnum.*;
-
 public class ScanProgressUpdater extends Thread {
-    private ListenableMediaPlayer listenableMediaPlayer;
-    private ProgressBar progressBar;
-    private AtomicBoolean videoPlaying = new AtomicBoolean(false);
+    private final ListenableMediaPlayer listenableMediaPlayer;
+    private final ProgressBar progressBar;
 
 
     public ScanProgressUpdater(ListenableMediaPlayer listenableMediaPlayer, ProgressBar progressBar) {
         this.listenableMediaPlayer = listenableMediaPlayer;
         this.progressBar = progressBar;
-        listenableMediaPlayer.registerListener(ON_PLAYING, mediaView -> videoPlaying.set(true));
-        listenableMediaPlayer.registerListener(ON_PAUSED, mediaView -> videoPlaying.set(false));
-        listenableMediaPlayer.registerListener(ON_STOPPED, mediaView -> videoPlaying.set(false));
-        listenableMediaPlayer.registerListener(ON_END_OF_MEDIA, mediaView -> videoPlaying.set(false));
     }
 
     public void run() {
