@@ -1,93 +1,128 @@
 package edus2.adapter.ui;
 
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
+import javafx.application.Platform;
+import javafx.scene.Node;
+import javafx.scene.image.ImageView;
+import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
+import uk.co.caprica.vlcj.javafx.videosurface.ImageViewVideoSurface;
+import uk.co.caprica.vlcj.player.base.MediaPlayer;
+import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
+import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ListenableMediaPlayer {
-    private Map<ListenableMediaPlayerEventEnum, Set<MediaPlayerEventHandler>> watcherMap;
-    private MediaView mediaView;
+    private final Map<ListenableMediaPlayerEventEnum, Set<MediaPlayerEventHandler>> watcherMap = new HashMap<>();
+    private final MediaPlayerFactory mediaPlayerFactory;
+    private final EmbeddedMediaPlayer mediaPlayer;
+    private final ImageView videoView;
+    private final AtomicBoolean mediaLoaded = new AtomicBoolean(false);
 
     public ListenableMediaPlayer() {
-        watcherMap = new HashMap<>();
-    }
-
-    public void setMedia(MediaView mediaView) {
-        detachInternalListeners();
-        this.mediaView = mediaView;
+        mediaPlayerFactory = new MediaPlayerFactory();
+        mediaPlayer = mediaPlayerFactory.mediaPlayers().newEmbeddedMediaPlayer();
+        videoView = new ImageView();
+        videoView.setPreserveRatio(false);
+        mediaPlayer.videoSurface().set(new ImageViewVideoSurface(videoView));
         registerInternalListeners();
     }
 
+    public Node getVideoNode() {
+        return videoView;
+    }
+
+    public ImageView getVideoView() {
+        return videoView;
+    }
+
     public Optional<MediaPlayer> getMediaPlayer() {
-        if (mediaView == null) {
+        if (!mediaLoaded.get()) {
             return Optional.empty();
         }
-
-        return Optional.ofNullable(mediaView.getMediaPlayer());
+        return Optional.of(mediaPlayer);
     }
 
-    private void registerInternalListeners() {
-        MediaPlayer player = mediaView.getMediaPlayer();
-        player.setOnPlaying(this::mediaPlaying);
-        player.setOnEndOfMedia(this::endOfMedia);
-        player.setOnReady(this::playerReady);
-        player.setOnStopped(this::playerStopped);
-        player.setOnPaused(this::playerPaused);
-
-        if (player.getStatus() == MediaPlayer.Status.READY) {
-            playerReady();
-        }
+    public void play(String mrl) {
+        mediaLoaded.set(true);
+        mediaPlayer.media().play(mrl);
     }
 
-    private void detachInternalListeners() {
-        if (mediaView == null) {
-            return;
-        }
-
-        MediaPlayer player = mediaView.getMediaPlayer();
-        if (player == null) {
-            return;
-        }
-
-        player.setOnPlaying(null);
-        player.setOnEndOfMedia(null);
-        player.setOnReady(null);
-        player.setOnStopped(null);
-        player.setOnPaused(null);
+    public void stop() {
+        mediaPlayer.controls().stop();
     }
 
-    private void playerPaused() {
-        callListeners(ListenableMediaPlayerEventEnum.ON_PAUSED);
+    public void clear() {
+        stop();
+        mediaPlayer.media().reset();
+        videoView.setImage(null);
+        mediaLoaded.set(false);
     }
 
-    private void mediaPlaying() {
-        callListeners(ListenableMediaPlayerEventEnum.ON_PLAYING);
+    public boolean isPlaying() {
+        return mediaLoaded.get() && mediaPlayer.status().isPlaying();
     }
 
-    private void endOfMedia() {
-        callListeners(ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA);
-    }
-
-    private void playerReady() {
-        callListeners(ListenableMediaPlayerEventEnum.ON_READY);
-    }
-
-    private void playerStopped() {
-        callListeners(ListenableMediaPlayerEventEnum.ON_STOPPED);
-    }
-
-    private void callListeners(ListenableMediaPlayerEventEnum status) {
-        Set<MediaPlayerEventHandler> listeners = watcherMap.getOrDefault(status, new HashSet<>());
-        for (MediaPlayerEventHandler handler : listeners) {
-            handler.handleEvent(mediaView);
-        }
+    public void release() {
+        clear();
+        mediaPlayer.release();
+        mediaPlayerFactory.release();
     }
 
     public void registerListener(ListenableMediaPlayerEventEnum eventType, MediaPlayerEventHandler handler) {
         Set<MediaPlayerEventHandler> watchers = watcherMap.getOrDefault(eventType, new HashSet<>());
         watchers.add(handler);
         watcherMap.put(eventType, watchers);
+    }
+
+    private void registerInternalListeners() {
+        mediaPlayer.events().addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
+            @Override
+            public void playing(MediaPlayer mediaPlayer) {
+                callListeners(ListenableMediaPlayerEventEnum.ON_PLAYING);
+            }
+
+            @Override
+            public void paused(MediaPlayer mediaPlayer) {
+                callListeners(ListenableMediaPlayerEventEnum.ON_PAUSED);
+            }
+
+            @Override
+            public void stopped(MediaPlayer mediaPlayer) {
+                callListeners(ListenableMediaPlayerEventEnum.ON_STOPPED);
+            }
+
+            @Override
+            public void finished(MediaPlayer mediaPlayer) {
+                mediaLoaded.set(false);
+                callListeners(ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA);
+            }
+
+            @Override
+            public void mediaPlayerReady(MediaPlayer mediaPlayer) {
+                callListeners(ListenableMediaPlayerEventEnum.ON_READY);
+            }
+
+            @Override
+            public void videoOutput(MediaPlayer mediaPlayer, int newCount) {
+                if (newCount > 0) {
+                    callListeners(ListenableMediaPlayerEventEnum.ON_READY);
+                }
+            }
+        });
+    }
+
+    private void callListeners(ListenableMediaPlayerEventEnum status) {
+        Platform.runLater(() -> {
+            Set<MediaPlayerEventHandler> listeners = watcherMap.getOrDefault(status, new HashSet<>());
+            for (MediaPlayerEventHandler handler : listeners) {
+                handler.handleEvent(videoView);
+            }
+        });
     }
 
     public enum ListenableMediaPlayerEventEnum {

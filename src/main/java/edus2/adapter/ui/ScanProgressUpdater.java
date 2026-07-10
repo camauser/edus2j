@@ -17,7 +17,7 @@ package edus2.adapter.ui;/*
 
 import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.media.MediaPlayer;
+import uk.co.caprica.vlcj.player.base.MediaPlayer;
 
 public class ScanProgressUpdater extends Thread {
     private final ListenableMediaPlayer listenableMediaPlayer;
@@ -32,8 +32,10 @@ public class ScanProgressUpdater extends Thread {
     public void run() {
         if (listenableMediaPlayer.getMediaPlayer().isPresent()) {
             MediaPlayer mediaPlayer = listenableMediaPlayer.getMediaPlayer().get();
-            double currentProgress = mediaPlayer.getCurrentTime().toSeconds() / mediaPlayer.getTotalDuration().toSeconds();
-            Platform.runLater(() -> progressBar.setProgress(currentProgress));
+            float position = mediaPlayer.status().position();
+            if (position >= 0) {
+                Platform.runLater(() -> progressBar.setProgress(position));
+            }
         }
     }
 

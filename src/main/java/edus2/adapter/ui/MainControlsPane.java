@@ -12,7 +12,6 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.media.MediaView;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -55,7 +54,7 @@ public class MainControlsPane extends BorderPane {
         this.mainDisplayPane = mainDisplayPane;
         fullscreenHandler = new FullscreenHandler(mainDisplayPane, stage);
         scanProgressUpdater = new ScanProgressUpdater(listenablePlayer, playbackProgress);
-        shutdownHandler = new ShutdownHandler(mainDisplayPane, stage, threadPool);
+        shutdownHandler = new ShutdownHandler(mainDisplayPane, stage, threadPool, listenablePlayer);
 
         titleBox = generateTitleBox();
         VBox playbackPositionBox = generatePlaybackPositionControl(playbackProgress);
@@ -92,12 +91,8 @@ public class MainControlsPane extends BorderPane {
         VBox.setMargin(playbackProgress, new Insets(5.0));
         VBox.setMargin(btnClearScreen, new Insets(5.0, 0, 0, 0));
         btnClearScreen.setOnAction(e -> {
-            if (mainDisplayPane.getCenter() instanceof MediaView) {
-                MediaView mediaView = (MediaView) mainDisplayPane.getCenter();
-                mediaView.getMediaPlayer().stop();
-                mediaView.setMediaPlayer(null);
-                playbackElements.getChildren().remove(btnClearScreen);
-            }
+            listenablePlayer.clear();
+            playbackElements.getChildren().remove(btnClearScreen);
         });
 
         listenablePlayer.registerListener(ListenableMediaPlayer.ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, (mp) -> playbackElements.getChildren().add(btnClearScreen));
