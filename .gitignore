@@ -16,3 +16,4 @@ edus2j.log
 /src/target/
 edus2j.iml
 /target/*
+.tools/
