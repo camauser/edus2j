@@ -9,6 +9,7 @@ import edus2.domain.EDUS2Configuration;
 import edus2.domain.ManikinScanEnum;
 import edus2.domain.MediaPlayerStatus;
 import edus2.domain.Scan;
+import edus2.domain.VideoDimensions;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
@@ -16,7 +17,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 
-import java.awt.Dimension;
 import java.util.Optional;
 
 
@@ -104,9 +104,9 @@ public class ScanPlaybackHandler {
 
     private void registerPlaybackListeners() {
         listenableMediaPlayer.registerListener(ListenableMediaPlayer.ListenableMediaPlayerEventEnum.ON_READY, (videoView) -> {
-            Dimension videoDimension = listenableMediaPlayer.getMediaPlayer().video().videoDimension();
-            int videoWidth = videoDimension != null ? videoDimension.width : DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS;
-            int videoHeight = videoDimension != null ? videoDimension.height : DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS;
+            Optional<VideoDimensions> videoDimensions = listenableMediaPlayer.getVideoDimensions();
+            int videoWidth = videoDimensions.map(VideoDimensions::getWidth).orElse(DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS);
+            int videoHeight = videoDimensions.map(VideoDimensions::getHeight).orElse(DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS);
             double windowWidth = mainDisplayPane.getWidth();
             double windowHeight = mainDisplayPane.getHeight();
             videoView.setPreserveRatio(false);

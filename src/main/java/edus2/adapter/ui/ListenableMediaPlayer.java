@@ -1,6 +1,7 @@
 package edus2.adapter.ui;
 
 import edus2.domain.MediaPlayerStatus;
+import edus2.domain.VideoDimensions;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.image.ImageView;
@@ -10,10 +11,12 @@ import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.base.State;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
+import java.awt.Dimension;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class ListenableMediaPlayer {
@@ -35,8 +38,13 @@ public class ListenableMediaPlayer {
         return videoView;
     }
 
-    public MediaPlayer getMediaPlayer() {
-        return mediaPlayer;
+    public Optional<VideoDimensions> getVideoDimensions() {
+        Dimension dimension = mediaPlayer.video().videoDimension();
+        if (dimension == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new VideoDimensions(dimension.width, dimension.height));
     }
 
     public void play(Path path) {
