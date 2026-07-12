@@ -8,6 +8,7 @@ import uk.co.caprica.vlcj.player.base.MediaPlayer;
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -42,13 +43,17 @@ public class ListenableMediaPlayer {
         return Optional.of(mediaPlayer);
     }
 
-    public void play(String mrl) {
+    public void play(Path path) {
         mediaLoaded.set(true);
-        mediaPlayer.media().play(mrl);
+        mediaPlayer.media().play(path.toAbsolutePath().toString());
     }
 
     public void stop() {
         mediaPlayer.controls().stop();
+    }
+
+    public boolean isPlaying() {
+        return mediaLoaded.get() && mediaPlayer.status().isPlaying();
     }
 
     public void clear() {
@@ -58,20 +63,16 @@ public class ListenableMediaPlayer {
         mediaLoaded.set(false);
     }
 
-    public boolean isPlaying() {
-        return mediaLoaded.get() && mediaPlayer.status().isPlaying();
+    public void registerListener(ListenableMediaPlayerEventEnum eventType, MediaPlayerEventHandler handler) {
+        Set<MediaPlayerEventHandler> watchers = watcherMap.getOrDefault(eventType, new HashSet<>());
+        watchers.add(handler);
+        watcherMap.put(eventType, watchers);
     }
 
     public void release() {
         clear();
         mediaPlayer.release();
         mediaPlayerFactory.release();
-    }
-
-    public void registerListener(ListenableMediaPlayerEventEnum eventType, MediaPlayerEventHandler handler) {
-        Set<MediaPlayerEventHandler> watchers = watcherMap.getOrDefault(eventType, new HashSet<>());
-        watchers.add(handler);
-        watcherMap.put(eventType, watchers);
     }
 
     private void registerInternalListeners() {
