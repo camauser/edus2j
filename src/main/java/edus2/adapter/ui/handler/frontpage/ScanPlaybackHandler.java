@@ -7,6 +7,7 @@ import edus2.application.ManikinFacade;
 import edus2.application.ScanFacade;
 import edus2.domain.EDUS2Configuration;
 import edus2.domain.ManikinScanEnum;
+import edus2.domain.MediaPlayerStatus;
 import edus2.domain.Scan;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
@@ -15,7 +16,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
-import uk.co.caprica.vlcj.player.base.State;
 
 import java.awt.Dimension;
 import java.util.Optional;
@@ -64,12 +64,12 @@ public class ScanPlaybackHandler {
     }
 
     private void toggleVideoPlayStatus() {
+        MediaPlayerStatus status = listenableMediaPlayer.getStatus();
         listenableMediaPlayer.getMediaPlayer().ifPresent(mediaPlayer -> {
-            State state = mediaPlayer.status().state();
-            if (state == State.PLAYING) {
+            if (status == MediaPlayerStatus.PLAYING) {
                 mediaPlayer.controls().setPause(true);
                 toast.display(PAUSE_IMAGE);
-            } else if (state == State.PAUSED) {
+            } else if (status == MediaPlayerStatus.PAUSED) {
                 mediaPlayer.controls().play();
                 toast.display(PLAY_IMAGE);
             }

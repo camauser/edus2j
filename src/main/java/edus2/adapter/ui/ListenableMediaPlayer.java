@@ -1,11 +1,13 @@
 package edus2.adapter.ui;
 
+import edus2.domain.MediaPlayerStatus;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.image.ImageView;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
+import uk.co.caprica.vlcj.player.base.State;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
 import java.nio.file.Path;
@@ -47,7 +49,17 @@ public class ListenableMediaPlayer {
     }
 
     public boolean isPlaying() {
-        return mediaPlayer.status().isPlaying();
+        return getStatus() == MediaPlayerStatus.PLAYING;
+    }
+
+    public MediaPlayerStatus getStatus() {
+        State state = mediaPlayer.status().state();
+        if (state == State.PLAYING) {
+            return MediaPlayerStatus.PLAYING;
+        } else if (state == State.PAUSED) {
+            return MediaPlayerStatus.PAUSED;
+        }
+        return MediaPlayerStatus.STOPPED;
     }
 
     public float getPosition() {
