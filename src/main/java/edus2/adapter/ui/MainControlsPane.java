@@ -12,13 +12,13 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.media.MediaView;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.time.Duration;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -34,9 +34,7 @@ public class MainControlsPane extends BorderPane {
     private ListenableMediaPlayer listenablePlayer;
     private ScheduledExecutorService threadPool;
     private Credits credits;
-    private static final int FRAMES_PER_SECOND = 60;
-    private static final int MILLIS_PER_SECOND = 1000;
-    private static final int MILLIS_BETWEEN_FRAMES = MILLIS_PER_SECOND / FRAMES_PER_SECOND;
+    private static final Duration SCAN_PROGRESS_UPDATER_INTERVAL = Duration.ofMillis(100);
 
     @Inject
     public MainControlsPane(Stage stage, BorderPane mainDisplayPane,
@@ -55,7 +53,7 @@ public class MainControlsPane extends BorderPane {
         this.mainDisplayPane = mainDisplayPane;
         fullscreenHandler = new FullscreenHandler(mainDisplayPane, stage);
         scanProgressUpdater = new ScanProgressUpdater(listenablePlayer, playbackProgress);
-        shutdownHandler = new ShutdownHandler(mainDisplayPane, stage, threadPool);
+        shutdownHandler = new ShutdownHandler(mainDisplayPane, stage, threadPool, listenablePlayer);
 
         titleBox = generateTitleBox();
         VBox playbackPositionBox = generatePlaybackPositionControl(playbackProgress);
@@ -92,17 +90,13 @@ public class MainControlsPane extends BorderPane {
         VBox.setMargin(playbackProgress, new Insets(5.0));
         VBox.setMargin(btnClearScreen, new Insets(5.0, 0, 0, 0));
         btnClearScreen.setOnAction(e -> {
-            if (mainDisplayPane.getCenter() instanceof MediaView) {
-                MediaView mediaView = (MediaView) mainDisplayPane.getCenter();
-                mediaView.getMediaPlayer().stop();
-                mediaView.setMediaPlayer(null);
-                playbackElements.getChildren().remove(btnClearScreen);
-            }
+            listenablePlayer.clear();
+            playbackElements.getChildren().remove(btnClearScreen);
         });
 
         listenablePlayer.registerListener(ListenableMediaPlayer.ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, (mp) -> playbackElements.getChildren().add(btnClearScreen));
         listenablePlayer.registerListener(ListenableMediaPlayer.ListenableMediaPlayerEventEnum.ON_PLAYING, (mp) -> playbackElements.getChildren().remove(btnClearScreen));
-        threadPool.scheduleAtFixedRate(scanProgressUpdater, 0, MILLIS_BETWEEN_FRAMES, TimeUnit.MILLISECONDS);
+        threadPool.scheduleAtFixedRate(scanProgressUpdater, 0, SCAN_PROGRESS_UPDATER_INTERVAL.toMillis(), TimeUnit.MILLISECONDS);
         playbackElements.setAlignment(Pos.BOTTOM_CENTER);
         return playbackElements;
     }

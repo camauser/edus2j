@@ -15,34 +15,33 @@ package edus2.adapter.ui;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import edus2.domain.MediaPlayerStatus;
 import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.media.MediaPlayer;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static edus2.adapter.ui.ListenableMediaPlayer.ListenableMediaPlayerEventEnum.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ScanProgressUpdater extends Thread {
-    private ListenableMediaPlayer listenableMediaPlayer;
-    private ProgressBar progressBar;
-    private AtomicBoolean videoPlaying = new AtomicBoolean(false);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScanProgressUpdater.class);
+    private final ListenableMediaPlayer listenableMediaPlayer;
+    private final ProgressBar progressBar;
+    private boolean anyVideoHasPlayed = false;
 
     public ScanProgressUpdater(ListenableMediaPlayer listenableMediaPlayer, ProgressBar progressBar) {
         this.listenableMediaPlayer = listenableMediaPlayer;
         this.progressBar = progressBar;
-        listenableMediaPlayer.registerListener(ON_PLAYING, mediaView -> videoPlaying.set(true));
-        listenableMediaPlayer.registerListener(ON_PAUSED, mediaView -> videoPlaying.set(false));
-        listenableMediaPlayer.registerListener(ON_STOPPED, mediaView -> videoPlaying.set(false));
-        listenableMediaPlayer.registerListener(ON_END_OF_MEDIA, mediaView -> videoPlaying.set(false));
     }
 
     public void run() {
-        if (listenableMediaPlayer.getMediaPlayer().isPresent()) {
-            MediaPlayer mediaPlayer = listenableMediaPlayer.getMediaPlayer().get();
-            double currentProgress = mediaPlayer.getCurrentTime().toSeconds() / mediaPlayer.getTotalDuration().toSeconds();
-            Platform.runLater(() -> progressBar.setProgress(currentProgress));
+        MediaPlayerStatus status = listenableMediaPlayer.getStatus();
+        if (status == MediaPlayerStatus.PLAYING) {
+            anyVideoHasPlayed = true;
+            float position = listenableMediaPlayer.getPosition();
+            if (position >= 0) {
+                Platform.runLater(() -> progressBar.setProgress(position));
+            }
+        } else if (anyVideoHasPlayed && status == MediaPlayerStatus.STOPPED) {
+            Platform.runLater(() -> progressBar.setProgress(1));
         }
     }
 

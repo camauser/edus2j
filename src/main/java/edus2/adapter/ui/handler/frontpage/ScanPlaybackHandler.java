@@ -7,18 +7,17 @@ import edus2.application.ManikinFacade;
 import edus2.application.ScanFacade;
 import edus2.domain.EDUS2Configuration;
 import edus2.domain.ManikinScanEnum;
+import edus2.domain.MediaPlayerStatus;
 import edus2.domain.Scan;
+import edus2.domain.VideoDimensions;
+import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
+import javafx.scene.layout.StackPane;
 
 import java.util.Optional;
-
-import static javafx.scene.media.MediaPlayer.Status.PLAYING;
 
 
 public class ScanPlaybackHandler {
@@ -46,6 +45,9 @@ public class ScanPlaybackHandler {
         this.scanFacade = scanFacade;
         this.configuration = configuration;
         this.toast = toast;
+        StackPane videoContainer = new StackPane(listenableMediaPlayer.getVideoNode());
+        videoContainer.setAlignment(Pos.CENTER);
+        mainDisplayPane.setCenter(videoContainer);
         registerPlaybackListeners();
         currentScan = "";
     }
@@ -61,18 +63,13 @@ public class ScanPlaybackHandler {
     }
 
     private void toggleVideoPlayStatus() {
-        if (listenableMediaPlayer.getMediaPlayer().isPresent()) {
-            MediaPlayer mediaPlayer = listenableMediaPlayer.getMediaPlayer().get();
-            switch (mediaPlayer.getStatus()) {
-                case PLAYING:
-                    mediaPlayer.pause();
-                    toast.display(PAUSE_IMAGE);
-                    break;
-                case PAUSED:
-                    mediaPlayer.play();
-                    toast.display(PLAY_IMAGE);
-                    break;
-            }
+        MediaPlayerStatus status = listenableMediaPlayer.getStatus();
+        if (status == MediaPlayerStatus.PLAYING) {
+            listenableMediaPlayer.pause();
+            toast.display(PAUSE_IMAGE);
+        } else if (status == MediaPlayerStatus.PAUSED) {
+            listenableMediaPlayer.play();
+            toast.display(PLAY_IMAGE);
         }
     }
 
@@ -93,34 +90,29 @@ public class ScanPlaybackHandler {
     private void playScan(Scan scan) {
         stopPlayer();
         currentLocationPlaying = scan.getScanEnum();
-        Media video = new Media(scan.getPath().toFile().toURI().toString());
-        MediaPlayer mediaPlayer = new MediaPlayer(video);
-        MediaView videoView = new MediaView(mediaPlayer);
-        listenableMediaPlayer.setMedia(videoView);
-        mainDisplayPane.setCenter(videoView);
+        listenableMediaPlayer.play(scan.getPath());
     }
 
     private void stopPlayer() {
-        listenableMediaPlayer.getMediaPlayer().ifPresent(MediaPlayer::stop);
+        listenableMediaPlayer.stop();
     }
 
     private boolean isScanPlaying(Scan scan) {
-        return listenableMediaPlayer.getMediaPlayer()
-                .map(mp -> mp.getStatus().equals(PLAYING))
-                .orElse(false)
+        return listenableMediaPlayer.isPlaying()
                 && scan.getScanEnum().equals(currentLocationPlaying);
     }
 
     private void registerPlaybackListeners() {
-        listenableMediaPlayer.registerListener(ListenableMediaPlayer.ListenableMediaPlayerEventEnum.ON_READY, ((mediaView) -> {
-            Media video = mediaView.getMediaPlayer().getMedia();
-            mediaView.setPreserveRatio(false);
+        listenableMediaPlayer.registerListener(ListenableMediaPlayer.ListenableMediaPlayerEventEnum.ON_READY, (videoView) -> {
+            Optional<VideoDimensions> videoDimensions = listenableMediaPlayer.getVideoDimensions();
+            int videoWidth = videoDimensions.map(VideoDimensions::getWidth).orElse(DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS);
+            int videoHeight = videoDimensions.map(VideoDimensions::getHeight).orElse(DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS);
             double windowWidth = mainDisplayPane.getWidth();
             double windowHeight = mainDisplayPane.getHeight();
-            mediaView.setFitWidth(calculateWidth(video.getWidth(), windowWidth));
-            mediaView.setFitHeight(calculateHeight(video.getHeight(), windowHeight));
-            listenableMediaPlayer.getMediaPlayer().ifPresent(MediaPlayer::play);
-        }));
+            videoView.setPreserveRatio(false);
+            videoView.setFitWidth(calculateWidth(videoWidth, windowWidth));
+            videoView.setFitHeight(calculateHeight(videoHeight, windowHeight));
+        });
 
         listenableMediaPlayer.registerListener(ListenableMediaPlayer.ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, (mp) -> currentLocationPlaying = null);
     }

@@ -41,7 +41,7 @@ public class EDUS2View extends Application {
     private ListenableMediaPlayer listenablePlayer = new ListenableMediaPlayer();
 
     public static void main(String[] args) {
-        Application.launch(args);
+        Application.launch(EDUS2View.class, args);
     }
 
     public static Image getThumbnailImage() {
