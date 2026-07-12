@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 public class ListenableMediaPlayer {
@@ -36,12 +35,20 @@ public class ListenableMediaPlayer {
         return videoView;
     }
 
-    public Optional<MediaPlayer> getMediaPlayer() {
-        return Optional.of(mediaPlayer);
+    public MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
     }
 
     public void play(Path path) {
         mediaPlayer.media().play(path.toAbsolutePath().toString());
+    }
+
+    public void play() {
+        mediaPlayer.controls().play();
+    }
+
+    public void pause() {
+        mediaPlayer.controls().setPause(true);
     }
 
     public void stop() {

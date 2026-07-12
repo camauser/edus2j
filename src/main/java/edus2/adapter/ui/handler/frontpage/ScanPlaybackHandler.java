@@ -15,7 +15,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import uk.co.caprica.vlcj.player.base.MediaPlayer;
 
 import java.awt.Dimension;
 import java.util.Optional;
@@ -65,15 +64,13 @@ public class ScanPlaybackHandler {
 
     private void toggleVideoPlayStatus() {
         MediaPlayerStatus status = listenableMediaPlayer.getStatus();
-        listenableMediaPlayer.getMediaPlayer().ifPresent(mediaPlayer -> {
-            if (status == MediaPlayerStatus.PLAYING) {
-                mediaPlayer.controls().setPause(true);
-                toast.display(PAUSE_IMAGE);
-            } else if (status == MediaPlayerStatus.PAUSED) {
-                mediaPlayer.controls().play();
-                toast.display(PLAY_IMAGE);
-            }
-        });
+        if (status == MediaPlayerStatus.PLAYING) {
+            listenableMediaPlayer.pause();
+            toast.display(PAUSE_IMAGE);
+        } else if (status == MediaPlayerStatus.PAUSED) {
+            listenableMediaPlayer.play();
+            toast.display(PLAY_IMAGE);
+        }
     }
 
     private void processScanRequest() {
@@ -107,12 +104,7 @@ public class ScanPlaybackHandler {
 
     private void registerPlaybackListeners() {
         listenableMediaPlayer.registerListener(ListenableMediaPlayer.ListenableMediaPlayerEventEnum.ON_READY, (videoView) -> {
-            Optional<MediaPlayer> mediaPlayerOptional = listenableMediaPlayer.getMediaPlayer();
-            if (!mediaPlayerOptional.isPresent()) {
-                return;
-            }
-
-            Dimension videoDimension = mediaPlayerOptional.get().video().videoDimension();
+            Dimension videoDimension = listenableMediaPlayer.getMediaPlayer().video().videoDimension();
             int videoWidth = videoDimension != null ? videoDimension.width : DEFAULT_MINIMUM_VIDEO_WIDTH_IN_PIXELS;
             int videoHeight = videoDimension != null ? videoDimension.height : DEFAULT_MINIMUM_VIDEO_HEIGHT_IN_PIXELS;
             double windowWidth = mainDisplayPane.getWidth();
