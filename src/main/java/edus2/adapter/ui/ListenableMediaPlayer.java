@@ -35,10 +35,6 @@ public class ListenableMediaPlayer {
         return videoView;
     }
 
-    public ImageView getVideoView() {
-        return videoView;
-    }
-
     public Optional<MediaPlayer> getMediaPlayer() {
         if (!mediaLoaded.get()) {
             return Optional.empty();
