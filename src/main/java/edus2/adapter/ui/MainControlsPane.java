@@ -18,6 +18,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.time.Duration;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -33,9 +34,7 @@ public class MainControlsPane extends BorderPane {
     private ListenableMediaPlayer listenablePlayer;
     private ScheduledExecutorService threadPool;
     private Credits credits;
-    private static final int FRAMES_PER_SECOND = 60;
-    private static final int MILLIS_PER_SECOND = 1000;
-    private static final int MILLIS_BETWEEN_FRAMES = MILLIS_PER_SECOND / FRAMES_PER_SECOND;
+    private static final Duration SCAN_PROGRESS_UPDATER_INTERVAL = Duration.ofMillis(100);
 
     @Inject
     public MainControlsPane(Stage stage, BorderPane mainDisplayPane,
@@ -97,7 +96,7 @@ public class MainControlsPane extends BorderPane {
 
         listenablePlayer.registerListener(ListenableMediaPlayer.ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA, (mp) -> playbackElements.getChildren().add(btnClearScreen));
         listenablePlayer.registerListener(ListenableMediaPlayer.ListenableMediaPlayerEventEnum.ON_PLAYING, (mp) -> playbackElements.getChildren().remove(btnClearScreen));
-        threadPool.scheduleAtFixedRate(scanProgressUpdater, 0, MILLIS_BETWEEN_FRAMES, TimeUnit.MILLISECONDS);
+        threadPool.scheduleAtFixedRate(scanProgressUpdater, 0, SCAN_PROGRESS_UPDATER_INTERVAL.toMillis(), TimeUnit.MILLISECONDS);
         playbackElements.setAlignment(Pos.BOTTOM_CENTER);
         return playbackElements;
     }

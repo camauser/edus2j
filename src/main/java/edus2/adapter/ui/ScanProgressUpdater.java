@@ -15,14 +15,17 @@ package edus2.adapter.ui;/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import edus2.domain.MediaPlayerStatus;
 import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
-import uk.co.caprica.vlcj.player.base.MediaPlayer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ScanProgressUpdater extends Thread {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScanProgressUpdater.class);
     private final ListenableMediaPlayer listenableMediaPlayer;
     private final ProgressBar progressBar;
-
+    private boolean anyVideoHasPlayed = false;
 
     public ScanProgressUpdater(ListenableMediaPlayer listenableMediaPlayer, ProgressBar progressBar) {
         this.listenableMediaPlayer = listenableMediaPlayer;
@@ -30,11 +33,15 @@ public class ScanProgressUpdater extends Thread {
     }
 
     public void run() {
-        if (listenableMediaPlayer.isPlaying()) {
+        MediaPlayerStatus status = listenableMediaPlayer.getStatus();
+        if (status == MediaPlayerStatus.PLAYING) {
+            anyVideoHasPlayed = true;
             float position = listenableMediaPlayer.getPosition();
             if (position >= 0) {
                 Platform.runLater(() -> progressBar.setProgress(position));
             }
+        } else if (anyVideoHasPlayed && status == MediaPlayerStatus.STOPPED) {
+            Platform.runLater(() -> progressBar.setProgress(1));
         }
     }
 
