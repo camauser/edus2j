@@ -30,9 +30,8 @@ public class ScanProgressUpdater extends Thread {
     }
 
     public void run() {
-        if (listenableMediaPlayer.getMediaPlayer().isPresent()) {
-            MediaPlayer mediaPlayer = listenableMediaPlayer.getMediaPlayer().get();
-            float position = mediaPlayer.status().position();
+        if (listenableMediaPlayer.isPlaying()) {
+            float position = listenableMediaPlayer.getPosition();
             if (position >= 0) {
                 Platform.runLater(() -> progressBar.setProgress(position));
             }

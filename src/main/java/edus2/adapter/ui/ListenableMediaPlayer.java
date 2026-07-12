@@ -14,14 +14,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ListenableMediaPlayer {
     private final Map<ListenableMediaPlayerEventEnum, Set<MediaPlayerEventHandler>> watcherMap = new HashMap<>();
     private final MediaPlayerFactory mediaPlayerFactory;
     private final EmbeddedMediaPlayer mediaPlayer;
     private final ImageView videoView;
-    private final AtomicBoolean mediaLoaded = new AtomicBoolean(false);
 
     public ListenableMediaPlayer() {
         mediaPlayerFactory = new MediaPlayerFactory();
@@ -37,14 +35,10 @@ public class ListenableMediaPlayer {
     }
 
     public Optional<MediaPlayer> getMediaPlayer() {
-        if (!mediaLoaded.get()) {
-            return Optional.empty();
-        }
         return Optional.of(mediaPlayer);
     }
 
     public void play(Path path) {
-        mediaLoaded.set(true);
         mediaPlayer.media().play(path.toAbsolutePath().toString());
     }
 
@@ -53,14 +47,17 @@ public class ListenableMediaPlayer {
     }
 
     public boolean isPlaying() {
-        return mediaLoaded.get() && mediaPlayer.status().isPlaying();
+        return mediaPlayer.status().isPlaying();
+    }
+
+    public float getPosition() {
+        return mediaPlayer.status().position();
     }
 
     public void clear() {
         stop();
         mediaPlayer.media().reset();
         videoView.setImage(null);
-        mediaLoaded.set(false);
     }
 
     public void registerListener(ListenableMediaPlayerEventEnum eventType, MediaPlayerEventHandler handler) {
@@ -94,7 +91,6 @@ public class ListenableMediaPlayer {
 
             @Override
             public void finished(MediaPlayer mediaPlayer) {
-                mediaLoaded.set(false);
                 callListeners(ListenableMediaPlayerEventEnum.ON_END_OF_MEDIA);
             }
 
